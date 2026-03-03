@@ -1,13 +1,7 @@
-# ai-agent-skills
-AI Agent Skills Collection based on the Skill.md open standard. These skills are developed using the following workflow pattern:
-	1.	Describe the agent in an Agents.md–compliant Markdown document
-	2.	Use OPAL to generate an AI Agent / Assistant description in Markdown and JSON, adding tools such as stored procedures, imported OpenAPI or MCP service bindings, or RDF descriptions of Services and Actions
-	3.	Ask an LLM to generate a SKILL.md bundle (ZIP format) from the JSON- or Markdown-based description
-	4.	Load and test the skills using any AI Agent that supports Skills# ai-agent-skills
+# Using These Skills
 
-AI Agent Skills Collection based on the **Skill.md** open standard. These skills are developed using the following workflow pattern:
+These are standard SKILLS.md folders and ZIP bundles that can be loaded into an AI agent environment that supports Skills. The enablement process is as follows:
 
-1. Describe the agent in an **Agents.md**–compliant Markdown document  
-2. Use **OPAL** to generate an AI Agent / Assistant description in Markdown and JSON, adding tools such as stored procedures, imported OpenAPI or MCP service bindings, or RDF descriptions of Services and Actions  
-3. Ask an LLM to generate a **SKILL.md** bundle (ZIP format) from the JSON- or Markdown-based description  
-4. Load and test the skills using any AI Agent that supports Skills
+1. Ask the host environment to load the skills bundle ZIP (or folder) from its URL (`file:` for local reference) or local path.
+2. Test the skill using the usage example documented in the SKILLS.md file.
+3. Add it to a workflow schedule if the skill needs to run in automated form on a daily, weekly, or monthly basis.
