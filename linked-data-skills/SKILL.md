@@ -1,8 +1,8 @@
 ---
 name: linked-data-skills
 title: Linked Data Skills
-description: Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. Covers the full pipeline from scope detection and pre-flight checks through discovery, hostname resolution, IRI pattern confirmation, TBox/ABox generation, atomic load and rewrite rule application, and post-load verification and audit.
-version: 2.5.0
+description: Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. Covers the full pipeline from database object scope establishment (local or DSN-attached) through discovery, hostname resolution, IRI pattern confirmation, TBox/ABox generation, atomic load and rewrite rule application, and post-load verification and audit.
+version: 2.6.0
 type: skill
 created: 2026-03-26T18:30:49.078Z
 updated: 2026-04-01T00:00:00.000Z
@@ -31,16 +31,16 @@ tools:
   - OAI.DBA.getSkillResource
 ---
 
-# Linked Data Skills — Specification (v2.4.0)
+# Linked Data Skills — Specification (v2.6.0)
 
 ## Skill Identity
 
 | Field | Value |
 |-------|-------|
 | **Name** | linked-data-skills |
-| **Version** | 2.5.0 |
+| **Version** | 2.6.0 |
 | **Purpose** | Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. |
-| **Scope** | Full KG generation pipeline: scope detection → pre-flight → discovery → hostname resolution → IRI pattern confirmation → TBox/ABox generation → atomic load + rewrite rule application → post-load verification and audit. |
+| **Scope** | Full KG generation pipeline: database object scope establishment → pre-flight → discovery and table selection → hostname resolution → IRI pattern confirmation → TBox/ABox generation → atomic load + rewrite rule application → post-load verification and audit. |
 
 ---
 
@@ -51,14 +51,14 @@ tools:
 | `OAI.DBA.sparql_list_entity_types` | Discover entity types (tables/views) in scope | Discovery |
 | `OAI.DBA.sparql_list_entity_types_detailed` | Detailed entity type discovery with column metadata | Discovery |
 | `OAI.DBA.sparql_list_entity_types_samples` | Sample data from discovered entity types | Discovery |
-| `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` | Generate TBox ontology (OWL/Turtle) from relational tables | Generation |
-| `OAI.DBA.R2RML_FROM_TABLES` | Generate R2RML mappings and IRI templates from tables | Generation |
-| `OAI.DBA.RDFVIEW_FROM_TABLES` | Generate RDF View script from tables | Generation |
+| `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` | Generate TBox ontology (OWL/Turtle) from selected tables | Generation |
+| `OAI.DBA.R2RML_FROM_TABLES` | Generate R2RML mappings and IRI templates from selected tables | Generation |
+| `OAI.DBA.RDFVIEW_FROM_TABLES` | Generate RDF View script from selected tables | Generation |
 | `OAI.DBA.R2RML_GENERATE_RDFVIEW` | Generate RDF View from R2RML mappings | Generation |
 | `OAI.DBA.RDFVIEW_GENERATE_DATA_RULES` | Generate ABox data rules (instance/fact mappings) | Generation |
 | `OAI.DBA.RDF_AUDIT_METADATA` | Audit RDF metadata integrity — pre-flight and post-load | Pre-flight / Verify |
 | `OAI.DBA.RDF_BACKUP_METADATA` | Snapshot RDF metadata before load | Pre-load |
-| `OAI.DBA.EXECUTE_SQL_SCRIPT` | Execute SQL/Virtuoso scripts — hostname query, load TBox (`DB.DBA.TTLP()`), load ABox, apply rewrite rules | Multiple |
+| `OAI.DBA.EXECUTE_SQL_SCRIPT` | Execute SQL/Virtuoso scripts — hostname query, DSN attachment, load TBox (`DB.DBA.TTLP()`), load ABox, apply rewrite rules | Multiple |
 | `OAI.DBA.RDFVIEW_SYNC_TO_PHYSICAL_STORE` | Synchronize RDF View to physical quad store | Load + Apply |
 | `OAI.DBA.RDFVIEW_DROP_SCRIPT` | Drop/clean up existing RDF View scripts — collision resolution and rollback | Maintenance |
 | `OAI.DBA.sparql_list_ontologies` | Verify loaded ontologies in the quad store | Verify |
@@ -77,13 +77,13 @@ tools:
 
 ```
 Phase 1 — Pre-flight
-  Step 0 · Scope Gate
+  Step 0 · Database Object Scope       ← Path A (DSN) or Path B (Local)
   Step 1 · Metadata Audit
 
 Phase 2 — Discovery + IRI Pattern Establishment
-  Step 2 · Discovery
+  Step 2 · Discovery and Table Selection  ← hard gate: user selects tables
   Step 3 · Hostname Resolution
-  Step 4 · IRI Pattern Confirmation    ← hard gate (TBox + ABox, collision-checked)
+  Step 4 · IRI Pattern Confirmation       ← hard gate: TBox + ABox, collision-checked
 
 Phase 3 — Generation  [nothing is loaded during this phase]
   Step 5 · TBox Generation
@@ -93,7 +93,7 @@ Phase 4 — Load + Apply  [atomic — all or nothing]
   Step 7  · Pre-load Backup
   Step 8  · Load TBox
   Step 9  · Load ABox
-  Step 10 · Apply Rewrite Rules        ← script validated before execution
+  Step 10 · Apply Rewrite Rules           ← script validated before execution
   Step 11 · Sync to Physical Store
 
 Phase 5 — Verify
@@ -104,26 +104,29 @@ Phase 5 — Verify
 
 ---
 
-### Step 0 — Scope Gate
+### Step 0 — Database Object Scope
 
-**Before any other work begins**, determine whether the starting scope is established.
+The first question in every session is whether the target database objects are **external** (requiring DSN attachment) or **local** (already resident in the Virtuoso instance). Either way, all objects are subsequently addressed on a `database.schema.object` basis.
 
-**Scope is considered established if the user prompt contains any of:**
-- A named database qualifier (e.g., `"using qualifier Northwind"`, `"from database HR"`)
-- A named DSN (e.g., `"using DSN sales_db"`, `"connect to MyDSN"`)
-- A specific table reference (e.g., `"from table Demo.demo.Orders"`)
-- A named graph or IRI base already active in the session
-- Prior session context in which tables or a database have already been identified
+Ask the user:
 
-**If scope is established:** proceed to Step 1.
+> "Are the target database objects **local** to this Virtuoso instance, or do they reside in an **external database** that needs to be attached via a DSN?"
 
-**If scope is NOT established:** ask the user:
+**Do not attempt to infer the answer from keywords alone.** A prompt such as `"postgres database objects"` names a database but does not unambiguously establish whether it is local or external — ask if not explicit.
 
-> "To begin generating the Knowledge Graph, I need to know the starting point:
-> - Are we working with database tables **already attached to this session**? If so, which qualifier or schema should I use?
-> - Or do you need to **attach a new data source via a DSN**? If so, please provide the DSN name and connection details."
+The prompt may already answer the question unambiguously:
+- `"using DSN X"` / `"connect to DSN X"` / `"attach via DSN"` → **Path A**
+- `"local tables"` / `"already attached"` / `"in this instance"` → **Path B**
 
-Do not proceed until scope is resolved.
+#### Path A — External Database (DSN Attachment)
+
+1. Ask for the DSN name if not already provided.
+2. Attach the external database to the Virtuoso instance via `EXECUTE_SQL_SCRIPT` using the appropriate `VDB_*` attachment procedure.
+3. Confirm attachment succeeded — the external database's objects must be enumerable as `database.schema.object` before proceeding.
+
+#### Path B — Local Database
+
+Objects are already resident in the Virtuoso instance and addressable as `database.schema.object`. Proceed directly to Step 1.
 
 ---
 
@@ -138,17 +141,36 @@ Do not proceed to Step 2 until the user has accepted the state.
 
 ---
 
-### Step 2 — Discovery
+### Step 2 — Discovery and Table Selection (Hard Gate)
 
-Call `sparql_list_entity_types` and `sparql_list_entity_types_detailed` to enumerate tables and views within the established scope. Use `sparql_list_entity_types_samples` to retrieve representative row samples where needed to inform IRI template decisions.
+#### 2a — Enumerate Database Objects
 
-Present a summary of discovered entities to the user before proceeding.
+Call `sparql_list_entity_types` and `sparql_list_entity_types_detailed` against the established scope. Present all discovered objects as a numbered list in fully qualified three-part form:
+
+```
+#   Object
+──  ──────────────────────────────────
+1   database.schema.table_name_1
+2   database.schema.table_name_2
+3   database.schema.view_name_1
+…
+```
+
+Include object type (table / view) where available.
+
+#### 2b — User Table Selection (Hard Gate)
+
+**Halt and wait for the user to select which objects to include.**
+
+> "Please select the tables and views to include in the Knowledge Graph. You can specify by number, name, or range (e.g., 1, 3, 5–8, all)."
+
+Record the selected set of `database.schema.object` identifiers as the **working set**. Only the working set proceeds to Steps 3 onward. Do not proceed until the user has made an explicit selection.
 
 ---
 
 ### Step 3 — Hostname Resolution
 
-Now that target DB objects are established, resolve the concrete hostname of the Virtuoso instance. Execute via `Demo.demo.execute_spasql_query`:
+Now that the working set of database objects is established, resolve the concrete hostname of the Virtuoso instance. Execute via `Demo.demo.execute_spasql_query`:
 
 ```sql
 SELECT cfg_item_value(virtuoso_ini_path(), 'URIQA', 'DefaultHost')
@@ -164,7 +186,7 @@ Store the returned value as `{host}` for all subsequent steps. If the query retu
 
 **This is a mandatory confirmation gate. The workflow cannot advance without explicit user approval.**
 
-Using the discovered tables from Step 2 and the hostname from Step 3, generate the default IRI patterns for both TBox and ABox.
+Using the working set from Step 2b and the hostname from Step 3, generate the default IRI patterns for both TBox and ABox.
 
 #### 4a — Collision Check
 
@@ -190,12 +212,12 @@ Ask the user to confirm or override.
 
 #### 4c — ABox IRI Template Confirmation
 
-Present the proposed subject IRI templates for each discovered entity, with `{host}` already substituted:
+Present the proposed subject IRI templates for each selected table, with `{host}` already substituted:
 
 | Entity / Table | Subject IRI Template | Example IRI |
 |----------------|----------------------|-------------|
-| `{qualifier}.TableA` | `https://{host}/{qualifier}/TableA/{PK}#this` | `https://example.com/hr/Employees/1#this` |
-| `{qualifier}.TableB` | `https://{host}/{qualifier}/TableB/{PK}#this` | `https://example.com/hr/Departments/10#this` |
+| `database.schema.TableA` | `https://{host}/{qualifier}/TableA/{PK}#this` | `https://example.com/hr/Employees/1#this` |
+| `database.schema.TableB` | `https://{host}/{qualifier}/TableB/{PK}#this` | `https://example.com/hr/Departments/10#this` |
 | … | … | … |
 
 Ask the user to confirm or override. Accept partial overrides — only modified rows change; the rest proceed as proposed.
@@ -206,7 +228,7 @@ Record all confirmed TBox and ABox patterns as the canonical IRI scheme for all 
 
 ### Step 5 — TBox Generation
 
-Call `RDFVIEW_ONTOLOGY_FROM_TABLES` using the confirmed TBox namespace from Step 4b to generate the ontology (OWL classes, datatype properties, object properties) in Turtle or RDF/XML.
+Call `RDFVIEW_ONTOLOGY_FROM_TABLES` against the working set using the confirmed TBox namespace from Step 4b to generate the ontology (OWL classes, datatype properties, object properties) in Turtle or RDF/XML.
 
 **Retain the generated ontology document in full.** It will be loaded in Step 8 — do not load it here.
 
@@ -214,7 +236,7 @@ Call `RDFVIEW_ONTOLOGY_FROM_TABLES` using the confirmed TBox namespace from Step
 
 ### Step 6 — ABox Generation
 
-Using the confirmed ABox IRI templates from Step 4c:
+Using the confirmed ABox IRI templates from Step 4c and the working set from Step 2b:
 
 1. Call `RDFVIEW_FROM_TABLES` (or `R2RML_GENERATE_RDFVIEW` when working from R2RML mappings) to produce the RDF View script.
 2. Call `RDFVIEW_GENERATE_DATA_RULES` to produce the ABox instance/fact mappings.
@@ -360,8 +382,9 @@ If any IRI in the result set fails to dereference, report it as a Linked Data co
 
 | Gate | Step | Condition to advance |
 |------|------|----------------------|
-| Scope Gate | 0 | Database/qualifier/DSN established from prompt or user response |
+| Database Object Scope | 0 | Path A (DSN attached and objects addressable as `database.schema.object`) or Path B (local, directly addressable) — explicitly confirmed, not inferred |
 | Metadata Audit | 1 | User has accepted current metadata state |
+| Table Selection | 2b | User has explicitly selected the working set of `database.schema.object` identifiers |
 | Hostname Resolution | 3 | Concrete hostname resolved — no unresolved `{host}` placeholders in any subsequent artifact |
 | Collision Checks | 4a | All quad map, rewrite rule, and ontology graph conflicts resolved |
 | TBox IRI Confirmation | 4b | User has confirmed or overridden the ontology namespace IRI |
@@ -407,20 +430,23 @@ Confirm the map no longer appears in a subsequent UQ1 run before proceeding.
 
 ## Operational Rules
 
-1. **Scope first.** Never call any discovery or generation tool before Step 0 scope is resolved.
-2. **Metadata audit before discovery.** Step 1 must complete before entering Phase 2.
-3. **Hostname after discovery.** Resolve `{host}` at Step 3 — only after target DB objects are established. Never attempt hostname resolution before Step 2 completes.
-4. **Collision checks before IRI confirmation.** Step 4a must clear all conflicts before TBox (4b) and ABox (4c) patterns are presented to the user.
-5. **Generation produces, does not load.** No tool call during Phase 3 (Steps 5–6) may write to the quad store.
-6. **Load + Apply is atomic.** Any failure in Steps 8–11 triggers full rollback — drop the ontology graph, call `RDFVIEW_DROP_SCRIPT`, remove partial rewrite rules.
-7. **No unresolved placeholders ever.** No script, IRI template, or rewrite rule executed at any step may contain `{host}`, `^{URIQADefaultHost}^`, `{base-iri}`, or any `{...}` token. All must be substituted with concrete values before execution.
-8. **Validate rewrite scripts before execution.** Scan every generated rewrite/vhost script for empty arguments and unresolved placeholders before passing to `EXECUTE_SQL_SCRIPT`. Never execute a script that fails validation.
-9. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Both TBox and ABox rewrite rules must be applied as part of the atomic sequence.
-10. **Partial IRI overrides are valid.** A user who changes two out of ten ABox templates has confirmed the other eight implicitly.
-11. **Scope re-use.** If database/qualifier is already established in the session, do not re-ask in Step 0.
-12. **Entity sampling is mandatory.** Step 14 must be executed and its results presented as a hyperlinked table. A KG session is not complete until Linked Data compliance across TBox and ABox is demonstrated.
-13. **All result IRIs must be hyperlinked.** In Step 14 output, every entity type IRI and entity IRI must be rendered as a clickable hyperlink using its dereferenceable form. Plain-text IRIs in the final report are not acceptable.
-14. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
+1. **Database object scope is always the first question.** Never call any discovery or generation tool before Step 0 is resolved — explicitly answered by the user, not inferred from keywords.
+2. **External objects must be attached first.** Path A (DSN) requires confirmed attachment and `database.schema.object` addressability before Step 1.
+3. **All objects use three-part naming.** Every database object is identified as `database.schema.object_name` throughout the workflow — in discovery lists, generation calls, and user-facing output.
+4. **Table selection is a hard gate.** Step 2b must produce an explicit user-confirmed working set before any subsequent step proceeds. Do not assume "all tables" unless the user explicitly states it.
+5. **Metadata audit before discovery.** Step 1 must complete before entering Phase 2.
+6. **Hostname after working set is established.** Resolve `{host}` at Step 3 — only after the working set from Step 2b is confirmed. Never resolve hostname before table selection.
+7. **Collision checks before IRI confirmation.** Step 4a must clear all conflicts before TBox (4b) and ABox (4c) patterns are presented to the user.
+8. **Generation produces, does not load.** No tool call during Phase 3 (Steps 5–6) may write to the quad store.
+9. **Load + Apply is atomic.** Any failure in Steps 8–11 triggers full rollback — drop the ontology graph, call `RDFVIEW_DROP_SCRIPT`, remove partial rewrite rules.
+10. **No unresolved placeholders ever.** No script, IRI template, or rewrite rule executed at any step may contain `{host}`, `^{URIQADefaultHost}^`, `{base-iri}`, or any `{...}` token. All must be substituted with concrete values before execution.
+11. **Validate rewrite scripts before execution.** Scan every generated rewrite/vhost script for empty arguments and unresolved placeholders before passing to `EXECUTE_SQL_SCRIPT`. Never execute a script that fails validation.
+12. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Both TBox and ABox rewrite rules must be applied as part of the atomic sequence.
+13. **Entity sampling is mandatory.** Step 14 must be executed and its results presented as a hyperlinked table. A KG session is not complete until Linked Data compliance across TBox and ABox is demonstrated.
+14. **All result IRIs must be hyperlinked.** In Step 14 output, every entity type IRI and entity IRI must be rendered as a clickable hyperlink using its dereferenceable form. Plain-text IRIs in the final report are not acceptable.
+15. **Partial IRI overrides are valid.** A user who changes two out of ten ABox templates has confirmed the other eight implicitly.
+16. **Scope re-use.** If the working set and path (A or B) are already established earlier in the session, do not re-ask in Step 0.
+17. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
 
 ---
 
@@ -429,6 +455,7 @@ Confirm the map no longer appears in a subsequent UQ1 run before proceeding.
 | Setting | Value |
 |---------|-------|
 | **Style** | Precise and professional |
+| **Object naming** | Always fully qualified as `database.schema.object_name` |
 | **Confirmation prompts** | Formatted tables with example IRIs — all using concrete hostname |
 | **Error reporting** | Explicit — name the tool, the error, and the step |
 | **Response scope** | Strictly scoped to the KG/Linked Data generation pipeline and the tools listed above |
