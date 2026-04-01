@@ -1,8 +1,8 @@
 ---
 name: linked-data-skills
 title: Linked Data Skills
-description: Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. Covers the full pipeline from scope detection and ontology generation through IRI template confirmation, ABox data rules, rewrite rule assignment, and physical store synchronization.
-version: 2.1.0
+description: Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. Covers the full pipeline from scope detection and pre-flight checks through TBox/ABox generation, atomic load and rewrite rule application, and post-load verification and audit.
+version: 2.2.0
 type: skill
 created: 2026-03-26T18:30:49.078Z
 updated: 2026-04-01T00:00:00.000Z
@@ -31,41 +31,41 @@ tools:
   - OAI.DBA.getSkillResource
 ---
 
-# Linked Data Skills — Specification (v2.0.0)
+# Linked Data Skills — Specification (v2.2.0)
 
 ## Skill Identity
 
 | Field | Value |
 |-------|-------|
 | **Name** | linked-data-skills |
-| **Version** | 2.0.0 |
+| **Version** | 2.2.0 |
 | **Purpose** | Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. |
-| **Scope** | Full KG generation pipeline: scope detection → discovery → TBox generation → ontology loading → IRI template confirmation → RDF View scripting → ABox data rules + rewrite rule assignment → physical store sync → audit. |
+| **Scope** | Full KG generation pipeline: scope detection → pre-flight checks → TBox/ABox generation → atomic load + rewrite rule application → post-load verification and audit. |
 
 ---
 
 ## Tools Reference
 
-| Tool | Role | Workflow Step |
-|------|------|---------------|
-| `OAI.DBA.sparql_list_entity_types` | Discover entity types (tables/views) in scope | Step 1 |
-| `OAI.DBA.sparql_list_entity_types_detailed` | Detailed entity type discovery with column metadata | Step 1 |
-| `OAI.DBA.sparql_list_entity_types_samples` | Sample data from discovered entity types | Step 1 |
-| `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` | Generate TBox ontology (OWL/Turtle) from relational tables | Step 2 |
-| `OAI.DBA.EXECUTE_SQL_SCRIPT` | Execute SQL/Virtuoso scripts — used to load ontology (`DB.DBA.TTLP()`), apply rewrite rules, and run generated view scripts | Steps 3, 7, 8 |
-| `OAI.DBA.sparql_list_ontologies` | Verify loaded ontologies in the quad store | Step 4 |
-| `OAI.DBA.R2RML_FROM_TABLES` | Generate R2RML mappings and IRI templates from tables | Step 5 |
-| `OAI.DBA.RDFVIEW_FROM_TABLES` | Generate RDF View script from tables | Step 6 |
-| `OAI.DBA.R2RML_GENERATE_RDFVIEW` | Generate RDF View from R2RML mappings | Step 6 |
-| `OAI.DBA.RDFVIEW_GENERATE_DATA_RULES` | Generate ABox data rules (instance/fact mappings) | Step 7 |
-| `OAI.DBA.RDFVIEW_SYNC_TO_PHYSICAL_STORE` | Synchronize RDF View to physical quad store | Step 8 |
-| `OAI.DBA.RDF_AUDIT_METADATA` | Audit RDF metadata integrity post-sync | Step 9 |
-| `OAI.DBA.RDF_BACKUP_METADATA` | Back up RDF metadata | Step 9 |
-| `OAI.DBA.RDFVIEW_DROP_SCRIPT` | Drop/clean up existing RDF View scripts | Maintenance |
-| `OAI.DBA.sparqlRemoteQuery` | Execute SPARQL against remote endpoints | Query / Verification |
-| `Demo.demo.execute_spasql_query` | Execute SPASQL (SQL + SPARQL hybrid) queries | Query / Verification |
-| `DB.DBA.graphqlQuery` | Execute GraphQL queries against Virtuoso | Query / Verification |
-| `DB.DBA.graphqlEndpointQuery` | Execute GraphQL against a specific endpoint | Query / Verification |
+| Tool | Role | Workflow Phase |
+|------|------|----------------|
+| `OAI.DBA.sparql_list_entity_types` | Discover entity types (tables/views) in scope | Generation |
+| `OAI.DBA.sparql_list_entity_types_detailed` | Detailed entity type discovery with column metadata | Generation |
+| `OAI.DBA.sparql_list_entity_types_samples` | Sample data from discovered entity types | Generation |
+| `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` | Generate TBox ontology (OWL/Turtle) from relational tables | Generation |
+| `OAI.DBA.R2RML_FROM_TABLES` | Generate R2RML mappings and IRI templates from tables | Generation |
+| `OAI.DBA.RDFVIEW_FROM_TABLES` | Generate RDF View script from tables | Generation |
+| `OAI.DBA.R2RML_GENERATE_RDFVIEW` | Generate RDF View from R2RML mappings | Generation |
+| `OAI.DBA.RDFVIEW_GENERATE_DATA_RULES` | Generate ABox data rules (instance/fact mappings) | Generation |
+| `OAI.DBA.RDF_AUDIT_METADATA` | Audit RDF metadata integrity — pre-flight and post-load | Pre-flight / Verify |
+| `OAI.DBA.RDF_BACKUP_METADATA` | Snapshot RDF metadata before load | Pre-load |
+| `OAI.DBA.EXECUTE_SQL_SCRIPT` | Execute SQL/Virtuoso scripts — load TBox (`DB.DBA.TTLP()`), load ABox, apply rewrite rules | Load + Apply |
+| `OAI.DBA.RDFVIEW_SYNC_TO_PHYSICAL_STORE` | Synchronize RDF View to physical quad store | Load + Apply |
+| `OAI.DBA.RDFVIEW_DROP_SCRIPT` | Drop/clean up existing RDF View scripts — used in collision resolution and rollback | Maintenance |
+| `OAI.DBA.sparql_list_ontologies` | Verify loaded ontologies in the quad store | Verify |
+| `OAI.DBA.sparqlRemoteQuery` | Execute SPARQL against remote endpoints | Query / Verify |
+| `Demo.demo.execute_spasql_query` | Execute SPASQL (SQL + SPARQL hybrid) queries | Query / Verify |
+| `DB.DBA.graphqlQuery` | Execute GraphQL queries against Virtuoso | Query / Verify |
+| `DB.DBA.graphqlEndpointQuery` | Execute GraphQL against a specific endpoint | Query / Verify |
 | `OAI.DBA.SPONGE_URL` | Fetch and ingest external URLs into the quad store | Data ingestion |
 | `OAI.DBA.chatPromptComplete` | LLM-mediated fallback for complex reasoning tasks | Fallback |
 | `OAI.DBA.getAssistantConfiguration` | Retrieve assistant/session configuration | Session |
@@ -75,9 +75,36 @@ tools:
 
 ## Session Workflow
 
+The pipeline is divided into four phases. Generation produces all artifacts without loading anything. Load + Apply is an atomic sequence — if any step fails, the entire phase rolls back. Verify and Audit confirm the outcome.
+
+```
+Phase 1 — Pre-flight
+  Step 0 · Scope Detection Gate
+  Step 1 · Pre-flight Checks (metadata audit + collision detection)
+
+Phase 2 — Generation  [nothing is loaded during this phase]
+  Step 2 · Discovery
+  Step 3 · TBox Generation
+  Step 4 · IRI Template Confirmation       ← hard gate
+  Step 5 · ABox Generation
+
+Phase 3 — Load + Apply  [atomic — all or nothing]
+  Step 6 · Pre-load Backup
+  Step 7 · Load TBox
+  Step 8 · Load ABox
+  Step 9 · Apply Rewrite Rules
+  Step 10 · Sync to Physical Store
+
+Phase 4 — Verify
+  Step 11 · Post-load Verification
+  Step 12 · Audit
+```
+
+---
+
 ### Step 0 — Scope Detection Gate
 
-**Before any generation work begins**, determine whether the starting scope is established.
+**Before any other work begins**, determine whether the starting scope is established.
 
 **Scope is considered established if the user prompt contains any of:**
 - A named database qualifier (e.g., `"using qualifier Northwind"`, `"from database HR"`)
@@ -86,7 +113,7 @@ tools:
 - A named graph or IRI base already active in the session
 - Prior session context in which tables or a database have already been identified
 
-**If scope is established:** proceed directly to Step 1.
+**If scope is established:** proceed to Step 1.
 
 **If scope is NOT established:** ask the user:
 
@@ -94,45 +121,57 @@ tools:
 > - Are we working with database tables **already attached to this session**? If so, which qualifier or schema should I use?
 > - Or do you need to **attach a new data source via a DSN**? If so, please provide the DSN name and connection details."
 
-Do not proceed until the user's response resolves the scope to either an existing qualifier/schema or a confirmed DSN attachment.
+Do not proceed until scope is resolved to either an existing qualifier/schema or a confirmed DSN attachment.
 
 ---
 
-### Step 1 — Discovery
+### Step 1 — Pre-flight Checks
 
-Use `sparql_list_entity_types` and `sparql_list_entity_types_detailed` to enumerate tables and views within the established scope. Use `sparql_list_entity_types_samples` to retrieve representative row samples where needed to inform IRI template decisions.
+Run all three checks before any generation work begins. Present a consolidated report to the user and require a decision before continuing.
+
+#### 1a — Metadata Audit
+
+Call `RDF_AUDIT_METADATA`. If the audit reports inconsistencies or dirty state, inform the user and offer:
+- Proceed anyway
+- Clean up first (user-directed)
+- Abort
+
+#### 1b — Quad Map Collision Detection
+
+Run **UQ1** (see Utility Queries) to list all existing quad maps. Compare against the intended quad map IRI for this session. If a collision is found:
+
+> "A quad map with IRI `<{proposed-qm-iri}>` already exists. Choose an action:
+> 1. **Drop it** — `SPARQL DROP QUAD MAP <{proposed-qm-iri}>` will be executed before proceeding
+> 2. **Rename** — provide a new IRI for the quad map to be created
+> 3. **Abort** — stop here"
+
+Execute the chosen action and confirm resolution (re-run UQ1) before continuing.
+
+#### 1c — Ontology Graph Collision Detection
+
+Call `sparql_list_ontologies`. If an ontology graph matching the intended `{base-iri}/ontology` IRI already exists, inform the user and offer the same three options (drop / rename / abort).
+
+**Do not proceed to Step 2 until all three checks pass or the user has explicitly accepted the state.**
+
+---
+
+### Step 2 — Discovery
+
+Call `sparql_list_entity_types` and `sparql_list_entity_types_detailed` to enumerate tables and views within the established scope. Use `sparql_list_entity_types_samples` to retrieve representative row samples where needed to inform IRI template decisions.
 
 Present a summary of discovered entities to the user before proceeding.
 
 ---
 
-### Step 2 — TBox Generation
+### Step 3 — TBox Generation
 
 Call `RDFVIEW_ONTOLOGY_FROM_TABLES` against the discovered tables to generate the TBox ontology (OWL classes, datatype properties, object properties) in Turtle or RDF/XML.
 
-Retain the generated ontology document and its intended named graph IRI for Step 3.
+**Retain the generated ontology document in full.** It will be loaded in Step 7 — do not load it here.
 
 ---
 
-### Step 3 — Ontology Loading
-
-Load the generated ontology into the Virtuoso quad store using `EXECUTE_SQL_SCRIPT` with `DB.DBA.TTLP()` (or `DB.DBA.RDF_LOAD_RDFXML()` for RDF/XML output) into a session-scoped named graph derived from the IRI base, e.g.:
-
-```
-DB.DBA.TTLP('<ontology-turtle>', '', '<{base-iri}/ontology>', 0);
-```
-
-**This step is mandatory.** Do not proceed to Step 4 until the load call returns without error.
-
----
-
-### Step 4 — Ontology Load Verification
-
-Call `sparql_list_ontologies` and confirm the ontology IRI from Step 2 appears in the result. If it does not appear, re-attempt the load or report the error to the user before continuing.
-
----
-
-### Step 5 — IRI Template Confirmation (Hard Gate)
+### Step 4 — IRI Template Confirmation (Hard Gate)
 
 **This is a mandatory confirmation gate. The workflow cannot advance without explicit user approval.**
 
@@ -154,36 +193,83 @@ Accept partial overrides — only the rows the user modifies are changed; the re
 
 ---
 
-### Step 6 — RDF View Script Generation
+### Step 5 — ABox Generation
 
-Using the confirmed IRI templates from Step 5, call `RDFVIEW_FROM_TABLES` (or `R2RML_GENERATE_RDFVIEW` when working from the R2RML mappings directly) to produce the RDF View script.
+Using the confirmed IRI templates from Step 4:
 
-Present the generated script to the user for review before execution.
+1. Call `RDFVIEW_FROM_TABLES` (or `R2RML_GENERATE_RDFVIEW` when working from R2RML mappings) to produce the RDF View script.
+2. Call `RDFVIEW_GENERATE_DATA_RULES` to produce the ABox instance/fact mappings.
+
+**Retain both artifacts in full.** Neither is loaded here — loading happens in Phase 3.
+
+Present the generated scripts to the user for review before proceeding.
 
 ---
 
-### Step 7 — ABox Data Rules + Rewrite Rule Assignment
+### Step 6 — Pre-load Backup
 
-Call `RDFVIEW_GENERATE_DATA_RULES` to produce the ABox instance/fact mappings.
+Call `RDF_BACKUP_METADATA` to take a snapshot of the current RDF metadata state. This provides a restore point if Phase 3 fails partway through.
 
-**In the same session step**, generate and apply URL rewrite rules via `EXECUTE_SQL_SCRIPT` covering two namespaces:
+Confirm the backup completed successfully before proceeding to Step 7.
 
-- **TBox rewrite rules** — map ontology IRIs (e.g., `{base-iri}/ontology#ClassName`) to the ontology document loaded in Step 3
+---
+
+### Step 7 — Load TBox
+
+Load the ontology generated in Step 3 into the Virtuoso quad store using `EXECUTE_SQL_SCRIPT` with `DB.DBA.TTLP()` into the session-scoped ontology named graph:
+
+```sql
+DB.DBA.TTLP('<ontology-turtle>', '', '<{base-iri}/ontology>', 0);
+```
+
+**This is the start of the atomic Load + Apply sequence.** If this step fails, do not proceed — report the error and offer rollback.
+
+---
+
+### Step 8 — Load ABox
+
+Apply the RDF View script and ABox data rules generated in Step 5 via `EXECUTE_SQL_SCRIPT`.
+
+If this step fails, execute rollback:
+1. Drop the ontology graph loaded in Step 7
+2. Call `RDFVIEW_DROP_SCRIPT` to remove any partially applied view script
+3. Report the error and the rollback outcome to the user
+
+---
+
+### Step 9 — Apply Rewrite Rules
+
+Generate and apply URL rewrite rules via `EXECUTE_SQL_SCRIPT` covering two namespaces:
+
+- **TBox rewrite rules** — map ontology IRIs (e.g., `{base-iri}/ontology#ClassName`) to the ontology document loaded in Step 7
 - **ABox rewrite rules** — map instance IRIs (e.g., `{base-iri}/Orders/{OrderID}`) to a SPARQL DESCRIBE endpoint so each IRI dereferences to its RDF description
 
-Both rule sets must be applied before Step 8. Confirm with the user that rewrite rules have been registered successfully.
+If this step fails, execute the same rollback as Step 8 and additionally remove any partially registered rewrite rules.
 
 ---
 
-### Step 8 — Sync to Physical Store
+### Step 10 — Sync to Physical Store
 
-Call `RDFVIEW_SYNC_TO_PHYSICAL_STORE` to materialize the RDF View into the physical quad store, making triples queryable via SPARQL.
+Call `RDFVIEW_SYNC_TO_PHYSICAL_STORE` to materialize the RDF View into the physical quad store.
+
+Successful completion of this step closes the atomic Load + Apply sequence.
 
 ---
 
-### Step 9 — Audit
+### Step 11 — Post-load Verification
 
-Call `RDF_AUDIT_METADATA` to verify integrity of the generated metadata. Optionally call `RDF_BACKUP_METADATA` to persist a backup of the session state.
+Run the following in sequence and confirm each:
+
+1. `sparql_list_ontologies` — confirm the ontology IRI from Step 3 is present
+2. **UQ1** — confirm the new quad map IRI appears and no unintended maps were created
+
+Report any discrepancies to the user before proceeding.
+
+---
+
+### Step 12 — Audit
+
+Call `RDF_AUDIT_METADATA` to verify integrity of the fully loaded state.
 
 Report a summary to the user:
 - Named graph IRI
@@ -198,10 +284,12 @@ Report a summary to the user:
 
 | Gate | Step | Condition to advance |
 |------|------|----------------------|
-| Scope Gate | 0 | Database/qualifier/DSN is established — from prompt or user response |
-| Ontology Load | 3–4 | Ontology confirmed present in `sparql_list_ontologies` output |
-| IRI Template Confirmation | 5 | User has explicitly confirmed or overridden all proposed templates |
-| Rewrite Rules | 7 | Both TBox and ABox rewrite rules confirmed applied before sync |
+| Scope Gate | 0 | Database/qualifier/DSN established from prompt or user response |
+| Pre-flight | 1 | Metadata audit passed; all collision checks resolved by user decision |
+| IRI Template Confirmation | 4 | User has explicitly confirmed or overridden all proposed templates |
+| Pre-load Backup | 6 | Backup confirmed before any loading begins |
+| Load + Apply atomic boundary | 7–10 | All four steps succeed; any failure triggers full rollback |
+| Post-load Verification | 11 | Ontology IRI and quad map IRI confirmed present after load |
 
 ---
 
@@ -209,9 +297,7 @@ Report a summary to the user:
 
 ### UQ1 — List Existing Quad Maps
 
-**Use whenever:** a list of existing quad maps is required — specifically to:
-- Detect naming collisions before creating a new RDF View
-- Identify quad maps available for cleanup
+**Use at:** Step 1b (collision detection) and Step 11 (post-load verification).
 
 ```sparql
 SPARQL
@@ -228,8 +314,6 @@ WHERE {
 
 Execute via `Demo.demo.execute_spasql_query`. Present results as a numbered list of quad map IRIs.
 
-**Collision check (Step 0 / Step 6):** Before generating or applying an RDF View script, run UQ1 and compare the proposed quad map IRI against the results. If a match is found, warn the user and ask whether to reuse, rename, or drop the existing map.
-
 **Cleanup:** To drop an existing quad map, execute via `EXECUTE_SQL_SCRIPT`:
 
 ```sql
@@ -243,12 +327,14 @@ Confirm the map no longer appears in a subsequent UQ1 run before proceeding.
 ## Operational Rules
 
 1. **Scope first.** Never call any discovery or generation tool before Step 0 scope is resolved.
-2. **No silent defaults.** Do not assume an IRI base, qualifier, or template — always surface the proposed value and wait for confirmation at the designated gate.
-3. **Ontology before ABox.** Never generate data rules (Step 7) if the ontology load (Step 3–4) has not been verified.
-4. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Rewrite rules must be applied in the same session step as ABox generation.
-5. **Partial overrides are valid.** At the IRI template gate, a user who changes two out of ten templates has confirmed the other eight implicitly — proceed accordingly.
-6. **Scope re-use.** If a database/qualifier is already established earlier in the session, do not re-ask in Step 0.
-7. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
+2. **Pre-flight is mandatory.** Steps 1a, 1b, and 1c must all be executed and resolved before entering Phase 2.
+3. **Generation produces, does not load.** No tool call during Phase 2 (Steps 2–5) may write to the quad store.
+4. **Load + Apply is atomic.** Any failure in Steps 7–10 triggers full rollback — drop the ontology graph, call `RDFVIEW_DROP_SCRIPT`, remove partial rewrite rules.
+5. **No silent defaults.** Do not assume an IRI base, qualifier, or template — always surface proposed values and wait for confirmation at designated gates.
+6. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Both TBox and ABox rewrite rules must be applied as part of the atomic sequence.
+7. **Partial IRI overrides are valid.** A user who changes two out of ten templates has confirmed the other eight implicitly.
+8. **Scope re-use.** If database/qualifier is already established in the session, do not re-ask in Step 0.
+9. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
 
 ---
 
