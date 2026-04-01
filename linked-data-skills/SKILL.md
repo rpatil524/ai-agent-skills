@@ -2,7 +2,7 @@
 name: linked-data-skills
 title: Linked Data Skills
 description: Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. Covers the full pipeline from scope detection and pre-flight checks through TBox/ABox generation, atomic load and rewrite rule application, and post-load verification and audit.
-version: 2.2.0
+version: 2.3.0
 type: skill
 created: 2026-03-26T18:30:49.078Z
 updated: 2026-04-01T00:00:00.000Z
@@ -38,7 +38,7 @@ tools:
 | Field | Value |
 |-------|-------|
 | **Name** | linked-data-skills |
-| **Version** | 2.2.0 |
+| **Version** | 2.3.0 |
 | **Purpose** | Generate and manage RDF Views, Knowledge Graphs, and Linked Data from relational database tables using Virtuoso stored procedures. |
 | **Scope** | Full KG generation pipeline: scope detection → pre-flight checks → TBox/ABox generation → atomic load + rewrite rule application → post-load verification and audit. |
 
@@ -175,12 +175,26 @@ Call `RDFVIEW_ONTOLOGY_FROM_TABLES` against the discovered tables to generate th
 
 **This is a mandatory confirmation gate. The workflow cannot advance without explicit user approval.**
 
-From the R2RML mappings produced by `R2RML_FROM_TABLES`, extract and present the proposed IRI templates as a formatted table:
+#### 4a — Resolve Hostname
+
+Before presenting any IRI templates, resolve the actual hostname of the Virtuoso instance. Execute via `Demo.demo.execute_spasql_query`:
+
+```sql
+SELECT cfg_item_value(virtuoso_ini_path(), 'URIQA', 'DefaultHost')
+```
+
+Use the returned value as `{host}` in all IRI templates and rewrite rule scripts for this session. **Do not carry forward any unresolved `{host}`, `^{URIQADefaultHost}^`, or `{base-iri}` placeholder** — every IRI presented to the user and used in generated scripts must contain the concrete hostname.
+
+If the query returns null or empty, ask the user to provide the hostname explicitly before continuing.
+
+#### 4b — Present and Confirm Templates
+
+From the R2RML mappings produced by `R2RML_FROM_TABLES`, extract and present the proposed IRI templates as a formatted table, with `{host}` already substituted:
 
 | Entity / Table | Subject IRI Template | Example IRI |
 |----------------|----------------------|-------------|
-| `Demo.demo.Orders` | `{base-iri}/Orders/{OrderID}` | `https://example.org/Orders/1001` |
-| `Demo.demo.Customers` | `{base-iri}/Customers/{CustomerID}` | `https://example.org/Customers/ALFKI` |
+| `Demo.demo.Orders` | `https://{host}/Orders/{OrderID}` | `https://example.org/Orders/1001` |
+| `Demo.demo.Customers` | `https://{host}/Customers/{CustomerID}` | `https://example.org/Customers/ALFKI` |
 | … | … | … |
 
 Then ask:
@@ -241,10 +255,20 @@ If this step fails, execute rollback:
 
 Generate and apply URL rewrite rules via `EXECUTE_SQL_SCRIPT` covering two namespaces:
 
-- **TBox rewrite rules** — map ontology IRIs (e.g., `{base-iri}/ontology#ClassName`) to the ontology document loaded in Step 7
-- **ABox rewrite rules** — map instance IRIs (e.g., `{base-iri}/Orders/{OrderID}`) to a SPARQL DESCRIBE endpoint so each IRI dereferences to its RDF description
+- **TBox rewrite rules** — map ontology IRIs (e.g., `https://{host}/schemas/{qualifier}#ClassName`) to the ontology document loaded in Step 7
+- **ABox rewrite rules** — map instance IRIs (e.g., `https://{host}/{qualifier}/Orders/{OrderID}`) to a SPARQL DESCRIBE endpoint so each IRI dereferences to its RDF description
 
-If this step fails, execute the same rollback as Step 8 and additionally remove any partially registered rewrite rules.
+#### Script Validation (mandatory before execution)
+
+Before passing the generated script to `EXECUTE_SQL_SCRIPT`, scan it for:
+
+1. **Unresolved placeholders** — any remaining `{host}`, `{base-iri}`, `^{URIQADefaultHost}^`, or `{...}` tokens. If found, substitute using the hostname resolved in Step 4a. Do not execute until all tokens are replaced.
+2. **Empty or NULL arguments** — any parameter position containing an empty string `''` or back-to-back commas `, ,` where a value is expected. If found, report the specific line and parameter, resolve before executing.
+3. **Confirm all arguments** — verify each `DB.DBA.URLREWRITE_CREATE_RULELIST` and `DB.DBA.VHOST_DEFINE` call has all required non-null parameters filled.
+
+Only execute the script after it passes all three checks. If any check cannot be resolved automatically, present the problematic lines to the user for manual correction before proceeding.
+
+If execution fails despite validation, execute the same rollback as Step 8 and additionally remove any partially registered rewrite rules.
 
 ---
 
@@ -286,8 +310,10 @@ Report a summary to the user:
 |------|------|----------------------|
 | Scope Gate | 0 | Database/qualifier/DSN established from prompt or user response |
 | Pre-flight | 1 | Metadata audit passed; all collision checks resolved by user decision |
-| IRI Template Confirmation | 4 | User has explicitly confirmed or overridden all proposed templates |
+| Hostname Resolution | 4a | Concrete hostname resolved from `URIQADefaultHost` or user input — no unresolved `{host}` placeholders |
+| IRI Template Confirmation | 4b | User has explicitly confirmed or overridden all proposed templates |
 | Pre-load Backup | 6 | Backup confirmed before any loading begins |
+| Rewrite Script Validation | 9 | No unresolved placeholders or empty arguments before execution |
 | Load + Apply atomic boundary | 7–10 | All four steps succeed; any failure triggers full rollback |
 | Post-load Verification | 11 | Ontology IRI and quad map IRI confirmed present after load |
 
@@ -331,10 +357,12 @@ Confirm the map no longer appears in a subsequent UQ1 run before proceeding.
 3. **Generation produces, does not load.** No tool call during Phase 2 (Steps 2–5) may write to the quad store.
 4. **Load + Apply is atomic.** Any failure in Steps 7–10 triggers full rollback — drop the ontology graph, call `RDFVIEW_DROP_SCRIPT`, remove partial rewrite rules.
 5. **No silent defaults.** Do not assume an IRI base, qualifier, or template — always surface proposed values and wait for confirmation at designated gates.
-6. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Both TBox and ABox rewrite rules must be applied as part of the atomic sequence.
-7. **Partial IRI overrides are valid.** A user who changes two out of ten templates has confirmed the other eight implicitly.
-8. **Scope re-use.** If database/qualifier is already established in the session, do not re-ask in Step 0.
-9. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
+6. **Hostname must be concrete.** No script, IRI template, or rewrite rule may contain an unresolved `{host}`, `^{URIQADefaultHost}^`, or `{base-iri}` token at execution time. Resolve via `cfg_item_value()` at Step 4a or ask the user.
+7. **Validate rewrite scripts before execution.** Scan every generated rewrite/vhost script for empty arguments and unresolved placeholders before passing to `EXECUTE_SQL_SCRIPT`. Never execute a script that fails validation.
+8. **Rewrite rules are not optional.** Linked Data without dereferenceable IRIs is incomplete. Both TBox and ABox rewrite rules must be applied as part of the atomic sequence.
+9. **Partial IRI overrides are valid.** A user who changes two out of ten templates has confirmed the other eight implicitly.
+10. **Scope re-use.** If database/qualifier is already established in the session, do not re-ask in Step 0.
+11. **Tool fallback.** If a primary tool call fails, report the error clearly before attempting `chatPromptComplete` as a fallback. Do not silently substitute.
 
 ---
 
