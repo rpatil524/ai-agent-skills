@@ -12,6 +12,33 @@ Use this file only when you need exact execution routing guidance.
 
 If the user explicitly asks for a protocol, honor that request instead of the default order.
 
+---
+
+## Authentication
+
+Both REST and MCP endpoints support **OAuth**. If a tool call or REST request returns 401, 403, or 500 (which may indicate an unauthenticated session), initiate the OAuth flow before retrying.
+
+### OAuth Flow — MCP
+
+| Instance | Authenticate via |
+|----------|-----------------|
+| `linkeddata.uriburner.com` | Call `mcp__claude_ai_URIBurner__authenticate` |
+
+This tool starts the OAuth flow and returns an authorization URL. Share the URL with the user. Once the user completes authorization in their browser, the MCP tools become available automatically.
+
+### OAuth Flow — REST
+
+The REST endpoints (`/chat/functions/*`) also support OAuth. If REST calls return 401/403/500 and MCP OAuth is not available, direct the user to authenticate via the MCP flow above — successful MCP OAuth also covers REST on the same instance.
+
+### When to trigger authentication
+
+- Any tool call or REST request returns 401, 403, or unexpected 500
+- User explicitly asks to authenticate or switch accounts
+
+Do not retry a failed call more than once before triggering the OAuth flow.
+
+---
+
 ## Direct curl
 
 Pattern:
@@ -40,8 +67,7 @@ Endpoints:
 - SSE: `https://linkeddata.uriburner.com/chat/mcp/sse`
 
 Guidance:
-- Treat MCP as requiring authentication unless the client is already configured.
-- From this environment, both MCP endpoints returned `401 Unauthorized` on March 6, 2026.
+- Treat MCP as requiring authentication unless the client is already configured. See Authentication section above.
 
 ## chatPromptComplete
 
@@ -50,7 +76,7 @@ Endpoint:
 
 Guidance:
 - Use for authenticated LLM-mediated execution.
-- From this environment, unauthenticated calls failed on March 6, 2026 because no API key was supplied.
+- See Authentication section above.
 
 ## OPAL Agent Routing
 
