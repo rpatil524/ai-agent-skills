@@ -7,14 +7,14 @@ description: >
   opening announcement, ask local-vs-DSN — no tool call until reply. (2) Call
   ADM.DBA.database_schema_objects({type:"TABLES",qualifier:X}) — NEVER call
   database_remote_datasources or EXECUTE_SQL_SCRIPT for enumeration. (3) Resolve
-  hostname+protocol via cfg_item_value(), confirm iri_path_segment + 4 IRIs, wait for CONFIRM —
-  DO NOT call any generation tool before reply. (4) Generate TBox+ABox views, deploy rewrite
+  hostname+protocol via cfg_item_value(), present IRI pattern table (ABox graph, TBox namespace,
+  entity IRI template, rewrite paths) — MANDATORY CONFIRM before any generation tool. (4) Generate TBox+ABox views, deploy rewrite
   rules, audit on error and after success. (5) Verify with hyperlinked entity samples.
   TOOL HIERARCHY: read queries use Demo.demo.execute_spasql_query; writes use EXECUTE_SQL_SCRIPT.
-version: 3.0.0
+version: 3.1.0
 type: skill
 created: 2026-03-26T18:30:49.078Z
-updated: 2026-04-02T12:00:00.000Z
+updated: 2026-04-03T00:00:00.000Z
 tools:
   - OAI.DBA.getSkillResource
   - ADM.DBA.database_schema_objects
@@ -70,15 +70,15 @@ After the user selects tables, call `Demo.demo.execute_spasql_query` for `Defaul
 
 **Do not proceed to Gate 4 without concrete `{protocol}` and `{host}` values.**
 
-### Gate 4 — Confirm IRI templates (NO GENERATION TOOL YET)
+### Gate 4 — Present IRI patterns and await CONFIRM (NO GENERATION TOOL YET)
 
-Present the four IRI patterns derived from `iri_path_segment`. Wait for the user to reply **CONFIRM** or **OVERRIDE**.
+Present the IRI pattern table (Knowledge Graph IRI, Ontology Namespace, Entity IRI template, rewrite paths) derived from `{protocol}`, `{host}`, and `iri_path_segment`. Wait for the user to reply **CONFIRM** or **OVERRIDE**.
 
-**Selecting tables is NOT authorization to generate scripts. The ONLY authorization to call `RDFVIEW_FROM_TABLES`, `RDFVIEW_ONTOLOGY_FROM_TABLES`, or `RDFVIEW_GENERATE_DATA_RULES` is an explicit "CONFIRM" reply at this gate.**
+**This gate is mandatory. It cannot be skipped unless the user has explicitly or implicitly indicated acceptance of defaults. Selecting tables is NOT authorization to generate scripts. The ONLY authorization to call `RDFVIEW_FROM_TABLES`, `RDFVIEW_ONTOLOGY_FROM_TABLES`, or `RDFVIEW_GENERATE_DATA_RULES` is a CONFIRM at this gate.**
 
 ### Gate 5 — Generate, deploy, verify
 
-Only after Gate 4 CONFIRM: generate TBox and ABox views, deploy rewrite rules, audit, verify with entity samples.
+Only after Gate 4 CONFIRM: generate Ontology and Knowledge Graph views, deploy rewrite rules, audit, verify with entity samples.
 
 ---
 
@@ -150,7 +150,7 @@ Only after Gate 4 CONFIRM: generate TBox and ABox views, deploy rewrite rules, a
 >
 > **Step 1** — Determine the database objects to use
 > **Step 2** — Confirm IRI templates before any script is generated
-> **Step 3** — Generate TBox and ABox views
+> **Step 3** — Generate Ontology and Knowledge Graph views
 > **Step 4** — Deploy Linked Data via rewrite rules
 > **Step 5** — Verify with hyperlinked entity samples
 >
@@ -278,41 +278,43 @@ Store `{protocol}` and `{host}`. All IRIs from this point must use `{protocol}:/
 
 Resolve all conflicts before presenting to the user.
 
-#### 2c — Derive and present IRI patterns
+#### 2c — Present IRI patterns and await CONFIRM
 
-Default `iri_path_segment` = `{qualifier}`. Derive:
+⛔ **This step is mandatory and must not be skipped. Do not proceed to Step 3 unless the user has explicitly replied CONFIRM, or has explicitly or implicitly indicated acceptance of the defaults (e.g., "use defaults", "proceed", "looks good").**
+
+Default `iri_path_segment` = `{qualifier}` (single path component, no `/` characters).
+
+Using the concrete `{protocol}` and `{host}` values resolved in 2a, present the following table — substituting actual values, no unresolved placeholders:
 
 | Artifact | IRI |
 |----------|-----|
 | `iri_path_segment` | `{iri_path_segment}` |
-| RDF View (ABox) Graph | `{protocol}://{host}/data/{iri_path_segment}` |
-| Ontology (TBox) Graph | `{protocol}://{host}/ontology/{iri_path_segment}` |
-| Ontology Namespace | `{protocol}://{host}/schema/{iri_path_segment}#` |
-| Example class IRI | `{protocol}://{host}/schema/{iri_path_segment}#TableName` |
-| Example entity IRI | `{protocol}://{host}/data/{iri_path_segment}/TableName/1#this` |
-
-Use concrete `{host}` and `{protocol}` values — no unresolved placeholders.
+| Knowledge Graph IRI | `{protocol}://{host}/{iri_path_segment}#` |
+| Ontology Namespace | `{protocol}://{host}/schemas/{iri_path_segment}/` |
+| Entity IRI template | `{protocol}://{host}/{iri_path_segment}/{table}/{pk_col}/{value}#this` |
+| Knowledge Graph rewrite path | `/{iri_path_segment}` |
+| Ontology rewrite path | `/schemas/{iri_path_segment}` |
 
 > ⚠️ **No scripts will be generated until you reply.**
-> - Reply **CONFIRM** to proceed with the IRIs as shown
+> - Reply **CONFIRM** to proceed with these IRIs
 > - Reply **OVERRIDE: iri_path_segment = {value}** to use a different path segment
 
 **Wait for the user's reply. Do not call any tool.**
 
-Record the confirmed `iri_path_segment` and four derived IRIs as canonical for all subsequent steps.
+Record the confirmed `iri_path_segment`. All actual IRIs are extracted from Step 3 tool output — the table above shows the expected patterns for pre-approval.
 
 **→ NEXT: Step 3.**
 
 ---
 
-### Step 3 — Generate TBox and ABox Views
+### Step 3 — Generate Ontology and Knowledge Graph Views
 
 ⚠️ **Load `references/workflow-details.md` via `getSkillResource` before executing this step.** It contains the exact tool call signatures for Steps 3, 4, and 5.
 
 Generate all three artifacts using the confirmed `iri_path_segment` and working set:
 
-- **3a** — Call `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` → TBox ontology (OWL/Turtle)
-- **3b** — Call `OAI.DBA.RDFVIEW_FROM_TABLES` → ABox RDF View script
+- **3a** — Call `OAI.DBA.RDFVIEW_ONTOLOGY_FROM_TABLES` → Ontology (OWL/Turtle)
+- **3b** — Call `OAI.DBA.RDFVIEW_FROM_TABLES` → Knowledge Graph RDF View script
 - **3c** — Call `OAI.DBA.RDFVIEW_GENERATE_DATA_RULES` → Linked Data rewrite rules script
 
 **Nothing is written to the database during this step.**

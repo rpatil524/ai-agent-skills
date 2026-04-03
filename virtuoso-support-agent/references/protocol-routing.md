@@ -13,8 +13,9 @@ The tools in this skill can be invoked through any of the following modalities. 
 Use when the host environment is MCP-enabled (e.g., Claude Code, MCP-compatible agent frameworks).
 
 Endpoints:
-- Streamable HTTP (preferred): `https://linkeddata.uriburner.com/chat/mcp/messages`
-- SSE: `https://linkeddata.uriburner.com/chat/mcp/sse`
+- Streamable HTTP (preferred): `https://demo.openlinksw.com/chat/mcp/messages` (Demo instance)
+- Streamable HTTP (preferred): `https://linkeddata.uriburner.com/chat/mcp/messages` (URIBurner)
+- SSE: `https://linkeddata.uriburner.com/chat/mcp/sse` (URIBurner)
 
 Tool naming convention: `{ServerName}:{ToolName}`
 - `Demo:execute_spasql_query`
@@ -24,8 +25,7 @@ All 25 tools are available via MCP on both Demo and URIBurner servers.
 
 Guidance:
 - Prefer streamable HTTP unless the client specifically expects SSE.
-- Treat MCP as requiring authentication unless the client is already configured.
-- From this environment, both MCP endpoints returned `401 Unauthorized` on March 6, 2026.
+- Treat MCP as requiring authentication unless the client is already configured. See Authentication section below.
 
 ---
 
@@ -91,7 +91,7 @@ Full OpenAPI spec: `https://linkeddata.uriburner.com/chat/api/openapi.yaml`
 Guidance:
 - Requires a valid API key or OAuth-backed credential.
 - Use for complex multi-step reasoning tasks or when agent orchestration is needed.
-- From this environment, unauthenticated calls failed on March 6, 2026 because no API key was supplied.
+- See Authentication section below.
 
 ---
 
@@ -112,6 +112,32 @@ curl -s -G "https://linkeddata.uriburner.com/chat/functions/sparqlQuery" \
   --data-urlencode "query=SELECT * WHERE { ?s ?p ?o } LIMIT 10" \
   --data-urlencode "format=json"
 ```
+
+---
+
+## Authentication
+
+Both REST and MCP endpoints support **OAuth**. If a tool call or REST request returns 401, 403, or 500 (which may indicate an unauthenticated session), initiate the OAuth flow before retrying.
+
+### OAuth Flow — MCP
+
+| Instance | Authenticate via |
+|----------|-----------------|
+| `demo.openlinksw.com` | Call `mcp__claude_ai_OpenLink_Demo__authenticate` |
+| `linkeddata.uriburner.com` | Call `mcp__claude_ai_URIBurner__authenticate` |
+
+These tools start the OAuth flow and return an authorization URL. Share the URL with the user. Once the user completes authorization in their browser, the MCP tools become available automatically.
+
+### OAuth Flow — REST
+
+The REST endpoints (`/chat/functions/*`) also support OAuth. If REST calls return 401/403/500 and MCP OAuth is not available, direct the user to authenticate via the MCP flow above — successful MCP OAuth also covers REST on the same instance.
+
+### When to trigger authentication
+
+- Any tool call or REST request returns 401, 403, or unexpected 500
+- User explicitly asks to authenticate or switch accounts
+
+Do not retry a failed call more than once before triggering the OAuth flow.
 
 ---
 

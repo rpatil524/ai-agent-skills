@@ -16,6 +16,33 @@ If the user explicitly names a protocol (e.g., "use MCP", "use REST", "use OPAL"
 
 ---
 
+## Authentication
+
+Both REST and MCP endpoints support **OAuth**. If a tool call or REST request returns 401, 403, or 500 (which may indicate an unauthenticated session), initiate the OAuth flow before retrying.
+
+### OAuth Flow — MCP
+
+| Instance | Authenticate via |
+|----------|-----------------|
+| `demo.openlinksw.com` | Call `mcp__claude_ai_OpenLink_Demo__authenticate` |
+| `linkeddata.uriburner.com` | Call `mcp__claude_ai_URIBurner__authenticate` |
+
+These tools start the OAuth flow and return an authorization URL. Share the URL with the user. Once the user completes authorization in their browser, the MCP tools become available automatically.
+
+### OAuth Flow — REST
+
+The REST endpoints (`/chat/functions/*`) also support OAuth. If REST calls return 401/403/500 and MCP OAuth is not available, direct the user to authenticate via the MCP flow above — successful MCP OAuth also covers REST on the same instance.
+
+### When to trigger authentication
+
+- Any tool call or REST request returns 401, 403, or unexpected 500
+- `database_schema_objects`, `RDFVIEW_*`, or `EXECUTE_SQL_SCRIPT` fail while `execute_spasql_query` succeeds (indicates partial auth — discovery and write tools require an authenticated session)
+- User explicitly asks to authenticate or switch accounts
+
+Do not retry a failed call more than once before triggering the OAuth flow.
+
+---
+
 ## Canonical OPAL Function Names
 
 From the Smart Agent definition, the canonical OPAL-recognizable function names for this skill are:
@@ -36,19 +63,22 @@ Use these names when the user asks for OPAL-oriented routing.
 ## MCP
 
 Endpoints:
-- `https://linkeddata.uriburner.com/chat/mcp/messages` (streamable HTTP)
-- `https://linkeddata.uriburner.com/chat/mcp/sse` (SSE)
+- `https://demo.openlinksw.com/chat/mcp/messages` (streamable HTTP — Demo instance)
+- `https://linkeddata.uriburner.com/chat/mcp/messages` (streamable HTTP — URIBurner)
+- `https://linkeddata.uriburner.com/chat/mcp/sse` (SSE — URIBurner)
 
-Treat MCP as requiring authentication unless the client is already configured.
+Treat MCP as requiring authentication unless the client is already configured. Use the OAuth flow above if not.
 
 ---
 
 ## REST Function Execution
 
-Functions are callable via the URIBurner REST API. Consult the OpenAPI specs for exact signatures:
+Functions are callable via the REST API. Consult the OpenAPI specs for exact signatures:
 
-- **Chat API:** `https://linkeddata.uriburner.com/chat/api/openapi.yaml`
-- **Functions/Procedures API:** `https://linkeddata.uriburner.com/chat/functions/openapi.yaml`
+| Instance | Functions/Procedures API | Chat API |
+|----------|--------------------------|----------|
+| `demo.openlinksw.com` | `https://demo.openlinksw.com/chat/functions/openapi.yaml` | `https://demo.openlinksw.com/chat/api/openapi.yaml` |
+| `linkeddata.uriburner.com` | `https://linkeddata.uriburner.com/chat/functions/openapi.yaml` | `https://linkeddata.uriburner.com/chat/api/openapi.yaml` |
 
 ---
 
@@ -56,7 +86,7 @@ Functions are callable via the URIBurner REST API. Consult the OpenAPI specs for
 
 Endpoint: `https://linkeddata.uriburner.com/chat/functions/chatPromptComplete`
 
-Requires authentication (API key). Use as fallback after MCP when native tool execution and REST have failed.
+Requires authentication. Use as fallback after MCP when native tool execution and REST have failed.
 
 ---
 
@@ -64,7 +94,7 @@ Requires authentication (API key). Use as fallback after MCP when native tool ex
 
 | Instance | Purpose |
 |----------|---------|
-| `Demo` | Test and sample data |
-| `URIBurner` | Production |
+| `Demo` (`demo.openlinksw.com`) | Test and sample data — default |
+| `URIBurner` (`linkeddata.uriburner.com`) | Production |
 
 When the user has not specified an instance, default to `Demo`. Confirm with the user before executing against `URIBurner`.

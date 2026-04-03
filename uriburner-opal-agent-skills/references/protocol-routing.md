@@ -30,7 +30,7 @@ All native tools are invoked by name directly:
 
 Guidance:
 - Prefer streamable HTTP unless the client specifically expects SSE.
-- Treat MCP as requiring authentication unless the client is already configured.
+- Treat MCP as requiring authentication unless the client is already configured. See Authentication section below.
 - Use native tools directly for standard operations; reserve `ChatPromptComplete` for when the user explicitly requests Gemini/SPARQL Agent 121.
 
 ---
@@ -133,6 +133,32 @@ WEB_FETCH:
 curl -s -G "https://linkeddata.uriburner.com/chat/functions/WEB_FETCH" \
   --data-urlencode "url=https://example.com"
 ```
+
+---
+
+## Authentication
+
+Both REST and MCP endpoints support **OAuth**. If a tool call or REST request returns 401, 403, or 500 (which may indicate an unauthenticated session), initiate the OAuth flow before retrying.
+
+### OAuth Flow — MCP
+
+| Instance | Authenticate via |
+|----------|-----------------|
+| `demo.openlinksw.com` | Call `mcp__claude_ai_OpenLink_Demo__authenticate` |
+| `linkeddata.uriburner.com` | Call `mcp__claude_ai_URIBurner__authenticate` |
+
+These tools start the OAuth flow and return an authorization URL. Share the URL with the user. Once the user completes authorization in their browser, the MCP tools become available automatically.
+
+### OAuth Flow — REST
+
+The REST endpoints (`/chat/functions/*`) also support OAuth. If REST calls return 401/403/500 and MCP OAuth is not available, direct the user to authenticate via the MCP flow above — successful MCP OAuth also covers REST on the same instance.
+
+### When to trigger authentication
+
+- Any tool call or REST request returns 401, 403, or unexpected 500
+- User explicitly asks to authenticate or switch accounts
+
+Do not retry a failed call more than once before triggering the OAuth flow.
 
 ---
 
