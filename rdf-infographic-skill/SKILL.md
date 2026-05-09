@@ -454,13 +454,14 @@ Advanced mode provides a full-featured visualization with settings panel, inspir
 
 **Control toolbar (top-right):**
 - Fullscreen toggle button
-- Center graph button
-- Theme toggle (sun/moon)
-- SPARQL construct button (placeholder for future use)
-- Settings gear button
+- Center graph button  
+- Settings gear button (opens settings panel)
+
+> **Note:** Do NOT include a theme toggle in the graph toolbar. The page already has a theme toggle in the navigation panel (top-left). Duplicate theme controls are redundant.
 
 **Settings panel (slides from right):**
 - **Physics Simulation**: Charge strength slider (-1200 to -50), Link distance slider (40-320px), Enable/disable physics toggle
+  > **Critical:** These controls MUST be wired to update the D3 force simulation in real-time. Use event listeners on the input elements to call `simulation.force("charge").strength(value)` and `simulation.force("link").distance(value)`, then `simulation.alpha(0.3).restart()` to apply changes.
 - **Predicate Display**: Radio option for "Icons" vs "Labels"
 - **Edge Filtering**: Checkbox list of all predicates, Select All/Deselect All buttons
 - **Node Filtering**: Chips for each node type (person, organization, place, concept, event, literal, resource), Select All/Deselect All
@@ -480,13 +481,20 @@ Advanced mode provides a full-featured visualization with settings panel, inspir
 
 **Implementation reference**: See `/Users/kidehen/Documents/Management/Development/OSDS_extension/src/graph_gen.js` for complete implementation details.
 
-#### Mode Elicitation
+#### Mode Elicitation (CRITICAL)
 
 When the user requests an RDF infographic with graph visualization:
-1. Ask: "Would you like a Basic or Advanced graph visualization?"
-2. If Basic → implement Basic mode only
-3. If Advanced → implement Advanced mode with toggle to Basic mode available
-4. Default to Basic if no preference specified
+
+**STOP - Do not generate any HTML until you complete this step:**
+
+1. Ask the user explicitly: "Would you like a **Basic** (lightweight, no settings panel) or **Advanced** (full-featured, with settings panel) graph visualization?"
+2. **Wait for the user's response** before proceeding
+3. If the user does not specify within 2 exchanges, default to Basic mode
+4. Once confirmed, proceed with the appropriate mode:
+   - **Basic** → implement Basic mode only (no Advanced features)
+   - **Advanced** → implement Advanced mode with toggle to switch to Basic at runtime
+
+> **Why this matters:** Including Advanced features (settings panel, physics controls, theme toggle, etc.) adds complexity and potential bugs. Only include them when the user explicitly requests them.
 
 The infographic should include a mode toggle (Basic/Advanced) in the visualization controls if Advanced is selected, allowing users to switch between modes at runtime.
 
