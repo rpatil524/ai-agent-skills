@@ -38,13 +38,23 @@ When uncertain, default to the **Generic** template and ask the user if they wan
 Default execution order for fetching content and invoking web services:
 
 1. Direct native access (file read, WebFetch, or `curl`) to the source URL
-2. URIBurner REST functions for content retrieval and RDF services
-3. Terminal-owned OAuth flow — when the endpoint requires OAuth 2.0 authentication, execute the OAuth flow from the terminal (authorization code, client credentials, or device flow), capture the Bearer token, and inject it into subsequent REST/OpenAPI calls via `Authorization: Bearer {token}` headers
-4. MCP via `https://linkeddata.uriburner.com/chat/mcp/messages` or `https://linkeddata.uriburner.com/chat/mcp/sse`
-5. Authenticated LLM-mediated execution via `https://linkeddata.uriburner.com/chat/functions/chatPromptComplete`
-6. OPAL Agent routing using recognizable OPAL function names
+2. **PinchTab browser automation** — for JS-heavy pages, login-protected content, or sites requiring browser interaction (e.g., LinkedIn posts, X/Twitter feeds). Use when curl returns 401, 403, or empty content but the page loads in a browser.
+   > **Installation check:** If `pinchtab` is not found in PATH, ask the user for permission to install it before proceeding.
+   > **Install options:** `brew install pinchtab` (macOS) or `cargo install pinchtab` (via Rust)
+   - Start PinchTab server: `pinchtab server` (or `pinchtab daemon install` for persistent service)
+   - Start instance: `pinchtab instance start` or `curl -X POST http://localhost:9867/instances/start`
+   - Navigate: `curl -X POST http://localhost:9867/navigate -d '{"url":"..."}'`
+   - Extract text: `curl http://localhost:9867/text` or `curl http://localhost:9867/snapshot`
+   - Cleanup: `pinchtab instance stop` when done
+3. URIBurner REST functions for content retrieval and RDF services
+4. Terminal-owned OAuth flow — when the endpoint requires OAuth 2.0 authentication, execute the OAuth flow from the terminal (authorization code, client credentials, or device flow), capture the Bearer token, and inject it into subsequent REST/OpenAPI calls via `Authorization: Bearer {token}` headers
+5. MCP via `https://linkeddata.uriburner.com/chat/mcp/messages` or `https://linkeddata.uriburner.com/chat/mcp/sse`
+6. Authenticated LLM-mediated execution via `https://linkeddata.uriburner.com/chat/functions/chatPromptComplete`
+7. OPAL Agent routing using recognizable OPAL function names
 
 If the user explicitly names a protocol, follow that preference instead.
+
+> **Important:** This routing applies only to the **content FETCH phase** (steps 1-7 above). Once source content is retrieved (via curl, PinchTab, WebFetch, or file read), the **transformation to RDF/JSON-LD** proceeds directly using the template prompts in section 2 — no further routing through steps 2-7 is needed unless you specifically need to query a live endpoint for additional data during transformation.
 
 ---
 
@@ -52,6 +62,12 @@ If the user explicitly names a protocol, follow that preference instead.
 
 1. **Identify the source URL** — extract the `file:` or `http[s]:` URL from the user's request.
 2. **Fetch content** — retrieve page or document text using available tools (browser automation, WebFetch, file read, etc.).
+   > **PinchTab fallback:** Use when curl/WebFetch returns 401, 403, empty content, or clearly JS-rendered output. Common scenarios:
+   > - LinkedIn profiles, posts, company pages
+   > - X/Twitter profiles, threads, replies
+   > - Sites with login walls or infinite scroll
+   > - Pages requiring JavaScript execution to render content
+   > **Important:** If PinchTab is not installed, ask the user explicitly for permission to install it before proceeding.
 3. **Select template** — use the table above; check for explicit user preference.
 4. **Determine output format** — RDF-Turtle is the default; respect explicit requests.
 5. **Populate and apply the template** — substitute all `{placeholders}` and generate the output.
@@ -312,56 +328,183 @@ Always use **both** `schema:naics` and `schema:identifier` together on industry 
 
 ---
 
-## HTML and Markdown Companion Requirements
+## HTML Infographic Companion Requirements
 
-When the user asks for an HTML infographic companion, Markdown companion, or HTML + Markdown pair for a generated Knowledge Graph, apply these requirements. For the complete HTML/Markdown/RDF pairing specification including resolver configuration, navigation panel behavior, localStorage correctness, Markdown output rules, and the full validation checklist, see the `rdf-infographic-skill` SKILL.md.
+When the user asks for an HTML infographic companion to a generated Knowledge Graph, apply these requirements. For the complete HTML/RDF pairing specification including resolver configuration, navigation panel behavior, localStorage correctness, and the full validation checklist, see the `rdf-infographic-skill` SKILL.md.
 
 ### Output Paths
 
 - Save RDF documents to `{rdf-output-directory}` and HTML infographics to `{html-output-directory}`. Resolve from explicit user instructions or session defaults.
-- Use a shared filename stem for each generated RDF/HTML/Markdown set: `{descriptive-slug}-{llm-id}-{n}`.
-  - `{descriptive-slug}` is a concise lowercase hyphenated summary of the source title or topic.
-  - `{llm-id}` identifies the underlying generating LLM or LLM interface, normalized to lowercase hyphen form (for example `gpt5-chat`, `gpt5-mini`, `claude-sonnet`, `gemini-pro`). If uncertain, infer from the active output root such as `GPT5-Chat-Generated` -> `gpt5-chat`; otherwise ask before saving.
-  - `{n}` starts at `1` and increments only when the exact target filename already exists.
-- When Markdown is requested, save the Markdown file to the **same folder as the HTML file**, using the same filename stem and `.md` extension.
 - Confirm resolved full file paths before saving.
 
 ### Entity IRIs and Resolver Links
 
 - Use `{page_url}` or `{post-url}` as the source-grounded namespace. Never use `file:` scheme IRIs when a canonical HTTPS URL exists.
-- Resolver priority: URIBurner (`https://linkeddata.uriburner.com/describe/?url={entity-iri}`) by default; user-designated resolver if specified; or none if user explicitly opts out. In footer prose, describe this as `[URIBurner describe links](https://linkeddata.uriburner.com/fct)` via the `{cname}/{describe}/{query}` pattern, as in `https://linkeddata.uriburner.com/describe/?url={uri}`, over RDF hash IRIs.
+- Resolver priority: URIBurner (`https://linkeddata.uriburner.com/describe/?uri={entity-iri}`) by default; user-designated resolver if specified; or none if user explicitly opts out.
 - Encode `#` as `%23` exactly once in resolver `uri` parameters. `%2523` (double-encoded) is invalid.
 - Entity links open in new tabs: `target="_blank" rel="noopener noreferrer"`.
 - FAQ questions, FAQ answers, glossary terms, glossary definitions, HowTo section title, and every HowTo step heading are ALL hyperlinked to their KG entity IRIs.
-- Markdown companions follow the same resolver-link rule for FAQ, glossary, HowTo, media, source/document, and other visible semantic entities.
-- Markdown companions include media when present in the RDF: images with Markdown image syntax, videos with HTML `<video controls>` blocks, audio with HTML `<audio controls>` blocks, and media captions/labels linked to RDF media entity IRIs via the resolver.
 - Local KG entities (hash-based IRIs) route through resolver. LOD Cloud cross-references (DBpedia, Wikidata) link directly.
 
 ### POSH and JSON-LD Metadata
 
 - POSH link: `<link rel="related" href="../rdf/{rdf-file}" type="text/turtle">`
 - JSON-LD `relatedLink` must use IRI form: `{"@id": "../rdf/{rdf-file}"}` — never a plain string literal.
-- When a Markdown companion exists, the HTML POSH metadata must include `<link rel="alternate" href="{markdown-file}" type="text/markdown" title="Markdown representation">`.
-- When a Markdown companion exists, the embedded JSON-LD must declare the Markdown file as an alternate encoding/representation of the HTML `schema:WebPage` or `schema:CreativeWork`, using a relative `@id` such as `{"@type":"schema:MediaObject","encodingFormat":"text/markdown","contentUrl":{"@id":"{markdown-file}"}}`.
-- Markdown companion header must include a relative link to the source HTML file and a relative link to the associated RDF file.
 - `prov:wasGeneratedBy` must reference a `schema:SoftwareApplication` entity per skill.
-- Skills attribution in footer: `Generated using <a href="https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/{skill-name}">skill-name</a>`
-- Footer generation environment attribution must state and hyperlink the inferred LLM/interface matching `{llm-id}`, the generation client/environment when known, the source delivery host/server when known, and the Linked Data resolver/server platform used for entity hyperlinks. Link LLM/interface and client/environment labels to their RDF provenance entities through the configured resolver. When URIBurner is used, hyperlink it and identify it as a Virtuoso-backed Linked Data resolver/server platform. RDF and embedded JSON-LD SHOULD mirror these using named provenance entities; never use `file:` IRIs.
+- Attributions in footer must include: AI Agent (OpenCode), each Skill used, LLM used, Server Platform (Virtuoso)
+
+```html
+<!-- Premium footer with 4-column grid design -->
+<footer class="footer">
+<p style="margin-bottom:20px"><a href="https://linkeddata.uriburner.com/sparql?query=..." target="_blank" class="cta-btn" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--accent);color:#fff;border-radius:12px;text-decoration:none;font-weight:600;font-size:0.95rem">Explore Knowledge Graph <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 3.5a1.5 1.5 0 0 1 0 3h-5l-.5.5 1 1a1 1 0 0 0 1.414 1.414l-2-2a1 1 0 0 0 0-1.414l-2-2a1 1 0 0 0-1.414 1.414l1 1-.5.5h5z"/></svg></a></p>
+<div class="tech-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px;border-top:1px solid var(--line);padding-top:24px">
+<div class="tech-card" style="text-align:center;padding:16px;background:var(--panel);border-radius:12px;border:1px solid var(--line)">
+<h4 style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">AI Agent</h4>
+<a href="https://opencode.ai" target="_blank" style="color:var(--accent);font-family:'Space Grotesk';font-weight:600;font-size:0.95rem;text-decoration:none">OpenCode</a>
+</div>
+<div class="tech-card" style="text-align:center;padding:16px;background:var(--panel);border-radius:12px;border:1px solid var(--line)">
+<h4 style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">AI Agent Skills</h4>
+<div style="font-size:0.8rem"><a href="https://github.com/anomalyco/opencode/tree/main/skill-name" target="_blank" style="color:var(--accent);text-decoration:none">skill-name</a></div>
+</div>
+<div class="tech-card" style="text-align:center;padding:16px;background:var(--panel);border-radius:12px;border:1px solid var(--line)">
+<h4 style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Language Model</h4>
+<a href="https://opencode.ai/models/minimax_m2.5free" target="_blank" style="color:var(--accent);font-family:'Space Grotesk';font-weight:600;font-size:0.95rem;text-decoration:none">minimax_m2.5free</a>
+</div>
+<div class="tech-card" style="text-align:center;padding:16px;background:var(--panel);border-radius:12px;border:1px solid var(--line)">
+<h4 style="font-size:0.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:8px">Server Platform</h4>
+<a href="https://virtuoso.openlinksw.com/" target="_blank" style="color:var(--accent);font-family:'Space Grotesk';font-weight:600;font-size:0.95rem;text-decoration:none">Virtuoso</a>
+</div>
+</div>
+</footer>
+```
+
+For HTML dashboards from SPARQL named graph queries, also include "Explore Knowledge Graph" link.
+
+### About Section Template
+
+Every HTML infographic generated from a named graph should include an About section explaining how the page was created. Use this template:
+
+```html
+<section class="section" id="about">
+<div class="eyebrow-dark">About</div>
+<div class="section-title"><h2>About This Page</h2></div>
+<p style="color:var(--muted);line-height:1.7">This knowledge graph overview was generated by querying the <a href="https://linkeddata.uriburner.com/sparql" target="_blank" style="color:var(--accent)">URIBurner SPARQL endpoint</a> for the named graph <code>{graph-iri}</code>. The original document was transformed into RDF using {skills-used}, then uploaded to the Virtuoso-based URIBurner server. The SPARQL query retrieved {entity-types} from the knowledge graph. The HTML infographic was then rendered using {skills-used} powered by {model-id} and running on Virtuoso.</p>
+<p style="margin-top:16px;font-size:0.85rem;color:var(--ink)"><strong>Technology Stack:</strong></p>
+<ul style="margin-top:8px;font-size:0.85rem;color:var(--ink);list-style:disc;padding-left:20px">
+<li>AI Agent: <a href="https://opencode.ai" target="_blank" style="color:var(--accent)">OpenCode</a></li>
+<li>Skills: <a href="https://github.com/anomalyco/opencode/tree/main/skill-name" target="_blank" style="color:var(--accent)">skill-name</a></li>
+<li>Language Model: <a href="https://opencode.ai/models/{model-id}" target="_blank" style="color:var(--accent)">{model-id}</a></li>
+<li>Server Platform: <a href="https://virtuoso.openlinksw.com/" target="_blank" style="color:var(--accent)">Virtuoso</a></li>
+<li>Knowledge Graph: <a href="https://linkeddata.uriburner.com/sparql" target="_blank" style="color:var(--accent)">URIBurner</a></li>
+</ul>
+</section>
+```
+
+Substitute: `{graph-iri}`, `{skills-used}`, `{entity-types}`, `{skill-links}`, and `{model-id}` with actual values.
 
 ### Navigation, Theme, and Validation
 
 - Collapse-to-header-bar floating navigation: always-visible compact header, toggle, draggable, resizable.
 - Never persist collapsed dimensions in `localStorage`. Recover from stale state. Page-specific keys.
 - Dark mode: `html[data-theme="dark"]` and `@media (prefers-color-scheme: dark)` produce equivalent rendering. All colors via CSS variables.
-- **GATE: 0 failures required.** Validate: HTML parse, JS syntax, RDF parse + compliance audit, resolver links, local RDF link, nav behavior, skills attribution, dark mode consistency. If Markdown is generated, validate the `.md` file exists in the same folder as the HTML, has HTML and RDF relative links, has no non-resolver external semantic links, embeds/references RDF media entities when present, and is declared by the HTML in both POSH `rel="alternate"` metadata and JSON-LD alternate-representation metadata.
+- **GATE: 0 failures required.** Validate: HTML parse, JS syntax, RDF parse + compliance audit, resolver links, local RDF link, nav behavior, skills attribution, dark mode consistency.
+
+---
+
+## MD Document Companion Requirements
+
+When generating a Markdown document alongside RDF and HTML outputs, the MD **MUST** follow these requirements:
+
+### Structure
+
+- **Title + metadata block** — author, date, source URL, reading time (if available).
+- **Overview** — 2–3 sentence summary of what the document covers.
+- **Core content sections** — entities, concepts, principles, relationships, statistics — organized with H2/H3 headings.
+- **How-To guide** — when the RDF includes `schema:HowTo`, render all steps as a numbered list with step titles and descriptions.
+- **FAQ** — when the RDF includes `schema:FAQPage`, render all Q&A pairs. Each question hyperlinks to its KG entity IRI via the URIBurner resolver.
+- **Glossary** — when the RDF includes `schema:DefinedTermSet`, render all terms with definitions. Each term name hyperlinks to its KG entity IRI via the resolver.
+- **Related Resources** — links to the original source, companion RDF file, and companion HTML file (all relative paths).
+
+### Entity Hyperlinks
+
+Every entity reference in the MD (classes, properties, instances, concepts, persons, organizations) **MUST** be hyperlinked using the URIBurner resolver pattern:
+
+```
+[Entity Label](https://linkeddata.uriburner.com/describe/?uri={URL-encoded-IRI})
+```
+
+This applies to:
+- **Relationships section** — every entity and property name in relationship descriptions must be a resolver link.
+- **Entity tables** — entity names in table cells must be resolver links.
+- **Glossary** — each term name must be a resolver link.
+- **FAQ** — each question must be a resolver link.
+- **How-To steps** — each step title must be a resolver link.
+
+### Relationships Section
+
+The MD **MUST** include a relationships section that:
+- Names every relationship (object property) linking domain entities.
+- Hyperlinks both the source entity, the property, and the target entity using resolver links.
+- Organizes relationships from the central/coordinating entity outward (e.g., Trip as the dispatch hub).
+- Uses bulleted or indented lists for visual hierarchy — not plain-text code blocks.
+
+### Checklist
+
+- [ ] All entity names in the relationships section are resolver-hyperlinked.
+- [ ] All property names in the relationships section are resolver-hyperlinked.
+- [ ] FAQ questions are resolver-hyperlinked.
+- [ ] Glossary terms are resolver-hyperlinked.
+- [ ] How-To step titles are resolver-hyperlinked.
+- [ ] Related Resources section includes relative links to companion RDF and HTML files.
+- [ ] No plain-text code blocks used for relationship descriptions that should be hyperlinked.
 
 ---
 
 ## Saving Output Files
 
-- **Turtle**: `{descriptive-slug}-{llm-id}-1.ttl` (increment if file exists)
-- **JSON-LD**: `{descriptive-slug}-{llm-id}-1.jsonld` (increment if file exists)
-- **HTML companion**: `{descriptive-slug}-{llm-id}-1.html` using the same stem as the RDF.
-- **Markdown companion**: `{descriptive-slug}-{llm-id}-1.md` using the same stem as the HTML when Markdown is requested.
+- **Turtle**: `{descriptive-slug}-{model-id}.ttl` (increment if file exists)
+- **JSON-LD**: `{descriptive-slug}-{model-id}.jsonld` (increment if file exists)
 - **Default save location**: `{output-directory}` — ask the user if not specified, or infer from context
 - Override if user specifies a path
+- Replace `-` with `_` in `{model-id}` for filesystem safety (e.g., `minimax_m2.5free`)
+
+### Ontology Identifier Selection Rules
+
+When generating RDF from documents, use these priority rules for entity types:
+
+1. **Use schema.org first** — If `schema.org/{Type}` exists (e.g., `schema:Person`, `schema:Organization`), use it.
+2. **Check shared ontologies** — Use well-known RDF vocabularies (e.g., `Dublin Core (dc:)`, `SKOS`, `FOAF`, `PROV`, `schema.org/` alternate terms). Do NOT assume a term exists without verification.
+3. **Create on-the-fly** — If neither schema.org nor a shared ontology has the needed type:
+   - Create a namespace IRI using the document base (e.g., `https://linkeddata.uriburner.com/DAV/docs-for-knowledge-graph-and-embeddings-generation/UB-PDFs/ontology#`)
+   - Define the new class/property in the output with proper `rdfs:comment` for documentation.
+   - Include the ontology IRI in the generated RDF's `@prefix` declarations.
+
+**Example:**
+```turtle
+@prefix somt: <https://linkeddata.uriburner.com/DAV/docs-for-knowledge-graph-and-embeddings-generation/UB-PDFs/ontology#> .
+
+somt:Interview a rdfs:Class ;
+    rdfs:label "Interview" ;
+    rdfs:comment "An interview or conversation with a person, typically in a professional context." ;
+    rdfs:isDefinedBy somt: .
+```
+
+Do NOT use non-existent schema.org terms like `schema:Interview` — this causes errors and breaks SPARQL queries.
+
+The output filenames SHOULD include a lowercase, filesystem-safe version of the underlying LLM model identifier to enable provenance tracking. Extract the model ID from the environment or task context:
+
+| Model Source | Example ID |
+|---|---|
+| minimax | `minimax_m2.5free` |
+| openai | `openai_gpt4o` |
+| anthropic | `anthropic_sonnet4` |
+| google | `google_gemini2` |
+| claudeCode | `claude_code` |
+| Other | `{provider}_{model}` (lowercase, underscores, no spaces) |
+
+Example output:
+- `anthropic-platform-strategy-minimax_m2.5free-1.ttl`
+- `azure-accelerate-databases-minimax_m2.5free-1.html`
+- `substack-deep-dive-openai_gpt4o-1.jsonld`
+
+This convention allows tracking which AI model generated each artifact without requiring external metadata.
