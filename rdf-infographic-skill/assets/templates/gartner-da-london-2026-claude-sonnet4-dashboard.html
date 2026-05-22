@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gartner D&amp;A London 2026 — Juan Sequeda Honest No-BS Takeaways | KG Analysis</title>
+<meta name="description" content="Knowledge graph analysis of Juan Sequeda's honest no-BS takeaways from Gartner Data & Analytics London May 2026. Covers AI ROI crisis, context layers, vendor strategy, governance singularity, and methodologies.">
+<meta name="author" content="Juan Sequeda">
+<meta property="og:title" content="Gartner D&A London 2026 — Knowledge Graph Analysis">
+<meta property="og:description" content="Interactive knowledge graph of Juan Sequeda's Gartner D&A London 2026 takeaways: AI ROI crisis, context layers, governance singularity, iron-thread methodology.">
+<link rel="canonical" href="https://juansequeda.substack.com/p/gartner-data-and-analytics-london">
+<link rel="related" type="text/turtle" href="gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl">
+<link rel="alternate" type="text/markdown" href="../markdown/gartner-da-london-2026-juan-sequeda-claude_sonnet4.md">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root {
+  --bg: #0f1117; --bg2: #1a1d2e; --bg3: #242840; --bg4: #2e3252;
+  --fg: #e8eaf6; --fg2: #b0b8d0; --fg3: #7a84a0;
+  --accent: #7c6af7; --accent2: #a78bfa; --accent3: #c4b5fd;
+  --green: #4ade80; --teal: #2dd4bf; --amber: #fbbf24;
+  --red: #f87171; --pink: #f472b6; --sky: #38bdf8;
+  --border: rgba(124,106,247,0.25); --shadow: 0 4px 24px rgba(0,0,0,0.5);
+  --nav-h: 44px;
+}
+[data-theme="light"] {
+  --bg: #f8f9ff; --bg2: #eef0fb; --bg3: #e4e7f8; --bg4: #d8dcf5;
+  --fg: #1a1d2e; --fg2: #3d4263; --fg3: #6b72a0;
+  --border: rgba(124,106,247,0.2); --shadow: 0 4px 24px rgba(100,100,200,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--fg);font-family:'Segoe UI',system-ui,sans-serif;font-size:15px;line-height:1.7;min-height:100vh}
+a{color:var(--accent2);text-decoration:none}
+a:hover{color:var(--accent3);text-decoration:underline}
+h1{font-size:2rem;font-weight:800;line-height:1.2;background:linear-gradient(135deg,var(--accent2),var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+h2{font-size:1.4rem;font-weight:700;color:var(--accent2);margin:2rem 0 1rem;border-left:3px solid var(--accent);padding-left:0.75rem}
+h3{font-size:1.1rem;font-weight:600;color:var(--teal);margin:1.25rem 0 0.5rem}
+p{margin-bottom:0.9rem;color:var(--fg2)}
+strong{color:var(--fg)}
+.container{max-width:1100px;margin:0 auto;padding:0 1.25rem}
+
+/* ── Floating Nav ─────────────────────────────────────────────── */
+#nav-panel{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(15,17,23,0.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:all .3s}
+#nav-header{display:flex;align-items:center;justify-content:space-between;height:var(--nav-h);padding:0 1.25rem;cursor:pointer;user-select:none}
+#nav-title{font-weight:700;font-size:.9rem;color:var(--accent2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+#nav-toggle{background:none;border:1px solid var(--border);border-radius:4px;color:var(--fg2);padding:2px 8px;font-size:.75rem;cursor:pointer;flex-shrink:0;margin-left:.5rem}
+#nav-toggle:hover{border-color:var(--accent)}
+#nav-body{overflow:hidden;max-height:0;transition:max-height .3s ease}
+#nav-panel.expanded #nav-body{max-height:320px}
+.nav-links{display:flex;flex-wrap:wrap;gap:.4rem;padding:.75rem 1.25rem;border-top:1px solid var(--border)}
+.nav-links a{font-size:.8rem;padding:.25rem .6rem;border:1px solid var(--border);border-radius:12px;color:var(--fg2);transition:all .2s}
+.nav-links a:hover{border-color:var(--accent);color:var(--accent2);background:rgba(124,106,247,.1)}
+#theme-btn{background:none;border:1px solid var(--border);border-radius:4px;color:var(--fg2);padding:2px 8px;font-size:.8rem;cursor:pointer;margin-left:.5rem}
+#theme-btn:hover{border-color:var(--accent)}
+
+/* ── Hero ─────────────────────────────────────────────────────── */
+.hero{padding:calc(var(--nav-h) + 3rem) 0 2.5rem;background:radial-gradient(ellipse at 60% 0%, rgba(124,106,247,.15) 0%, transparent 60%)}
+.hero-meta{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem}
+.badge{font-size:.72rem;font-weight:600;padding:.2rem .6rem;border-radius:12px;letter-spacing:.04em}
+.badge-event{background:rgba(45,212,191,.15);color:var(--teal);border:1px solid rgba(45,212,191,.3)}
+.badge-pub{background:rgba(124,106,247,.15);color:var(--accent2);border:1px solid var(--border)}
+.badge-date{background:rgba(251,191,36,.12);color:var(--amber);border:1px solid rgba(251,191,36,.3)}
+.badge-kg{background:rgba(74,222,128,.12);color:var(--green);border:1px solid rgba(74,222,128,.3)}
+.hero h1{margin-bottom:.75rem}
+.hero-desc{font-size:1.05rem;color:var(--fg2);max-width:780px;margin-bottom:1.5rem}
+.hero-stats{display:flex;flex-wrap:wrap;gap:.75rem}
+.stat-pill{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.4rem .9rem;font-size:.82rem;color:var(--fg2)}
+.stat-pill strong{color:var(--accent2)}
+
+/* ── Section Cards ────────────────────────────────────────────── */
+section{padding:2.5rem 0}
+section:nth-child(even){background:var(--bg2)}
+.section-inner{padding:2rem 0}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-bottom:1rem;transition:border-color .2s}
+.card:hover{border-color:var(--accent)}
+.card h3{margin-top:0}
+.takeaway-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem}
+.takeaway-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem;border-top:3px solid var(--accent)}
+.takeaway-card:nth-child(2){border-top-color:var(--teal)}
+.takeaway-card:nth-child(3){border-top-color:var(--amber)}
+.takeaway-card:nth-child(4){border-top-color:var(--pink)}
+.takeaway-card:nth-child(5){border-top-color:var(--green)}
+.takeaway-card:nth-child(6){border-top-color:var(--sky)}
+.takeaway-num{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--fg3);margin-bottom:.3rem}
+.takeaway-title{font-weight:700;font-size:1rem;color:var(--fg);margin-bottom:.5rem}
+.takeaway-desc{font-size:.85rem;color:var(--fg2);line-height:1.55}
+.stat-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem}
+.stat-table th{background:var(--bg3);color:var(--fg2);font-weight:600;padding:.5rem .75rem;text-align:left;border-bottom:1px solid var(--border)}
+.stat-table td{padding:.5rem .75rem;border-bottom:1px solid rgba(124,106,247,.1);color:var(--fg2)}
+.stat-table tr:hover td{background:rgba(124,106,247,.05)}
+.stat-num{font-weight:700;color:var(--accent2);font-size:1.1rem}
+.archetype-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin:1rem 0}
+.arch-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem}
+.arch-name{font-weight:700;color:var(--amber);font-size:.9rem;margin-bottom:.4rem}
+.arch-desc{font-size:.82rem;color:var(--fg2)}
+.cdmp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:.75rem;margin:1rem 0}
+.cdmp-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:1rem;border-left:3px solid var(--teal)}
+.cdmp-card:nth-child(2){border-left-color:var(--pink)}
+.cdmp-card:nth-child(3){border-left-color:var(--green)}
+.cdmp-name{font-weight:700;font-size:.9rem;color:var(--fg);margin-bottom:.4rem}
+.cdmp-desc{font-size:.82rem;color:var(--fg2)}
+.gov-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
+.gov-chip{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:.3rem .75rem;font-size:.8rem;color:var(--fg2);transition:all .2s}
+.gov-chip:hover{background:rgba(124,106,247,.15);border-color:var(--accent);color:var(--accent2)}
+.insight-row{display:flex;gap:.75rem;margin-bottom:.75rem;align-items:flex-start}
+.insight-icon{font-size:1.25rem;flex-shrink:0;margin-top:.1rem}
+.insight-body strong{display:block;color:var(--fg);font-size:.92rem}
+.insight-body p{font-size:.85rem;color:var(--fg2);margin:0}
+
+/* ── KG Explorer ──────────────────────────────────────────────── */
+#kg-explorer{scroll-margin-top:calc(var(--nav-h) + 1rem)}
+.kg-shell{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.kg-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;padding:.75rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border)}
+.kg-mode-group{display:flex;gap:.25rem}
+.kg-btn{background:var(--bg2);border:1px solid var(--border);color:var(--fg2);padding:.3rem .75rem;border-radius:6px;font-size:.78rem;cursor:pointer;transition:all .2s}
+.kg-btn.active,.kg-btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.kg-sep{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.kg-label{font-size:.75rem;color:var(--fg3);font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.kg-filter-group{display:flex;gap:.25rem;flex-wrap:wrap}
+.kg-filter-btn{background:var(--bg2);border:1px solid var(--border);color:var(--fg2);padding:.2rem .55rem;border-radius:4px;font-size:.73rem;cursor:pointer;transition:all .2s}
+.kg-filter-btn.active,.kg-filter-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.kg-search{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:.3rem .6rem;font-size:.78rem;color:var(--fg);width:160px;outline:none}
+.kg-search:focus{border-color:var(--accent)}
+.kg-search::placeholder{color:var(--fg3)}
+.kg-status{font-size:.73rem;color:var(--fg3);margin-left:auto}
+.kg-pane-wrap{position:relative;height:520px}
+#basic-kg-pane,#adv-kg-pane{position:absolute;inset:0;width:100%;height:100%}
+#adv-kg-pane{display:none}
+.kg-pane-wrap svg{width:100%;height:100%;background:var(--bg)}
+.node-circle{stroke-width:1.5;cursor:pointer;transition:r .15s}
+.node-circle:hover{stroke-width:2.5}
+.node-label{font-size:9px;fill:var(--fg2);pointer-events:none;text-anchor:middle}
+.link-line{stroke-opacity:.55}
+.link-label{font-size:8px;fill:var(--fg3);pointer-events:none;text-anchor:middle}
+.edge-link{cursor:pointer}
+.edge-link text.link-label{fill:#a78bfa;pointer-events:all}
+.edge-link:hover text.link-label{fill:#c4b5fd;opacity:1}
+.kg-legend{display:flex;flex-wrap:wrap;gap:.5rem;padding:.6rem 1rem;border-top:1px solid var(--border);background:var(--bg3)}
+.legend-item{display:flex;align-items:center;gap:.3rem;font-size:.73rem;color:var(--fg3)}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.settings-btn{background:var(--bg2);border:1px solid var(--border);color:var(--fg2);padding:.3rem .75rem;border-radius:6px;font-size:.78rem;cursor:pointer;transition:all .2s;display:none}
+.settings-btn.active,.settings-btn:hover{border-color:var(--accent);color:var(--accent2)}
+#settings-panel{display:none;position:absolute;top:0;right:0;width:280px;height:100%;background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:.75rem;font-size:.8rem;z-index:10}
+.settings-section-title{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent2);margin:.75rem 0 .4rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.settings-section-title:first-child{margin-top:0;padding-top:0;border-top:none}
+.settings-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;gap:.5rem}
+.settings-row label{color:var(--fg2);flex:1;font-size:.78rem}
+.settings-row input[type=range]{flex:1;accent-color:var(--accent)}
+.settings-row input[type=text]{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--fg);padding:.2rem .4rem;font-size:.75rem;outline:none}
+.settings-row input[type=text]:focus{border-color:var(--accent)}
+.settings-toggle{position:relative;display:inline-flex;width:34px;height:18px;flex-shrink:0}
+.settings-toggle input{opacity:0;width:0;height:0}
+.settings-toggle-slider{position:absolute;inset:0;background:var(--bg3);border-radius:9px;cursor:pointer;transition:.2s;border:1px solid var(--border)}
+.settings-toggle input:checked+.settings-toggle-slider{background:var(--accent)}
+.settings-toggle-slider::before{content:'';position:absolute;width:12px;height:12px;left:2px;top:2px;background:#fff;border-radius:50%;transition:.2s}
+.settings-toggle input:checked+.settings-toggle-slider::before{transform:translateX(16px)}
+.settings-radio-group{display:flex;gap:.4rem;flex-wrap:wrap}
+.settings-radio-group label{display:flex;align-items:center;gap:.25rem;cursor:pointer;color:var(--fg2);font-size:.75rem;padding:.2rem .4rem;border:1px solid var(--border);border-radius:4px}
+.settings-radio-group label:has(input:checked){border-color:var(--accent);color:var(--accent2)}
+.settings-radio-group input{display:none}
+.settings-checkbox-row{display:flex;align-items:center;gap:.35rem;margin-bottom:.2rem;cursor:pointer;color:var(--fg2);font-size:.75rem}
+.settings-checkbox-row input{accent-color:var(--accent)}
+.settings-chips{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.25rem}
+.settings-chip{padding:.15rem .45rem;border:1px solid var(--border);border-radius:10px;font-size:.7rem;cursor:pointer;color:var(--fg3);transition:all .2s}
+.settings-chip.active{background:rgba(124,106,247,.2);border-color:var(--accent);color:var(--accent2)}
+.settings-ctrl-row{display:flex;gap:.3rem;margin-bottom:.4rem}
+.settings-ctrl-btn{flex:1;padding:.2rem;border:1px solid var(--border);border-radius:4px;background:var(--bg3);color:var(--fg2);font-size:.7rem;cursor:pointer;text-align:center}
+.settings-ctrl-btn:hover{border-color:var(--accent);color:var(--accent2)}
+.settings-legend-row{display:flex;align-items:center;gap:.4rem;margin-bottom:.2rem;font-size:.73rem;color:var(--fg2)}
+.settings-divider{height:1px;background:var(--border);margin:.6rem 0}
+#custom-resolver-row{display:none}
+
+/* ── FAQ / Glossary / HowTo ───────────────────────────────────── */
+.faq-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:.75rem}
+.faq-q{font-weight:700;color:var(--fg);font-size:.92rem;margin-bottom:.35rem}
+.faq-a{font-size:.88rem;color:var(--fg2);margin:0}
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:.75rem}
+.gloss-item{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.9rem 1.1rem}
+.gloss-term{font-weight:700;color:var(--teal);font-size:.88rem;margin-bottom:.3rem}
+.gloss-def{font-size:.82rem;color:var(--fg2)}
+.howto-list{counter-reset:steps;list-style:none}
+.howto-item{counter-increment:steps;display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start}
+.howto-num{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--teal));color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem}
+.howto-body strong{display:block;font-size:.92rem;color:var(--fg);margin-bottom:.25rem}
+.howto-body p{font-size:.85rem;color:var(--fg2);margin:0}
+
+/* ── Attribution ──────────────────────────────────────────────── */
+.attribution{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;margin-top:2rem;display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+.attr-links{display:flex;gap:.75rem;flex-wrap:wrap}
+.attr-link{font-size:.82rem;padding:.3rem .7rem;border:1px solid var(--border);border-radius:6px;color:var(--fg2)}
+.attr-link:hover{border-color:var(--accent);color:var(--accent2)}
+.attr-copy{font-size:.78rem;color:var(--fg3)}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media(max-width:600px){h1{font-size:1.5rem}.kg-pane-wrap{height:380px}.stat-table{font-size:.78rem}}
+
+/* ── SPARQL Section ───────────────────────────────────────────── */
+.sparql-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;margin-bottom:.85rem;overflow:hidden}
+.sparql-card summary{padding:.75rem 1.1rem;cursor:pointer;display:flex;align-items:center;gap:.6rem;font-weight:600;font-size:.9rem;color:var(--fg2);list-style:none;user-select:none;border-bottom:1px solid transparent;transition:background .2s}
+.sparql-card summary::-webkit-details-marker{display:none}
+.sparql-card summary::before{content:'▶';font-size:.65rem;color:var(--accent2);transition:transform .2s;flex-shrink:0}
+.sparql-card[open] summary::before{transform:rotate(90deg)}
+.sparql-card[open] summary{background:var(--bg3);border-bottom-color:var(--border)}
+.sparql-card summary:hover{background:var(--bg3)}
+.sparql-title{color:var(--accent2);font-weight:700}
+.sparql-title:hover{color:var(--accent3)}
+.sparql-body{padding:1rem 1.1rem}
+.sparql-pre{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.9rem 1rem;overflow-x:auto;font-size:.78rem;line-height:1.55;margin-bottom:.75rem;font-family:'Cascadia Code','Fira Code','Courier New',monospace;color:var(--fg2)}
+.sparql-pre code{color:var(--fg2)}
+.sparql-actions{display:flex;align-items:center;flex-wrap:wrap;gap:.75rem}
+.sparql-run{display:inline-flex;align-items:center;gap:.35rem;background:linear-gradient(135deg,var(--accent),#5b21b6);color:#fff;border:none;border-radius:6px;padding:.35rem .9rem;font-size:.8rem;font-weight:600;cursor:pointer;text-decoration:none;transition:opacity .2s}
+.sparql-run:hover{opacity:.85;color:#fff;text-decoration:none}
+.sparql-ep{font-size:.78rem;color:var(--fg3)}
+.sparql-ep a{color:var(--fg2)}
+.sparql-ep a:hover{color:var(--accent2)}
+.sparql-explore-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--teal);border-radius:8px;padding:1rem 1.25rem;margin-top:1.5rem}
+.sparql-explore-box strong{color:var(--teal);font-size:.9rem;display:block;margin-bottom:.5rem}
+.sparql-explore-links{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.sparql-explore-link{font-size:.8rem;padding:.3rem .7rem;border:1px solid var(--border);border-radius:6px;color:var(--fg2)}
+.sparql-explore-link:hover{border-color:var(--teal);color:var(--teal)}
+</style>
+</head>
+<body>
+
+<!-- ── Floating Nav ──────────────────────────────────────────── -->
+<nav id="nav-panel">
+  <div id="nav-header" onclick="toggleNav()">
+    <span id="nav-title">Gartner D&amp;A London 2026 — Juan Sequeda KG</span>
+    <button id="theme-btn" onclick="toggleTheme(event)" title="Toggle theme">☀</button>
+    <button id="nav-toggle">▾ Menu</button>
+  </div>
+  <div id="nav-body">
+    <div class="nav-links">
+      <a href="#overview">Overview</a>
+      <a href="#takeaways">Takeaways</a>
+      <a href="#ai-archetypes">AI Archetypes</a>
+      <a href="#context-layer">Context Layer</a>
+      <a href="#vendor-strategy">Vendor Strategy</a>
+      <a href="#governance">Governance</a>
+      <a href="#methodologies">Methodologies</a>
+      <a href="#kg-explorer">KG Explorer</a>
+      <a href="#faq">FAQ</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#howto">How To</a>
+      <a href="#sparql-queries">SPARQL Queries</a>
+      <a href="gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl">RDF/Turtle ↗</a>
+      <a href="../markdown/gartner-da-london-2026-juan-sequeda-claude_sonnet4.md">Markdown ↗</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────── -->
+<div class="hero">
+<div class="container">
+  <div class="hero-meta">
+    <span class="badge badge-event">📍 Gartner D&amp;A London · May 2026</span>
+    <span class="badge badge-pub">✍ Juan Sequeda · Substack</span>
+    <span class="badge badge-date">📅 Published 2026-05-20</span>
+    <span class="badge badge-kg">🔗 Knowledge Graph</span>
+  </div>
+  <h1>Gartner D&amp;A London 2026:<br>My Honest No-BS Takeaways</h1>
+  <p class="hero-desc">An interactive knowledge graph analysis of Juan Sequeda's field dispatch from Gartner Data &amp; Analytics London 2026 — covering the AI ROI crisis, context layers, vendor strategy, governance singularity, iron-thread methodology, and data community insights.</p>
+  <div class="hero-stats">
+    <div class="stat-pill"><strong>1 in 5</strong> AI initiatives delivering ROI</div>
+    <div class="stat-pill"><strong>6 takeaway</strong> sections encoded</div>
+    <div class="stat-pill"><strong>8 governance</strong> domains converging</div>
+    <div class="stat-pill"><strong>3 CDMP</strong> strategy options</div>
+    <div class="stat-pill"><strong>Knowledge Engineering</strong> goes mainstream</div>
+  </div>
+</div>
+</div>
+
+<!-- ── Overview ──────────────────────────────────────────────── -->
+<section id="overview">
+<div class="container">
+  <h2>Overview</h2>
+  <p>Juan Sequeda's approximately tenth Gartner D&amp;A conference — this time in <a href="https://linkeddata.uriburner.com/describe/?url=http%3A%2F%2Fdbpedia.org%2Fresource%2FLondon">London</a>, May 2026 — delivered six themed sections of practitioner-grounded takeaways. The article pulls no punches: 4 out of 5 AI initiatives are failing, CDOs are ranked third by CEOs in AI savviness, and the industry is still calling 2026 "the year of the foundation" — again.</p>
+  <p>The article covers: the AI ROI crisis and its statistical evidence; context layers as mainstream AI infrastructure; the three CDMP vendor strategy options; governance singularity as eight domains converge; the iron-thread / pay-as-you-go methodology for avoiding waterfall anti-patterns; and the power of the data community.</p>
+  <div class="card">
+    <h3>Source Article</h3>
+    <p><strong>Title:</strong> <a href="https://juansequeda.substack.com/p/gartner-data-and-analytics-london">Gartner Data &amp; Analytics London May 2026: My Honest No-BS Takeaways</a><br>
+    <strong>Author:</strong> <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23juanSequeda">Juan Sequeda</a>, Principal Scientist at <a href="https://linkeddata.uriburner.com/describe/?url=http%3A%2F%2Fdbpedia.org%2Fresource%2FServiceNow">ServiceNow</a><br>
+    <strong>Event:</strong> <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23conference">Gartner Data &amp; Analytics London</a>, organized by <a href="https://linkeddata.uriburner.com/describe/?url=http%3A%2F%2Fdbpedia.org%2Fresource%2FGartner">Gartner</a></p>
+  </div>
+</div>
+</section>
+
+<!-- ── Takeaways ─────────────────────────────────────────────── -->
+<section id="takeaways" style="background:var(--bg2)">
+<div class="container">
+  <h2>Six Takeaway Sections</h2>
+  <div class="takeaway-grid">
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 1</div>
+      <div class="takeaway-title">Basics and Foundations</div>
+      <div class="takeaway-desc">AI ROI crisis (1 in 5 delivering), readiness gaps, C-suite alignment needs, AI archetypes. The perennial "year of the foundation" — again.</div>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 2</div>
+      <div class="takeaway-title">Context, Context, Context</div>
+      <div class="takeaway-desc">Context layers as mainstream AI infrastructure. Semantics, ontologies, and KGs are no longer niche. Knowledge engineering as an emerging enterprise practice. You cannot buy context.</div>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 3</div>
+      <div class="takeaway-title">Vendor Strategy</div>
+      <div class="takeaway-desc">CDMP options: CSP-centric, ISV-centric, App-centric. Strategic vs Critical vendor tier framework. Metadata ownership as the next competitive frontier.</div>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 4</div>
+      <div class="takeaway-title">Governance is King and Queen</div>
+      <div class="takeaway-desc">Governance singularity: AI forcing eight governance domains to converge. Operational governance already happening, unrecognized. Data contracts. Policy as code.</div>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 5</div>
+      <div class="takeaway-title">Methodologies</div>
+      <div class="takeaway-desc">What the industry is not talking about: iron-thread / pay-as-you-go methodology. "Day in the life of data." Avoiding the waterfall foundation anti-pattern.</div>
+    </div>
+    <div class="takeaway-card">
+      <div class="takeaway-num">Takeaway 6</div>
+      <div class="takeaway-title">Awesome Community</div>
+      <div class="takeaway-desc">Juan's ~10th Gartner D&amp;A conference. Long-running analyst relationships since the 2016 Capsenta Cool Vendor award. The Honest No-BS dinner group.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── AI Archetypes ──────────────────────────────────────────── -->
+<section id="ai-archetypes">
+<div class="container">
+  <h2>AI Archetypes &amp; Statistics</h2>
+  <p>Gartner defines three AI adoption archetypes. Juan Sequeda challenges the AI-Cautious archetype as a legitimate organizational strategy — calling it a posture that leaves organizations behind, not a viable path forward.</p>
+  <div class="archetype-grid">
+    <div class="arch-card">
+      <div class="arch-name">🟡 <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23archCautious">AI-Cautious</a></div>
+      <div class="arch-desc">Organizations proceeding carefully. Juan's critique: caution is a posture, not a strategy. Being AI-Cautious should not be validated as a legitimate archetype.</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-name">🔵 <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23archOpportunistic">AI-Opportunistic</a></div>
+      <div class="arch-desc">Pursuing AI selectively where clear opportunities arise, without full organizational commitment.</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-name">🟢 <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23archFirst">AI-First</a></div>
+      <div class="arch-desc">AI embedded as a core organizational operating principle across all functions. Juan's preferred direction.</div>
+    </div>
+  </div>
+  <h3>Key Statistics</h3>
+  <table class="stat-table">
+    <thead><tr><th>Metric</th><th>Figure</th></tr></thead>
+    <tbody>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat1">AI ROI Rate 2025</a></td><td><span class="stat-num">1 in 5</span> AI initiatives achieving ROI</td></tr>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat2">Agent Cost Concern Gap</a></td><td><span class="stat-num">6/10</span> IT leaders concerned; only <span class="stat-num">1/10</span> D&amp;A leaders</td></tr>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat3">AI FinOps Adoption</a></td><td><span class="stat-num">47%</span> of European organizations have financial guardrails</td></tr>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat4">Data Engineering Effectiveness</a></td><td>Only <span class="stat-num">26%</span> rate data engineering as highly effective</td></tr>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat5">Governance Readiness</a></td><td>Only <span class="stat-num">13%</span> say D&amp;A governance can lead AI; <span class="stat-num">90%</span> say architecture needs overhaul</td></tr>
+      <tr><td><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23stat6">KE Starting Point Poll</a></td><td><span class="stat-num">60%</span> starting with semantic layers; <span class="stat-num">40%</span> straight to ontologies/KGs</td></tr>
+    </tbody>
+  </table>
+</div>
+</section>
+
+<!-- ── Context Layer ──────────────────────────────────────────── -->
+<section id="context-layer" style="background:var(--bg2)">
+<div class="container">
+  <h2>Context, Context, Context</h2>
+  <p>Gartner 2026: <em>"Semantics, knowledge graphs and ontologies are no longer niche technologies but essential components of AI-ready data infrastructure."</em> The talk by <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23andresGarciaRodeja">Andres Garcia-Rodeja</a> on building a context layer drew a packed room with 30 minutes of post-session Q&amp;A on basic foundational questions — a clear signal that this is now mainstream territory.</p>
+  <div class="card">
+    <h3>The Three Context Components</h3>
+    <div class="insight-row"><div class="insight-icon">🧩</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23contextSemantics">Semantics</a></strong><p>Ontologies, business glossaries, metrics definitions. The foundational semantic layer — where data catalogs and metadata tools have traditionally focused.</p></div></div>
+    <div class="insight-row"><div class="insight-icon">⚡</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23contextOperationalState">Operational State</a></strong><p>Entities, activities, and environmental conditions — what is actually happening in the business right now, not after the fact.</p></div></div>
+    <div class="insight-row"><div class="insight-icon">🔍</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23contextProvenance">Provenance</a></strong><p>Tracking of data, the processes it went through, decisions made, actions taken, outcomes that resulted.</p></div></div>
+  </div>
+  <div class="card">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23cantBuyContext">You Cannot Buy Context</a></h3>
+    <p>Context already exists in every organization — in systems, processes, people's heads, institutional and tacit knowledge. It is fragmented and poorly managed, not missing. No vendor can sell it to you.</p>
+  </div>
+  <div class="card">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23deterministicSemantics">Deterministic Semantics for Trust</a></h3>
+    <p>When reliability and trust are required, use semantics-powered deterministic reasoning, not probabilistic LLM inference. Knowledge graphs and ontologies are the backbone for trustworthy agentic AI.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── Vendor Strategy ────────────────────────────────────────── -->
+<section id="vendor-strategy">
+<div class="container">
+  <h2>Vendor Strategy</h2>
+  <p>The CDMP (Converged Data Management Platform) vendor strategy panel featured Gartner analysts <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23ehtishamZaidi">Ehtisham Zaidi</a>, <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23robertThanaraj">Robert Thanaraj</a>, and <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23roxaneEdjlali">Roxane Edjlali</a>, moderated by <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23danielCota">Daniel Cota</a>.</p>
+  <div class="cdmp-grid">
+    <div class="cdmp-card">
+      <div class="cdmp-name"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23cspOption">☁ CSP-Centric CDMP</a></div>
+      <div class="cdmp-desc">Pre-integrated capabilities within one cloud; best for time-to-market. Limitation: metadata tools typically scan only inside own ecosystem — multi-cloud buyers still need ISVs.</div>
+    </div>
+    <div class="cdmp-card">
+      <div class="cdmp-name"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23isvOption">🔧 ISV-Centric CDMP</a></div>
+      <div class="cdmp-desc">Best-of-breed depth and cloud neutrality. Risks: acquisition instability and re-creating fragmented best-of-breed stitching problems.</div>
+    </div>
+    <div class="cdmp-card">
+      <div class="cdmp-name"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23appOption">📱 App-Centric CDMP</a></div>
+      <div class="cdmp-desc">App vendors already hold their domain's semantics better than anyone else. Challenge: organizations use multiple applications across the enterprise.</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23metadataOwnershipInsight">Metadata Ownership: The Next Frontier</a></h3>
+    <p>The next competitive battleground is not who owns your data, but who owns your metadata. App vendors already know their domain's semantics; hyperscalers and ISVs are still trying to infer what app vendors already know.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── Governance ─────────────────────────────────────────────── -->
+<section id="governance" style="background:var(--bg2)">
+<div class="container">
+  <h2>Governance is King and Queen</h2>
+  <p>Governance keynote by <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23anuragRaj">Anurag Raj</a> — Juan calls it one of the best sessions at the conference.</p>
+  <div class="card">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23governanceSingularity">Governance Singularity</a></h3>
+    <p>AI is forcing the convergence of eight governance domains into a single blurring scope. These boundaries are dissolving whether organizations plan for it or not.</p>
+    <div class="gov-grid">
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govData">Data Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govAI">AI Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govAnalytics">Analytics Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govCyber">Cybersecurity Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govMDM">MDM Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govDecision">Decision Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govCorporate">Corporate Risk Governance</a>
+      <a class="gov-chip" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23govIT">IT Governance</a>
+    </div>
+  </div>
+  <div class="insight-row" style="margin-top:.75rem"><div class="insight-icon">🤝</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23dataContractBridge">Data Contracts as Bridge</a></strong><p>Data contracts bridge upstream operational governance and downstream analytical governance, carrying schema, lineage, SLAs, and quality metrics.</p></div></div>
+  <div class="insight-row"><div class="insight-icon">⚙</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23policyAsCodeInsight">Policy as Code</a></strong><p>Six policy types (definitions/models, quality, security, privacy, ethics, lifecycle) translated into enforceable executable code.</p></div></div>
+  <div class="insight-row"><div class="insight-icon">💡</div><div class="insight-body"><strong><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23operationalGovernanceInsight">Operational Governance Already Exists</a></strong><p>Operations teams govern daily — managing data entry rules, maintaining source correctness, notifying teams of changes — but don't call it governance. The D&amp;A world has ignored this upstream activity.</p></div></div>
+</div>
+</section>
+
+<!-- ── Methodologies ──────────────────────────────────────────── -->
+<section id="methodologies">
+<div class="container">
+  <h2>Methodologies</h2>
+  <p>"What the industry is not talking about." Juan Sequeda's practitioner methodologies for avoiding the waterfall foundation anti-pattern.</p>
+  <div class="card">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23ironThreadMethod">Iron-Thread / Pay-As-You-Go Methodology</a></h3>
+    <p>Start from a business outcome, identify the minimum foundation needed to support it, execute end-to-end delivering value while building the foundation simultaneously. Repeat per use case. The opposite of waterfall-first-then-value. <a href="http://www.juansequeda.com/blog/2019/10/24/a-pay-as-you-go-methodology-to-design-and-build-knowledge-graphs/">Published 2019</a> for knowledge graph design.</p>
+  </div>
+  <div class="card">
+    <h3><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23dayInLifeMethod">Day in the Life of a Piece of Data</a></h3>
+    <p>Follow one specific, important piece of data from its operational origin through every system, governance checkpoint, analytics process, and decision it influences — and map the round trip back to operations. Forces cross-team dialogue and makes abstract governance concrete.</p>
+  </div>
+  <div class="card" style="border-color:rgba(248,113,113,.3)">
+    <h3 style="color:var(--red)"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23waterfallAntiPattern" style="color:var(--red)">⚠ Foundation-First Waterfall Anti-Pattern</a></h3>
+    <p>Organizations hear "build the foundation first" and enter waterfall mode: big foundation project, then next layer, then next — nothing delivered, everyone loses patience. The industry desperately needs use-case-by-use-case methodologies to counter this cycle.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── KG Explorer ────────────────────────────────────────────── -->
+<section id="kg-explorer" style="background:var(--bg2)">
+<div class="container">
+  <h2>Knowledge Graph Explorer</h2>
+  <p>Interactive D3.js visualization of the companion <a href="gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl">RDF/Turtle knowledge graph</a>. Switch between Basic and Advanced modes; filter by node type, density, and predicates; click nodes to open their URIBurner resolver page.</p>
+  <div class="kg-shell">
+    <!-- Toolbar -->
+    <div class="kg-toolbar">
+      <div class="kg-mode-group">
+        <button class="kg-btn active" id="btn-basic" onclick="switchMode('basic')">Basic</button>
+        <button class="kg-btn" id="btn-advanced" onclick="switchMode('advanced')">Advanced ⚙</button>
+      </div>
+      <div class="kg-sep"></div>
+      <!-- Basic controls (hidden in advanced) -->
+      <span id="basic-controls" style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap">
+        <span class="kg-label">Density</span>
+        <div class="kg-filter-group">
+          <button class="kg-filter-btn active" id="density-core" onclick="setDensity('core')">Core</button>
+          <button class="kg-filter-btn" id="density-full" onclick="setDensity('full')">Full</button>
+        </div>
+        <div class="kg-sep"></div>
+        <span class="kg-label">Type</span>
+        <div class="kg-filter-group">
+          <button class="kg-filter-btn active" id="type-all" onclick="setTypeFilter('all')">All</button>
+          <button class="kg-filter-btn" id="type-person" onclick="setTypeFilter('person')">People</button>
+          <button class="kg-filter-btn" id="type-org" onclick="setTypeFilter('org')">Orgs</button>
+          <button class="kg-filter-btn" id="type-takeaway" onclick="setTypeFilter('takeaway')">Takeaways</button>
+          <button class="kg-filter-btn" id="type-insight" onclick="setTypeFilter('insight')">Insights</button>
+        </div>
+        <input class="kg-search" id="basic-search" placeholder="Search nodes…" oninput="renderBasic()">
+      </span>
+      <button class="settings-btn kg-btn" id="adv-fullscreen-btn" onclick="toggleFullscreen()" title="Fullscreen">⛶</button>
+      <button class="settings-btn kg-btn" id="adv-center-btn" onclick="centerAdvGraph()" title="Center graph">⊙</button>
+      <button class="settings-btn kg-btn" id="settings-toggle-btn" onclick="toggleSettings()" aria-expanded="false">⚙ Settings</button>
+      <span class="kg-status" id="kg-status">Loading…</span>
+    </div>
+    <!-- Pane -->
+    <div class="kg-pane-wrap" style="position:relative">
+      <svg id="basic-kg-pane"></svg>
+      <svg id="adv-kg-pane" style="display:none"></svg>
+      <!-- Settings Panel -->
+      <div id="settings-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem">
+          <span style="font-weight:700;font-size:.8rem;color:var(--accent2)">⚙ Advanced Settings</span>
+          <button onclick="toggleSettings()" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--fg2);padding:1px 7px;cursor:pointer;font-size:.8rem" aria-label="Close settings">✕</button>
+        </div>
+        <div class="settings-section-title">Physics</div>
+        <div class="settings-row">
+          <label>Enable physics</label>
+          <label class="settings-toggle"><input type="checkbox" id="adv-physics" checked onchange="togglePhysics(this.checked)"><span class="settings-toggle-slider"></span></label>
+        </div>
+        <div class="settings-row">
+          <label>Charge</label>
+          <input type="range" id="adv-charge" min="-800" max="-50" value="-300" oninput="applyPhysics()">
+        </div>
+        <div class="settings-row">
+          <label>Link distance</label>
+          <input type="range" id="adv-distance" min="40" max="300" value="120" oninput="applyPhysics()">
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Node Types</div>
+        <div class="settings-chips" id="adv-node-chips"></div>
+        <div class="settings-ctrl-row">
+          <button class="settings-ctrl-btn" onclick="selectAllNodeTypes()">All</button>
+          <button class="settings-ctrl-btn" onclick="selectNoneNodeTypes()">None</button>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Edge Predicates</div>
+        <div id="edge-filter-list"></div>
+        <div class="settings-ctrl-row" style="margin-top:.35rem">
+          <button class="settings-ctrl-btn" onclick="selectAllEdges()">All</button>
+          <button class="settings-ctrl-btn" onclick="selectNoneEdges()">None</button>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Predicate Display</div>
+        <div class="settings-radio-group">
+          <label><input type="radio" name="pred-display" value="labels" checked onchange="setPredDisplay('labels')">Labels</label>
+          <label><input type="radio" name="pred-display" value="icons" onchange="setPredDisplay('icons')">Icons</label>
+          <label><input type="radio" name="pred-display" value="none" onchange="setPredDisplay('none')">None</label>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Arrow Style</div>
+        <div class="settings-radio-group">
+          <label><input type="radio" name="arrow-style" value="single" checked onchange="setArrowStyle('single')">Single →</label>
+          <label><input type="radio" name="arrow-style" value="dual" onchange="setArrowStyle('dual')">Dual ↔</label>
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Literal Filter</div>
+        <div class="settings-row">
+          <input type="text" id="adv-literal" placeholder="Filter by label/ID…" oninput="setLiteralFilter(this.value)">
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Resolver</div>
+        <div class="settings-radio-group" style="margin-bottom:.4rem">
+          <label><input type="radio" name="resolver" value="uriburner" checked onchange="setResolver('uriburner')">URIBurner</label>
+          <label><input type="radio" name="resolver" value="none" onchange="setResolver('none')">None</label>
+          <label><input type="radio" name="resolver" value="custom" onchange="setResolver('custom')">Custom</label>
+        </div>
+        <div id="custom-resolver-row" class="settings-row">
+          <input type="text" id="custom-resolver-input" placeholder="https://…/{uri}" oninput="setCustomResolver(this.value)">
+        </div>
+        <div class="settings-divider"></div>
+        <div class="settings-section-title">Legend</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#7c6af7;display:inline-block"></span> Person</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#2dd4bf;display:inline-block"></span> Organization / Event</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#fbbf24;display:inline-block"></span> Takeaway</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#4ade80;display:inline-block"></span> Insight / Methodology</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#f472b6;display:inline-block"></span> Statistic / Archetype / Context</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#38bdf8;display:inline-block"></span> Governance / Vendor</div>
+        <div class="settings-legend-row"><span style="width:10px;height:10px;border-radius:50%;background:#a1a1aa;display:inline-block"></span> Article / Other</div>
+      </div>
+    </div>
+    <!-- Legend bar -->
+    <div class="kg-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#7c6af7"></div>Person</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2dd4bf"></div>Org/Event</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#fbbf24"></div>Takeaway</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Insight/Method</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#f472b6"></div>Stat/Archetype</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#38bdf8"></div>Gov/Vendor</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a1a1aa"></div>Article/Other</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── FAQ ───────────────────────────────────────────────────── -->
+<section id="faq">
+<div class="container">
+  <h2>Frequently Asked Questions</h2>
+  <div class="faq-item"><div class="faq-q">Why are 4 out of 5 AI initiatives failing to achieve ROI?</div><div class="faq-a">The root causes are foundational: data availability and quality remain the #1 barrier. Only 26% of D&amp;A/AI leaders rate their data engineering as highly effective, only 13% say their governance can fully lead AI governance, and 90% say their architecture needs an overhaul. Organizations are deploying AI without the underlying data readiness.</div></div>
+  <div class="faq-item"><div class="faq-q">What should a context layer actually include?</div><div class="faq-a">Semantics (ontologies, business glossaries, metrics definitions), Operational State (entities, activities, real-time business conditions), and Provenance (decision traces, data lineage, process history). Juan extends this to also include Users, Access, and Assets. Data catalogs rebranded as context platforms may not cover everything needed for AI-first use cases.</div></div>
+  <div class="faq-item"><div class="faq-q">What is the governance singularity?</div><div class="faq-a">A term from Anurag Raj's session: AI is forcing the convergence of data governance, AI governance, analytics governance, cybersecurity, MDM, decision governance, corporate risk governance, and IT governance into a single blurring scope. These boundaries are dissolving whether organizations plan for it or not.</div></div>
+  <div class="faq-item"><div class="faq-q">What is the iron-thread / pay-as-you-go methodology?</div><div class="faq-a">Juan Sequeda's practitioner methodology: start from a business outcome, identify the minimum foundation needed, execute end-to-end delivering both value and foundation simultaneously. Repeat per use case. The opposite of waterfall-first-then-value. Originally published in 2019 for knowledge graph design.</div></div>
+  <div class="faq-item"><div class="faq-q">When should I choose CSP-centric vs ISV-centric vs App-centric CDMP?</div><div class="faq-a">CSP-centric: you're already on one cloud, time-to-market is priority. ISV-centric: you need best-of-breed depth or cloud neutrality — monitor acquisition risk. App-centric: your use cases fit within an application's footprint. Key question: where is the gravity of your data and context?</div></div>
+  <div class="faq-item"><div class="faq-q">How should CDOs and CIOs work together on AI?</div><div class="faq-a">Urgently and directly. CEO surveys show CDOs rank 3rd in perceived AI savviness (behind CISOs and CIOs). CEOs are spreading AI leadership bets across all three. CDOs not working closely with their CIO are at a competitive disadvantage. CIO-CDO alignment on AI strategy is a prerequisite, not a nice-to-have.</div></div>
+  <div class="faq-item"><div class="faq-q">Should my organization adopt an AI-Cautious posture?</div><div class="faq-a">Juan Sequeda's view: No. Caution is a posture that leaves you behind, not a strategy. He challenges Gartner's validation of AI-Cautious as a legitimate archetype. Being cautious about individual AI investments is prudent; positioning the entire organization as AI-Cautious is not.</div></div>
+</div>
+</section>
+
+<!-- ── Glossary ───────────────────────────────────────────────── -->
+<section id="glossary" style="background:var(--bg2)">
+<div class="container">
+  <h2>Glossary</h2>
+  <div class="glossary-grid">
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termContextLayer">Context Layer</a></div><div class="gloss-def">A platform providing semantics, operational state, and provenance to enable reliable AI. Evolution of data catalog tools, now rebranded as "context platforms."</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termCDMP">Converged Data Management Platform (CDMP)</a></div><div class="gloss-def">Gartner's term for a unified platform integrating data integration, quality, governance, and metadata management. Built via CSP-centric, ISV-centric, or App-centric approaches.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termIronThread">Iron-Thread Methodology</a></div><div class="gloss-def">Juan Sequeda's pay-as-you-go approach: deliver business value and build foundational capabilities simultaneously per use case. Avoids big-bang waterfall foundation projects.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termGovernanceSingularity">Governance Singularity</a></div><div class="gloss-def">AI-driven convergence of data, AI, analytics, cybersecurity, MDM, decision, corporate risk, and IT governance into a single expanding scope.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termDataContract">Data Contract</a></div><div class="gloss-def">A formal agreement between data producers and consumers specifying schema, lineage, SLAs, and quality metrics. Bridges upstream operational governance and downstream analytical governance.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termPolicyAsCode">Policy as Code</a></div><div class="gloss-def">Translating governance policies (definitions, quality, security, privacy, ethics, lifecycle) into enforceable executable code rather than documentation.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termKnowledgeEngineering">Knowledge Engineering</a></div><div class="gloss-def">The practice of building ontologies, knowledge graphs, and semantic layers encoding business meaning. Increasingly essential for agentic AI.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termSemanticLayer">Semantic Layer</a></div><div class="gloss-def">A layer providing business meaning to data for BI and reporting use cases. Recommended starting point for organizations from traditional star-schema analytics backgrounds.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termAIFinOps">AI FinOps</a></div><div class="gloss-def">Financial governance and cost guardrails for AI. 47% of European organizations have implemented these; 6 in 10 IT leaders (vs 1 in 10 D&amp;A leaders) are concerned about agent cost overruns.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termProvenance">Provenance</a></div><div class="gloss-def">Tracking of data origins, the processes it underwent, decisions made, actions taken, and outcomes that resulted. Core context component alongside semantics and operational state.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termAIArchetype">AI Archetype</a></div><div class="gloss-def">Gartner's classification of organizational AI postures: AI-Cautious, AI-Opportunistic, AI-First. Juan challenges AI-Cautious as a legitimate strategic posture.</div></div>
+    <div class="gloss-item"><div class="gloss-term"><a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23termKnowledgeGraph">Knowledge Graph</a></div><div class="gloss-def">A network representation of entities, types, and relationships grounded in ontologies. Gartner 2026: no longer niche; essential for AI-ready data infrastructure. Build them now.</div></div>
+  </div>
+</div>
+</section>
+
+<!-- ── HowTo ──────────────────────────────────────────────────── -->
+<section id="howto">
+<div class="container">
+  <h2>How To: Build AI-Ready Data Foundations</h2>
+  <p>Per Juan Sequeda's Gartner London 2026 takeaways — a practical seven-step guide.</p>
+  <ol class="howto-list">
+    <li class="howto-item"><div class="howto-num">1</div><div class="howto-body"><strong>Start with a business outcome, not a technology</strong><p>Identify the specific business outcome you want to achieve and work backwards to the minimum data, context, and governance foundation needed. Resist defining the full foundation before the first use case.</p></div></li>
+    <li class="howto-item"><div class="howto-num">2</div><div class="howto-body"><strong>Audit the context that already exists in your organization</strong><p>Context cannot be purchased. Inventory your existing ontologies, business glossaries, metrics definitions, operational rules, and tacit institutional knowledge before evaluating any context platform product.</p></div></li>
+    <li class="howto-item"><div class="howto-num">3</div><div class="howto-body"><strong>Choose your CDMP strategy: CSP, ISV, or App-centric</strong><p>Assess where your data gravity lives, your cloud commitment, and the tier of each vendor: Strategic (future direction) vs Critical (mission-critical today). These dimensions are independent.</p></div></li>
+    <li class="howto-item"><div class="howto-num">4</div><div class="howto-body"><strong>Bridge operational and analytical governance with data contracts</strong><p>Map the key data flows between operational systems and downstream analytics. Define data contracts specifying schema, lineage, SLAs, and quality metrics. Bring both teams into the same conversation.</p></div></li>
+    <li class="howto-item"><div class="howto-num">5</div><div class="howto-body"><strong>Run the "day in the life of a piece of data" exercise</strong><p>Select one important piece of data. Follow it from operational origin through every system, governance checkpoint, analytics process, and decision it influences. Map the full round trip back to operations.</p></div></li>
+    <li class="howto-item"><div class="howto-num">6</div><div class="howto-body"><strong>Match your knowledge engineering starting point to your background</strong><p>Coming from BI and star schemas? Start with semantic layers. Coming from operational data integration? Go straight to ontologies and knowledge graphs.</p></div></li>
+    <li class="howto-item"><div class="howto-num">7</div><div class="howto-body"><strong>Use deterministic semantics for high-reliability AI use cases</strong><p>When trust and auditability matter, use semantics-powered deterministic reasoning grounded in ontologies and knowledge graphs — not probabilistic LLM inference alone.</p></div></li>
+  </ol>
+</div>
+</section>
+
+<!-- ── SPARQL Queries ─────────────────────────────────────────────── -->
+<section id="sparql-queries">
+<div class="container">
+  <h2>Live SPARQL Queries</h2>
+  <p>Explore this knowledge graph interactively via the <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">URIBurner SPARQL endpoint</a> — a <a href="https://virtuoso.openlinksw.com/" target="_blank" rel="noopener">Virtuoso</a>-backed Linked Data server. Each query targets the named graph <code style="font-size:.82rem;background:var(--bg3);padding:.1rem .35rem;border-radius:4px">https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl</code> where this knowledge graph is hosted.</p>
+
+  <details class="sparql-card">
+    <summary>
+      <a class="sparql-title" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23sparqlQuery1" target="_blank" rel="noopener" onclick="event.stopPropagation()">AI Statistics with Supporting Theses</a>
+    </summary>
+    <div class="sparql-body">
+      <pre class="sparql-pre"><code>PREFIX schema: &lt;http://schema.org/&gt;
+PREFIX : &lt;https://juansequeda.substack.com/p/gartner-data-and-analytics-london#&gt;
+
+SELECT ?stat ?statName ?statValue ?thesisName
+FROM &lt;https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl&gt;
+WHERE {
+  ?stat a :Statistic ;
+        schema:name ?statName ;
+        schema:value ?statValue .
+  OPTIONAL { ?stat :supportsThesis ?thesis . ?thesis schema:name ?thesisName . }
+}
+ORDER BY ?statName</code></pre>
+      <div class="sparql-actions">
+        <a class="sparql-run" id="run-q1" href="#" target="_blank" rel="noopener">▶ Run live query</a>
+        <span class="sparql-ep">Endpoint: <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">linkeddata.uriburner.com/sparql</a></span>
+      </div>
+    </div>
+  </details>
+
+  <details class="sparql-card">
+    <summary>
+      <a class="sparql-title" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23sparqlQuery2" target="_blank" rel="noopener" onclick="event.stopPropagation()">Persons and Organizational Affiliations</a>
+    </summary>
+    <div class="sparql-body">
+      <pre class="sparql-pre"><code>PREFIX schema: &lt;http://schema.org/&gt;
+
+SELECT ?person ?personName ?orgName ?title
+FROM &lt;https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl&gt;
+WHERE {
+  ?person a schema:Person ;
+          schema:name ?personName .
+  OPTIONAL { ?person schema:worksFor ?org . ?org schema:name ?orgName . }
+  OPTIONAL { ?person schema:jobTitle ?title . }
+}
+ORDER BY ?personName</code></pre>
+      <div class="sparql-actions">
+        <a class="sparql-run" id="run-q2" href="#" target="_blank" rel="noopener">▶ Run live query</a>
+        <span class="sparql-ep">Endpoint: <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">linkeddata.uriburner.com/sparql</a></span>
+      </div>
+    </div>
+  </details>
+
+  <details class="sparql-card">
+    <summary>
+      <a class="sparql-title" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23sparqlQuery3" target="_blank" rel="noopener" onclick="event.stopPropagation()">Takeaway Sections with Key Insights</a>
+    </summary>
+    <div class="sparql-body">
+      <pre class="sparql-pre"><code>PREFIX schema: &lt;http://schema.org/&gt;
+PREFIX : &lt;https://juansequeda.substack.com/p/gartner-data-and-analytics-london#&gt;
+
+SELECT ?sectionName ?insightName ?insightDesc
+FROM &lt;https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl&gt;
+WHERE {
+  :article schema:hasPart ?section .
+  ?section a :ConferenceTakeaway ;
+           schema:name ?sectionName ;
+           :hasInsight ?insight .
+  ?insight schema:name ?insightName .
+  OPTIONAL { ?insight schema:description ?insightDesc . }
+}
+ORDER BY ?section ?insightName</code></pre>
+      <div class="sparql-actions">
+        <a class="sparql-run" id="run-q3" href="#" target="_blank" rel="noopener">▶ Run live query</a>
+        <span class="sparql-ep">Endpoint: <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">linkeddata.uriburner.com/sparql</a></span>
+      </div>
+    </div>
+  </details>
+
+  <details class="sparql-card">
+    <summary>
+      <a class="sparql-title" href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23sparqlQuery4" target="_blank" rel="noopener" onclick="event.stopPropagation()">Governance Domains in the Governance Singularity</a>
+    </summary>
+    <div class="sparql-body">
+      <pre class="sparql-pre"><code>PREFIX schema: &lt;http://schema.org/&gt;
+PREFIX : &lt;https://juansequeda.substack.com/p/gartner-data-and-analytics-london#&gt;
+
+SELECT ?domain ?domainName
+FROM &lt;https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl&gt;
+WHERE {
+  ?domain a :GovernanceDomain ;
+          schema:name ?domainName .
+}
+ORDER BY ?domainName</code></pre>
+      <div class="sparql-actions">
+        <a class="sparql-run" id="run-q4" href="#" target="_blank" rel="noopener">▶ Run live query</a>
+        <span class="sparql-ep">Endpoint: <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">linkeddata.uriburner.com/sparql</a></span>
+      </div>
+    </div>
+  </details>
+</div>
+</section>
+
+<!-- ── Attribution ────────────────────────────────────────────── -->
+<div class="container" style="padding-bottom:3rem">
+
+  <div class="sparql-explore-box" style="margin-top:2rem;margin-bottom:1.5rem">
+    <strong>🔍 Explore Knowledge Graph via SPARQL</strong>
+    <p style="font-size:.85rem;color:var(--fg2);margin:.4rem 0 .6rem">Entity hyperlinks throughout this page use <a href="https://linkeddata.uriburner.com/fct" target="_blank" rel="noopener">URIBurner</a> describe links — a <a href="https://virtuoso.openlinksw.com/" target="_blank" rel="noopener">Virtuoso</a>-backed Linked Data resolver — via the <code style="font-size:.78rem">describe/?url={uri}</code> pattern over RDF hash IRIs. Use the quick-explore links below or open the <a href="https://linkeddata.uriburner.com/sparql" target="_blank" rel="noopener">SPARQL endpoint</a> directly.</p>
+    <div class="sparql-explore-links">
+      <a class="sparql-explore-link" id="explore-all" href="#" target="_blank" rel="noopener">All Entities</a>
+      <a class="sparql-explore-link" id="explore-stats" href="#" target="_blank" rel="noopener">AI Statistics</a>
+      <a class="sparql-explore-link" id="explore-persons" href="#" target="_blank" rel="noopener">Persons</a>
+      <a class="sparql-explore-link" id="explore-gov" href="#" target="_blank" rel="noopener">Governance Domains</a>
+      <a class="sparql-explore-link" id="explore-methods" href="#" target="_blank" rel="noopener">Methodologies</a>
+    </div>
+  </div>
+
+  <div class="attribution">
+    <div class="attr-copy">KG generated by <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fjuansequeda.substack.com%2Fp%2Fgartner-data-and-analytics-london%23kgGeneratorSkill">kg-generator skill</a> · <a href="https://www.anthropic.com/claude" target="_blank" rel="noopener">Claude Sonnet 4.6</a> · 2026-05-20 · <a href="https://claude.ai/download" target="_blank" rel="noopener">Cowork Desktop</a> · Source: <a href="https://juansequeda.substack.com/p/gartner-data-and-analytics-london">Juan Sequeda · Substack</a></div>
+    <div class="attr-links">
+      <a class="attr-link" href="gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl">📄 RDF/Turtle</a>
+      <a class="attr-link" href="gartner-da-london-2026-juan-sequeda-claude_sonnet4.jsonld">🔗 JSON-LD</a>
+      <a class="attr-link" href="../markdown/gartner-da-london-2026-juan-sequeda-claude_sonnet4.md">📝 Markdown</a>
+      <a class="attr-link" href="https://juansequeda.substack.com/p/gartner-data-and-analytics-london">🌐 Source</a>
+    </div>
+  </div>
+  <p style="margin-top:14px;color:var(--fg3);font-size:0.86rem">
+    Generated using
+    <a href="https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/kg-generator" target="_blank" rel="noopener">kg-generator</a>,
+    <a href="https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/rdf-infographic-skill" target="_blank" rel="noopener">rdf-infographic-skill</a>
+  </p>
+  <p style="margin-top:6px;color:var(--fg3);font-size:0.82rem">
+    Linked Data resolver: <a href="https://linkeddata.uriburner.com/" target="_blank" rel="noopener">URIBurner</a> — Virtuoso-backed Linked Data resolver/server platform ·
+    Source delivery: <a href="https://juansequeda.substack.com" target="_blank" rel="noopener">juansequeda.substack.com</a>
+  </p>
+</div>
+
+<script>
+// ── Constants ──────────────────────────────────────────────────
+const BASE = 'https://juansequeda.substack.com/p/gartner-data-and-analytics-london#';
+const RESOLVER = 'https://linkeddata.uriburner.com/describe/?url=';
+
+const NODE_COLORS = {
+  person:'#7c6af7', org:'#2dd4bf', event:'#2dd4bf',
+  takeaway:'#fbbf24', insight:'#4ade80', methodology:'#4ade80',
+  statistic:'#f472b6', archetype:'#f472b6', context:'#f472b6',
+  governance:'#38bdf8', vendor:'#38bdf8',
+  article:'#a1a1aa', instance:'#a1a1aa'
+};
+
+const PRED_ICONS = {
+  'author':'✍','hasPart':'⊃','about':'💬','hasInsight':'💡',
+  'supportsThesis':'📊','worksFor':'🏢','location':'📍',
+  'organizer':'🏆','mentions':'👥','prescribes':'🔧',
+  'wasGeneratedBy':'⚙','containedIn':'🌍','a':'⊆',
+  'subClassOf':'⬆','relatesTo':'↔'
+};
+
+// ── Predicate IRI resolver ─────────────────────────────────────
+const PRED_IRI_MAP = {
+  'a':'http://www.w3.org/1999/02/22-rdf-syntax-ns#type',
+  'domain':'http://www.w3.org/2000/01/rdf-schema#domain',
+  'range':'http://www.w3.org/2000/01/rdf-schema#range',
+  'subClassOf':'http://www.w3.org/2000/01/rdf-schema#subClassOf',
+  'seeAlso':'http://www.w3.org/2000/01/rdf-schema#seeAlso'
+};
+function predIRI(label){ return PRED_IRI_MAP[label]||(BASE+label); }
+
+const PRED_DESCR = {
+  'author':'schema:author — creator or author of this resource',
+  'hasPart':'schema:hasPart — this resource contains or includes the target',
+  'about':'schema:about — the subject matter of the resource',
+  'hasInsight':'local:hasInsight — connects a takeaway section to a key insight it contains',
+  'supportsThesis':'local:supportsThesis — empirical statistic supporting the stated claim',
+  'worksFor':'schema:worksFor — person is employed by this organization',
+  'location':'schema:location — physical location of this event',
+  'organizer':'schema:organizer — organization responsible for this event',
+  'mentions':'schema:mentions — resource explicitly mentions this entity',
+  'prescribes':'local:prescribes — methodology recommends this specific practice',
+  'wasGeneratedBy':'prov:wasGeneratedBy — generated by this agent or activity',
+  'containedIn':'schema:containedInPlace — geographically contained within',
+  'relatesTo':'local:relatesTo — general semantic relationship between entities',
+  'a':'rdf:type — indicates this node is an instance of the target class'
+};
+
+const NODE_ICONS = {
+  article:'📄', juanSequeda:'✍', mirceaDanciulescu:'👤',
+  andresGarciaRodeja:'👤', ehtishamZaidi:'👤', robertThanaraj:'👤',
+  roxaneEdjlali:'👤', anuragRaj:'👤', markBeyer:'👤',
+  sanjeevMohan:'👤', malcolmHawker:'👤', guidoDeSimoni:'👤',
+  derekBirdsong:'👤', oleOlesenBagneux:'👤', samirSharma:'👤',
+  gartner:'🏢', serviceNow:'🏢', wpp:'🏢', capsenta:'🏢', substackPlatform:'🏢',
+  conference:'📅', london:'🌍', unitedKingdom:'🌍',
+  takeaway1:'💡', takeaway2:'💡', takeaway3:'💡',
+  takeaway4:'💡', takeaway5:'💡', takeaway6:'💡',
+  archCautious:'🏷', archOpportunistic:'🏷', archFirst:'🏷',
+  contextSemantics:'🧩', contextOperationalState:'⚡', contextProvenance:'🔍',
+  stat1:'📊', stat2:'📊', stat4:'📊', stat5:'📊', stat6:'📊',
+  cspOption:'☁', isvOption:'🔧', appOption:'📱',
+  aiRoiCrisis:'🔥', ciocdoAlignmentGap:'🤝', foundationYearIrony:'♻',
+  contextDefinition:'🧩', knowledgeEngineeringRise:'🚀', cantBuyContext:'🚫',
+  deterministicSemantics:'✅', vendorTierInsight:'⚖', metadataOwnershipInsight:'🔑',
+  governanceSingularity:'⚡', operationalGovernanceInsight:'💡',
+  dataContractBridge:'🤝', policyAsCodeInsight:'⚙',
+  ironThreadInsight:'🧵', dayInLifeInsight:'🔄', waterfallAntiPattern:'⚠',
+  ironThreadMethod:'🧵', dayInLifeMethod:'📋',
+  govData:'⚖', govAI:'🤖', govAnalytics:'📈', govCyber:'🛡',
+  govMDM:'🗃', govDecision:'🎯', govCorporate:'🏛', govIT:'💻',
+  kgGeneratorSkill:'⚙'
+};
+
+// ── KG Data (derived from companion RDF at generation time) ────
+const kgData = {
+  nodes:[
+    {id:'article',label:'Gartner D&A London Article',type:'article'},
+    {id:'juanSequeda',label:'Juan Sequeda',type:'person'},
+    {id:'mirceaDanciulescu',label:'Mircea Danciulescu',type:'person'},
+    {id:'andresGarciaRodeja',label:'Andres Garcia-Rodeja',type:'person'},
+    {id:'ehtishamZaidi',label:'Ehtisham Zaidi',type:'person'},
+    {id:'anuragRaj',label:'Anurag Raj',type:'person'},
+    {id:'markBeyer',label:'Mark Beyer',type:'person'},
+    {id:'sanjeevMohan',label:'Sanjeev Mohan',type:'person'},
+    {id:'malcolmHawker',label:'Malcolm Hawker',type:'person'},
+    {id:'gartner',label:'Gartner',type:'org'},
+    {id:'serviceNow',label:'ServiceNow',type:'org'},
+    {id:'wpp',label:'WPP',type:'org'},
+    {id:'capsenta',label:'Capsenta',type:'org'},
+    {id:'conference',label:'Gartner D&A London 2026',type:'event'},
+    {id:'london',label:'London',type:'event'},
+    {id:'unitedKingdom',label:'United Kingdom',type:'event'},
+    {id:'takeaway1',label:'Basics & Foundations',type:'takeaway'},
+    {id:'takeaway2',label:'Context Layer',type:'takeaway'},
+    {id:'takeaway3',label:'Vendor Strategy',type:'takeaway'},
+    {id:'takeaway4',label:'Governance',type:'takeaway'},
+    {id:'takeaway5',label:'Methodologies',type:'takeaway'},
+    {id:'takeaway6',label:'Community',type:'takeaway'},
+    {id:'archCautious',label:'AI-Cautious',type:'archetype'},
+    {id:'archOpportunistic',label:'AI-Opportunistic',type:'archetype'},
+    {id:'archFirst',label:'AI-First',type:'archetype'},
+    {id:'contextSemantics',label:'Semantics',type:'context'},
+    {id:'contextOperationalState',label:'Operational State',type:'context'},
+    {id:'contextProvenance',label:'Provenance',type:'context'},
+    {id:'stat1',label:'AI ROI Rate 2025',type:'statistic'},
+    {id:'stat2',label:'Cost Concern Gap',type:'statistic'},
+    {id:'stat4',label:'Data Eng Effectiveness',type:'statistic'},
+    {id:'stat5',label:'Governance Readiness',type:'statistic'},
+    {id:'stat6',label:'KE Starting Point Poll',type:'statistic'},
+    {id:'cspOption',label:'CSP-Centric CDMP',type:'vendor'},
+    {id:'isvOption',label:'ISV-Centric CDMP',type:'vendor'},
+    {id:'appOption',label:'App-Centric CDMP',type:'vendor'},
+    {id:'aiRoiCrisis',label:'AI ROI Crisis',type:'insight'},
+    {id:'ciocdoAlignmentGap',label:'CIO-CDO Alignment Gap',type:'insight'},
+    {id:'foundationYearIrony',label:'Year of the Foundation',type:'insight'},
+    {id:'contextDefinition',label:'What Is Context?',type:'insight'},
+    {id:'knowledgeEngineeringRise',label:'KE Goes Mainstream',type:'insight'},
+    {id:'cantBuyContext',label:'Cannot Buy Context',type:'insight'},
+    {id:'deterministicSemantics',label:'Deterministic Semantics',type:'insight'},
+    {id:'vendorTierInsight',label:'Strategic vs Critical Tiers',type:'insight'},
+    {id:'metadataOwnershipInsight',label:'Metadata Ownership Frontier',type:'insight'},
+    {id:'governanceSingularity',label:'Governance Singularity',type:'insight'},
+    {id:'operationalGovernanceInsight',label:'Operational Gov. Exists',type:'insight'},
+    {id:'dataContractBridge',label:'Data Contracts Bridge',type:'insight'},
+    {id:'policyAsCodeInsight',label:'Policy as Code',type:'insight'},
+    {id:'ironThreadInsight',label:'Iron-Thread Value',type:'insight'},
+    {id:'waterfallAntiPattern',label:'Waterfall Anti-Pattern',type:'insight'},
+    {id:'ironThreadMethod',label:'Iron-Thread Methodology',type:'methodology'},
+    {id:'dayInLifeMethod',label:'Day in Life of Data',type:'methodology'},
+    {id:'govData',label:'Data Governance',type:'governance'},
+    {id:'govAI',label:'AI Governance',type:'governance'},
+    {id:'govAnalytics',label:'Analytics Governance',type:'governance'},
+    {id:'govCyber',label:'Cybersecurity Governance',type:'governance'},
+    {id:'govMDM',label:'MDM Governance',type:'governance'},
+    {id:'govDecision',label:'Decision Governance',type:'governance'},
+    {id:'govCorporate',label:'Corporate Risk Governance',type:'governance'},
+    {id:'govIT',label:'IT Governance',type:'governance'},
+    {id:'kgGeneratorSkill',label:'kg-generator Skill',type:'instance'}
+  ],
+  links:[
+    {source:'article',target:'juanSequeda',label:'author'},
+    {source:'article',target:'conference',label:'about'},
+    {source:'article',target:'takeaway1',label:'hasPart'},
+    {source:'article',target:'takeaway2',label:'hasPart'},
+    {source:'article',target:'takeaway3',label:'hasPart'},
+    {source:'article',target:'takeaway4',label:'hasPart'},
+    {source:'article',target:'takeaway5',label:'hasPart'},
+    {source:'article',target:'takeaway6',label:'hasPart'},
+    {source:'article',target:'kgGeneratorSkill',label:'wasGeneratedBy'},
+    {source:'takeaway1',target:'aiRoiCrisis',label:'hasInsight'},
+    {source:'takeaway1',target:'ciocdoAlignmentGap',label:'hasInsight'},
+    {source:'takeaway1',target:'foundationYearIrony',label:'hasInsight'},
+    {source:'takeaway1',target:'archCautious',label:'hasPart'},
+    {source:'takeaway1',target:'archOpportunistic',label:'hasPart'},
+    {source:'takeaway1',target:'archFirst',label:'hasPart'},
+    {source:'takeaway1',target:'stat1',label:'hasPart'},
+    {source:'takeaway1',target:'stat2',label:'hasPart'},
+    {source:'takeaway1',target:'stat4',label:'hasPart'},
+    {source:'takeaway1',target:'stat5',label:'hasPart'},
+    {source:'takeaway2',target:'contextDefinition',label:'hasInsight'},
+    {source:'takeaway2',target:'knowledgeEngineeringRise',label:'hasInsight'},
+    {source:'takeaway2',target:'cantBuyContext',label:'hasInsight'},
+    {source:'takeaway2',target:'deterministicSemantics',label:'hasInsight'},
+    {source:'takeaway2',target:'contextSemantics',label:'hasPart'},
+    {source:'takeaway2',target:'contextOperationalState',label:'hasPart'},
+    {source:'takeaway2',target:'contextProvenance',label:'hasPart'},
+    {source:'takeaway2',target:'stat6',label:'hasPart'},
+    {source:'takeaway3',target:'vendorTierInsight',label:'hasInsight'},
+    {source:'takeaway3',target:'metadataOwnershipInsight',label:'hasInsight'},
+    {source:'takeaway3',target:'cspOption',label:'hasPart'},
+    {source:'takeaway3',target:'isvOption',label:'hasPart'},
+    {source:'takeaway3',target:'appOption',label:'hasPart'},
+    {source:'takeaway4',target:'governanceSingularity',label:'hasInsight'},
+    {source:'takeaway4',target:'operationalGovernanceInsight',label:'hasInsight'},
+    {source:'takeaway4',target:'dataContractBridge',label:'hasInsight'},
+    {source:'takeaway4',target:'policyAsCodeInsight',label:'hasInsight'},
+    {source:'takeaway4',target:'govData',label:'hasInsight'},
+    {source:'takeaway4',target:'govAI',label:'hasInsight'},
+    {source:'takeaway4',target:'govAnalytics',label:'hasInsight'},
+    {source:'takeaway4',target:'govCyber',label:'hasInsight'},
+    {source:'takeaway4',target:'govMDM',label:'hasInsight'},
+    {source:'takeaway4',target:'govDecision',label:'hasInsight'},
+    {source:'takeaway4',target:'govCorporate',label:'hasInsight'},
+    {source:'takeaway4',target:'govIT',label:'hasInsight'},
+    {source:'takeaway5',target:'ironThreadInsight',label:'hasInsight'},
+    {source:'takeaway5',target:'waterfallAntiPattern',label:'hasInsight'},
+    {source:'takeaway5',target:'ironThreadMethod',label:'hasPart'},
+    {source:'takeaway5',target:'dayInLifeMethod',label:'hasPart'},
+    {source:'takeaway6',target:'markBeyer',label:'mentions'},
+    {source:'takeaway6',target:'sanjeevMohan',label:'mentions'},
+    {source:'takeaway6',target:'malcolmHawker',label:'mentions'},
+    {source:'takeaway6',target:'ehtishamZaidi',label:'mentions'},
+    {source:'stat1',target:'aiRoiCrisis',label:'supportsThesis'},
+    {source:'stat2',target:'aiRoiCrisis',label:'supportsThesis'},
+    {source:'stat4',target:'aiRoiCrisis',label:'supportsThesis'},
+    {source:'stat5',target:'aiRoiCrisis',label:'supportsThesis'},
+    {source:'stat6',target:'knowledgeEngineeringRise',label:'supportsThesis'},
+    {source:'ironThreadMethod',target:'juanSequeda',label:'author'},
+    {source:'dayInLifeMethod',target:'juanSequeda',label:'author'},
+    {source:'ironThreadMethod',target:'ironThreadInsight',label:'prescribes'},
+    {source:'juanSequeda',target:'serviceNow',label:'worksFor'},
+    {source:'mirceaDanciulescu',target:'wpp',label:'worksFor'},
+    {source:'ehtishamZaidi',target:'gartner',label:'worksFor'},
+    {source:'anuragRaj',target:'gartner',label:'worksFor'},
+    {source:'markBeyer',target:'gartner',label:'worksFor'},
+    {source:'conference',target:'london',label:'location'},
+    {source:'conference',target:'gartner',label:'organizer'},
+    {source:'london',target:'unitedKingdom',label:'containedIn'},
+    {source:'andresGarciaRodeja',target:'takeaway2',label:'relatesTo'}
+  ]
+};
+
+// ── Core node IDs ──────────────────────────────────────────────
+const CORE_NODE_IDS = new Set([
+  'article','juanSequeda','conference','gartner','serviceNow',
+  'takeaway1','takeaway2','takeaway3','takeaway4','takeaway5','takeaway6',
+  'aiRoiCrisis','contextDefinition','governanceSingularity',
+  'ironThreadMethod','knowledgeEngineeringRise','vendorTierInsight',
+  'archCautious','archFirst','contextSemantics','contextOperationalState',
+  'contextProvenance','cspOption','isvOption','appOption',
+  'stat1','dayInLifeMethod','anuragRaj','mirceaDanciulescu','kgGeneratorSkill'
+]);
+
+// ── State ──────────────────────────────────────────────────────
+let currentMode = 'basic';
+let currentDensity = 'core';
+let currentTypeFilter = 'all';
+let basicSim = null, advSim = null;
+
+// Advanced state
+let advPhysicsEnabled = true;
+let advPredDisplay = 'labels';
+const advActiveNodeTypes = new Set(['person','org','event','takeaway','insight','methodology','statistic','archetype','context','governance','vendor','article','instance']);
+const advActiveEdgePredicates = new Set();
+let advLiteralFilter = '';
+let advResolverPref = 'uriburner';
+let advCustomResolver = '';
+let advArrowStyle = 'single';
+
+// ── Helpers ────────────────────────────────────────────────────
+function nodeColor(n){ return NODE_COLORS[n.type]||'#a1a1aa'; }
+function nodeRadius(n){ return n.type==='article'?14:n.type==='takeaway'?11:n.type==='org'||n.type==='event'?9:7; }
+
+function getResolver(iri){
+  if(advResolverPref==='none') return iri;
+  if(advResolverPref==='custom'&&advCustomResolver) return advCustomResolver.replace('{uri}',encodeURIComponent(iri));
+  return RESOLVER+encodeURIComponent(iri);
+}
+
+function nodeIRI(id){
+  // Check for DBpedia sameAs
+  const dbp = {gartner:'http://dbpedia.org/resource/Gartner',serviceNow:'http://dbpedia.org/resource/ServiceNow',wpp:'http://dbpedia.org/resource/WPP_plc',substackPlatform:'http://dbpedia.org/resource/Substack',london:'http://dbpedia.org/resource/London',unitedKingdom:'http://dbpedia.org/resource/United_Kingdom'};
+  return dbp[id]||(BASE+id);
+}
+
+// ── Filtered Data ──────────────────────────────────────────────
+function filteredData(density){
+  const nodeIds = density==='core' ? CORE_NODE_IDS : new Set(kgData.nodes.map(n=>n.id));
+  let nodes = kgData.nodes.filter(n=>nodeIds.has(n.id));
+  const search = document.getElementById('basic-search')?.value.toLowerCase()||'';
+  if(search) nodes = nodes.filter(n=>n.label.toLowerCase().includes(search)||n.id.toLowerCase().includes(search));
+  if(currentTypeFilter!=='all') nodes = nodes.filter(n=>n.type===currentTypeFilter||(currentTypeFilter==='insight'&&n.type==='methodology'));
+  const nodeSet = new Set(nodes.map(n=>n.id));
+  const links = kgData.links.filter(l=>{
+    const s=typeof l.source==='object'?l.source.id:l.source;
+    const t=typeof l.target==='object'?l.target.id:l.target;
+    return nodeSet.has(s)&&nodeSet.has(t);
+  });
+  const linked = new Set();
+  links.forEach(l=>{
+    linked.add(typeof l.source==='object'?l.source.id:l.source);
+    linked.add(typeof l.target==='object'?l.target.id:l.target);
+  });
+  const finalNodes = nodes.filter(n=>linked.has(n.id));
+  return {nodes: finalNodes.length?finalNodes:nodes, links};
+}
+
+function advFilteredData(density){
+  const nodeIds = density==='core' ? CORE_NODE_IDS : new Set(kgData.nodes.map(n=>n.id));
+  let nodes = kgData.nodes.filter(n=>nodeIds.has(n.id)&&advActiveNodeTypes.has(n.type));
+  if(advLiteralFilter){
+    const f=advLiteralFilter.toLowerCase();
+    nodes=nodes.filter(n=>n.label.toLowerCase().includes(f)||n.id.toLowerCase().includes(f));
+  }
+  const nodeSet=new Set(nodes.map(n=>n.id));
+  const links=kgData.links.filter(l=>{
+    const s=typeof l.source==='object'?l.source.id:l.source;
+    const t=typeof l.target==='object'?l.target.id:l.target;
+    return nodeSet.has(s)&&nodeSet.has(t)&&advActiveEdgePredicates.has(l.label);
+  });
+  const linked=new Set();
+  links.forEach(l=>{
+    linked.add(typeof l.source==='object'?l.source.id:l.source);
+    linked.add(typeof l.target==='object'?l.target.id:l.target);
+  });
+  const finalNodes=nodes.filter(n=>linked.has(n.id));
+  return {nodes:finalNodes.length?finalNodes:nodes,links};
+}
+
+// ── Render Basic ───────────────────────────────────────────────
+function renderBasic(){
+  const {nodes,links} = filteredData(currentDensity);
+  updateStatus(nodes.length, links.length);
+  const svg = d3.select('#basic-kg-pane');
+  svg.selectAll('*').remove();
+  const W=svg.node().clientWidth||800, H=svg.node().clientHeight||520;
+  svg.append('defs').append('marker').attr('id','arr-b').attr('viewBox','0 -4 8 8').attr('refX',18).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','#7c6af7');
+  const g=svg.append('g');
+  svg.call(d3.zoom().scaleExtent([.2,4]).on('zoom',e=>g.attr('transform',e.transform)));
+  const linkData=links.map(l=>({source:typeof l.source==='object'?l.source.id:l.source,target:typeof l.target==='object'?l.target.id:l.target,label:l.label}));
+  if(basicSim) basicSim.stop();
+  basicSim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(linkData).id(d=>d.id).distance(120))
+    .force('charge',d3.forceManyBody().strength(-280))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collide',d3.forceCollide(18));
+  const link=g.append('g').selectAll('line').data(linkData).join('line')
+    .attr('class','link-line').attr('stroke','#7c6af755').attr('stroke-width',1.2).attr('marker-end','url(#arr-b)')
+    .on('mouseenter',function(){d3.select(this).attr('stroke','#a78bfa').attr('stroke-opacity',1).attr('stroke-width',2.5);})
+    .on('mouseleave',function(){d3.select(this).attr('stroke','#7c6af755').attr('stroke-opacity',1).attr('stroke-width',1.2);});
+  // Edge labels as true SVG hyperlinks
+  const lbl=g.append('g').selectAll('a').data(linkData).join('a')
+    .attr('class','edge-link')
+    .attr('href',d=>getResolver(predIRI(d.label)))
+    .attr('target','_blank');
+  lbl.append('text').attr('class','link-label').text(d=>d.label);
+  lbl.append('title').text(d=>(PRED_DESCR[d.label]||d.label)+'\n→ '+predIRI(d.label));
+  const node=g.append('g').selectAll('g').data(nodes).join('g').attr('cursor','pointer').call(d3.drag().on('start',dragStart).on('drag',dragged).on('end',dragEnd));
+  node.append('circle').attr('class','node-circle').attr('r',d=>nodeRadius(d)).attr('fill',d=>nodeColor(d)+'33').attr('stroke',d=>nodeColor(d));
+  node.append('text').attr('class','node-label').attr('dy',d=>nodeRadius(d)+11).text(d=>d.label.length>18?d.label.slice(0,16)+'…':d.label);
+  node.on('click',(_,d)=>window.open(getResolver(nodeIRI(d.id)),'_blank'));
+  node.on('dblclick',(_,d)=>{d.fx=null;d.fy=null;basicSim.alpha(.1).restart();});
+  node.append('title').text(d=>d.label+'\n'+nodeIRI(d.id)+'\n(double-click to unpin)');
+  basicSim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    lbl.attr('transform',d=>`translate(${(d.source.x+d.target.x)/2},${(d.source.y+d.target.y)/2})`);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+  function dragStart(event,d){if(!event.active)basicSim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;}
+  function dragged(event,d){d.fx=event.x;d.fy=event.y;}
+  function dragEnd(event,d){if(!event.active)basicSim.alphaTarget(0);}
+}
+
+// ── Render Advanced ────────────────────────────────────────────
+function renderAdvanced(){
+  const {nodes,links} = advFilteredData(currentDensity);
+  updateStatus(nodes.length, links.length);
+  const svg=d3.select('#adv-kg-pane');
+  svg.selectAll('*').remove();
+  const W=svg.node().clientWidth||800, H=svg.node().clientHeight||520;
+  const defs=svg.append('defs');
+  defs.append('marker').attr('id','arr-adv').attr('viewBox','0 -4 8 8').attr('refX',18).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','#7c6af7');
+  defs.append('marker').attr('id','arr-adv-start').attr('viewBox','0 -4 8 8').attr('refX',-10).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6).attr('orient','auto-start-reverse').append('path').attr('d','M0,-4L8,0L0,4').attr('fill','#7c6af7');
+  const g=svg.append('g');
+  svg.call(d3.zoom().scaleExtent([.2,4]).on('zoom',e=>g.attr('transform',e.transform)));
+  const linkData=links.map(l=>({source:typeof l.source==='object'?l.source.id:l.source,target:typeof l.target==='object'?l.target.id:l.target,label:l.label}));
+  const charge=parseInt(document.getElementById('adv-charge')?.value||-300);
+  const dist=parseInt(document.getElementById('adv-distance')?.value||120);
+  if(advSim) advSim.stop();
+  advSim=d3.forceSimulation(nodes)
+    .force('link',d3.forceLink(linkData).id(d=>d.id).distance(dist))
+    .force('charge',d3.forceManyBody().strength(charge))
+    .force('center',d3.forceCenter(W/2,H/2))
+    .force('collide',d3.forceCollide(20));
+  if(!advPhysicsEnabled) advSim.stop();
+  const link=g.append('g').selectAll('line').data(linkData).join('line')
+    .attr('class','link-line').attr('stroke','#7c6af755').attr('stroke-width',1.4)
+    .attr('marker-end','url(#arr-adv)')
+    .attr('marker-start',advArrowStyle==='dual'?'url(#arr-adv-start)':null)
+    .on('mouseenter',function(){d3.select(this).attr('stroke','#a78bfa').attr('stroke-opacity',1).attr('stroke-width',2.8);})
+    .on('mouseleave',function(){d3.select(this).attr('stroke','#7c6af755').attr('stroke-opacity',1).attr('stroke-width',1.4);});
+  // Edge labels as true SVG hyperlinks
+  const edgeLbls=g.append('g').selectAll('a').data(linkData).join('a')
+    .attr('class','edge-link')
+    .attr('href',d=>getResolver(predIRI(d.label)))
+    .attr('target','_blank')
+    .attr('opacity',advPredDisplay==='none'?0:1);
+  edgeLbls.append('text').attr('class','link-label')
+    .text(d=>advPredDisplay==='icons'?(PRED_ICONS[d.label]||d.label):d.label);
+  edgeLbls.append('title').text(d=>(PRED_DESCR[d.label]||d.label)+'\n→ '+predIRI(d.label));
+  const node=g.append('g').selectAll('g').data(nodes).join('g').attr('cursor','pointer').call(d3.drag().on('start',ds).on('drag',dd).on('end',de));
+  node.append('circle').attr('class','node-circle').attr('r',d=>nodeRadius(d)).attr('fill',d=>nodeColor(d)+'33').attr('stroke',d=>nodeColor(d));
+  if(advPredDisplay!=='none'){
+    node.append('text').attr('class','node-label').attr('dy',d=>nodeRadius(d)+11).text(d=>{
+      const ico=NODE_ICONS[d.id]?NODE_ICONS[d.id]+' ':'';
+      const lbl=d.label.length>18?d.label.slice(0,16)+'…':d.label;
+      return advPredDisplay==='icons'?ico+lbl:lbl;
+    });
+  } else {
+    node.append('text').attr('class','node-label').attr('dy',d=>nodeRadius(d)+11).text(d=>d.label.length>18?d.label.slice(0,16)+'…':d.label);
+  }
+  node.on('click',(_,d)=>window.open(getResolver(nodeIRI(d.id)),'_blank'));
+  node.on('dblclick',(_,d)=>{d.fx=null;d.fy=null;if(advSim)advSim.alpha(.1).restart();});
+  node.append('title').text(d=>d.label+'\n'+nodeIRI(d.id)+'\n(double-click to unpin)');
+  advSim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    edgeLbls.attr('transform',d=>`translate(${(d.source.x+d.target.x)/2},${(d.source.y+d.target.y)/2})`);
+    node.attr('transform',d=>`translate(${d.x},${d.y})`);
+  });
+  function ds(event,d){if(!event.active)advSim.alphaTarget(.3).restart();d.fx=d.x;d.fy=d.y;}
+  function dd(event,d){d.fx=event.x;d.fy=event.y;}
+  function de(event,d){if(!event.active)advSim.alphaTarget(0);d.fx=null;d.fy=null;}
+}
+
+// ── Controls ───────────────────────────────────────────────────
+function updateStatus(n,l){
+  const el=document.getElementById('kg-status');
+  if(el) el.textContent=`${n} nodes · ${l} edges`;
+}
+
+function switchMode(m){
+  currentMode=m;
+  document.getElementById('btn-basic').classList.toggle('active',m==='basic');
+  document.getElementById('btn-advanced').classList.toggle('active',m==='advanced');
+  document.getElementById('basic-kg-pane').style.display=m==='basic'?'block':'none';
+  document.getElementById('adv-kg-pane').style.display=m==='advanced'?'block':'none';
+  document.getElementById('basic-controls').style.display=m==='basic'?'flex':'none';
+  ['settings-toggle-btn','adv-fullscreen-btn','adv-center-btn'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display=m==='advanced'?'flex':'none';
+  });
+  if(m==='advanced') renderAdvanced(); else renderBasic();
+}
+
+function setDensity(d){
+  currentDensity=d;
+  document.getElementById('density-core').classList.toggle('active',d==='core');
+  document.getElementById('density-full').classList.toggle('active',d==='full');
+  currentMode==='basic'?renderBasic():renderAdvanced();
+}
+
+function setTypeFilter(t){
+  currentTypeFilter=t;
+  ['all','person','org','takeaway','insight'].forEach(x=>{
+    document.getElementById('type-'+x)?.classList.toggle('active',x===t);
+  });
+  renderBasic();
+}
+
+function toggleSettings(){
+  const p=document.getElementById('settings-panel');
+  const b=document.getElementById('settings-toggle-btn');
+  const show=p.style.display==='none'||!p.style.display;
+  p.style.display=show?'block':'none';
+  b.classList.toggle('active',show);
+  b.setAttribute('aria-expanded',show?'true':'false');
+}
+
+function toggleFullscreen(){
+  const wrap=document.querySelector('.kg-pane-wrap');
+  if(!document.fullscreenElement){
+    wrap.requestFullscreen&&wrap.requestFullscreen();
+  } else {
+    document.exitFullscreen&&document.exitFullscreen();
+  }
+}
+
+function togglePhysics(on){
+  advPhysicsEnabled=on;
+  if(advSim){if(on)advSim.alpha(.3).restart();else advSim.stop();}
+}
+
+function applyPhysics(){
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function setPredDisplay(v){
+  advPredDisplay=v;
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function setArrowStyle(v){
+  advArrowStyle=v;
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function setLiteralFilter(v){
+  advLiteralFilter=v.toLowerCase();
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function setResolver(v){
+  advResolverPref=v;
+  document.getElementById('custom-resolver-row').style.display=v==='custom'?'flex':'none';
+}
+
+function setCustomResolver(v){
+  advCustomResolver=v;
+}
+
+function toggleEdgePred(p,on){
+  if(on) advActiveEdgePredicates.add(p); else advActiveEdgePredicates.delete(p);
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function toggleNodeType(t){
+  if(advActiveNodeTypes.has(t)) advActiveNodeTypes.delete(t); else advActiveNodeTypes.add(t);
+  document.querySelectorAll('.settings-chip').forEach(c=>{
+    if(c.dataset.type===t) c.classList.toggle('active',advActiveNodeTypes.has(t));
+  });
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function selectAllNodeTypes(){
+  kgData.nodes.forEach(n=>advActiveNodeTypes.add(n.type));
+  document.querySelectorAll('.settings-chip').forEach(c=>c.classList.add('active'));
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function selectNoneNodeTypes(){
+  advActiveNodeTypes.clear();
+  document.querySelectorAll('.settings-chip').forEach(c=>c.classList.remove('active'));
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function selectAllEdges(){
+  kgData.links.forEach(l=>advActiveEdgePredicates.add(l.label));
+  document.querySelectorAll('#edge-filter-list input').forEach(i=>i.checked=true);
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function selectNoneEdges(){
+  advActiveEdgePredicates.clear();
+  document.querySelectorAll('#edge-filter-list input').forEach(i=>i.checked=false);
+  if(currentMode==='advanced') renderAdvanced();
+}
+
+function centerAdvGraph(){
+  const c=document.getElementById('adv-kg-pane');
+  const W=c.clientWidth||800, H=c.clientHeight||480;
+  if(advSim){advSim.force('center',d3.forceCenter(W/2,H/2));advSim.alpha(.3).restart();}
+}
+
+// ── Nav / Theme ────────────────────────────────────────────────
+function toggleNav(){
+  document.getElementById('nav-panel').classList.toggle('expanded');
+  document.getElementById('nav-toggle').textContent=document.getElementById('nav-panel').classList.contains('expanded')?'▴ Menu':'▾ Menu';
+}
+
+function toggleTheme(e){
+  e.stopPropagation();
+  const light=document.documentElement.getAttribute('data-theme')==='light';
+  document.documentElement.setAttribute('data-theme',light?'':'light');
+  document.getElementById('theme-btn').textContent=light?'☀':'🌙';
+  try{localStorage.setItem('gartner-juan-kg-theme',light?'dark':'light');}catch(err){}
+}
+
+// ── Init ───────────────────────────────────────────────────────
+window.addEventListener('load',function(){
+  // Restore theme
+  try{const t=localStorage.getItem('gartner-juan-kg-theme');if(t==='light'){document.documentElement.setAttribute('data-theme','light');document.getElementById('theme-btn').textContent='🌙';}}catch(err){}
+
+  // Build node type chips from kgData
+  const typeSet=new Set(kgData.nodes.map(n=>n.type));
+  const chips=document.getElementById('adv-node-chips');
+  [...typeSet].sort().forEach(t=>{
+    const ch=document.createElement('span');
+    ch.className='settings-chip active';
+    ch.dataset.type=t;
+    ch.textContent=t;
+    ch.style.borderColor=NODE_COLORS[t]||'var(--border)';
+    ch.onclick=()=>toggleNodeType(t);
+    chips.appendChild(ch);
+  });
+
+  // Build edge predicate filters from kgData
+  const preds=[...new Set(kgData.links.map(l=>l.label))].sort();
+  preds.forEach(p=>{
+    advActiveEdgePredicates.add(p);
+    const lbl=document.createElement('label');
+    lbl.className='settings-checkbox-row';
+    const ico=PRED_ICONS[p]?PRED_ICONS[p]+' ':'';
+    lbl.innerHTML=`<input type="checkbox" checked value="${p}" onchange="toggleEdgePred('${p}',this.checked)"> ${ico}${p}`;
+    document.getElementById('edge-filter-list').appendChild(lbl);
+  });
+
+  renderBasic();
+
+  // ── SPARQL live query URL builder ──────────────────────────────
+  const SPARQL_EP = 'https://linkeddata.uriburner.com/sparql';
+  const SPARQL_GRAPH = 'https://linkeddata.uriburner.com/DAV/demos/daas/gartner-da-london-2026-juan-sequeda-claude_sonnet4.ttl';
+  function sparqlUrl(q){ return SPARQL_EP+'?query='+encodeURIComponent(q)+'&format=text%2Fhtml'; }
+
+  const liveQueries = {
+    'run-q1': `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\n\nSELECT ?stat ?statName ?statValue ?thesisName\nFROM <${SPARQL_GRAPH}>\nWHERE {\n  ?stat a :Statistic ;\n        schema:name ?statName ;\n        schema:value ?statValue .\n  OPTIONAL { ?stat :supportsThesis ?thesis . ?thesis schema:name ?thesisName . }\n}\nORDER BY ?statName`,
+    'run-q2': `PREFIX schema: <http://schema.org/>\n\nSELECT ?person ?personName ?orgName ?title\nFROM <${SPARQL_GRAPH}>\nWHERE {\n  ?person a schema:Person ;\n          schema:name ?personName .\n  OPTIONAL { ?person schema:worksFor ?org . ?org schema:name ?orgName . }\n  OPTIONAL { ?person schema:jobTitle ?title . }\n}\nORDER BY ?personName`,
+    'run-q3': `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\n\nSELECT ?sectionName ?insightName ?insightDesc\nFROM <${SPARQL_GRAPH}>\nWHERE {\n  <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#article> schema:hasPart ?section .\n  ?section a :ConferenceTakeaway ;\n           schema:name ?sectionName ;\n           :hasInsight ?insight .\n  ?insight schema:name ?insightName .\n  OPTIONAL { ?insight schema:description ?insightDesc . }\n}\nORDER BY ?section ?insightName`,
+    'run-q4': `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\n\nSELECT ?domain ?domainName\nFROM <${SPARQL_GRAPH}>\nWHERE {\n  ?domain a :GovernanceDomain ;\n          schema:name ?domainName .\n}\nORDER BY ?domainName`
+  };
+  Object.keys(liveQueries).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.href=sparqlUrl(liveQueries[id]);
+  });
+
+  // ── Explore quick-links ────────────────────────────────────────
+  const exploreQueries = {
+    'explore-all':     `SELECT DISTINCT ?s ?type ?name\nFROM <${SPARQL_GRAPH}>\nWHERE {\n  ?s a ?type .\n  OPTIONAL { ?s <http://schema.org/name> ?name . }\n}\nORDER BY ?type ?name\nLIMIT 100`,
+    'explore-stats':   `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\nSELECT ?s ?statName ?statValue\nFROM <${SPARQL_GRAPH}>\nWHERE { ?s a :Statistic ; schema:name ?statName ; schema:value ?statValue . }\nORDER BY ?statName`,
+    'explore-persons': `PREFIX schema: <http://schema.org/>\nSELECT ?s ?name ?org\nFROM <${SPARQL_GRAPH}>\nWHERE { ?s a schema:Person ; schema:name ?name . OPTIONAL { ?s schema:worksFor/schema:name ?org . } }\nORDER BY ?name`,
+    'explore-gov':     `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\nSELECT ?s ?name\nFROM <${SPARQL_GRAPH}>\nWHERE { ?s a :GovernanceDomain ; schema:name ?name . }\nORDER BY ?name`,
+    'explore-methods': `PREFIX schema: <http://schema.org/>\nPREFIX : <https://juansequeda.substack.com/p/gartner-data-and-analytics-london#>\nSELECT ?s ?name ?desc\nFROM <${SPARQL_GRAPH}>\nWHERE { ?s a :Methodology ; schema:name ?name . OPTIONAL { ?s schema:description ?desc . } }\nORDER BY ?name`
+  };
+  Object.keys(exploreQueries).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.href=sparqlUrl(exploreQueries[id]);
+  });
+});
+</script>
+</body>
+</html>
