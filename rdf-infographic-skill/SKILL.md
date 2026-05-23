@@ -613,6 +613,41 @@ When the user requests an RDF infographic with graph visualization:
 3. If the user explicitly asks for full controls, make Advanced the default selected mode while preserving the Basic toggle.
 4. Do not include a graph-specific theme toggle in any mode.
 
+#### ✅ POST-WRITE VERIFICATION GATE — KG Explorer (BLOCKING)
+
+**After writing the KG Explorer HTML/CSS/JS block and before proceeding to any subsequent section**, grep the generated output for every item in this list. A missing item is a delivery blocker — fix it before continuing.
+
+This gate exists because PRE-BUILD CHECKs operate on intent and are silently skipped under session pressure. This gate operates on evidence: the string either exists in the output or it does not.
+
+**CSS — must exist in `<style>`:**
+- `#kg-explorer.kg-active` — box-shadow/border-color rule that fires when zoom is armed
+
+**HTML — must exist in the KG Explorer markup:**
+- `id="pred-filters"` — container div that receives dynamic predicate checkboxes
+- `id="literal-filter"` — text input for literal/label filtering
+- A fullscreen toggle `<button>` with accessible label
+- Settings panel close `<button>` containing `✕` or `×`
+- `Select All` and `Deselect All` predicate controls (buttons or links)
+
+**JavaScript — must exist as named functions or inline handlers:**
+- `setPredAll` (or equivalent) — function that bulk-checks/unchecks all predicate checkboxes
+- `classList.add('kg-active')` — zoom-arm handler adds class to `#kg-explorer`
+- `classList.remove('kg-active')` — zoom-release handler removes class from `#kg-explorer`
+- Dynamic predicate checkbox population — code that reads unique predicates from link data and inserts `<input type="checkbox">` elements into `#pred-filters`
+- `simulation.force` wired to slider inputs — physics sliders must call `simulation.force("charge").strength(...)` or equivalent and `simulation.alpha(0.3).restart()`
+
+**Verification method**: Run the following grep against the generated HTML file; every pattern must return at least one match:
+```
+grep -c "kg-explorer.kg-active" file.html        # must be ≥ 1
+grep -c "pred-filters" file.html                  # must be ≥ 2 (HTML + JS)
+grep -c "literal-filter" file.html                # must be ≥ 2 (HTML + JS)
+grep -c "setPredAll\|Select All" file.html        # must be ≥ 2
+grep -c "kg-active" file.html                     # must be ≥ 3 (CSS + add + remove)
+grep -c "simulation\.force" file.html             # must be ≥ 1
+```
+
+**GATE: 0 failures required.** Do not present or link the file if any grep returns 0.
+
 ## Constructing kgData from RDF (CRITICAL)
 
 ⛔ **PRE-BUILD CHECK**: Before embedding kgData in HTML, re-read the "Validation Checklist" and "Programmatic Orphan-Node Gate" below. Confirm: all RDF entities represented as nodes, all triples as links, 0 orphan nodes in both full and core datasets, 0 orphan nodes in default rendered state. Build the extraction script (Python/rdflib) first, run it, verify 0 orphans, THEN embed in HTML. Never manually type kgData.
