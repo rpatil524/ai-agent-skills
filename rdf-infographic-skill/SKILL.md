@@ -625,15 +625,19 @@ This gate exists because PRE-BUILD CHECKs operate on intent and are silently ski
 **HTML — must exist in the KG Explorer markup:**
 - `id="pred-filters"` — container div that receives dynamic predicate checkboxes
 - `id="literal-filter"` — text input for literal/label filtering
-- A fullscreen toggle `<button>` with accessible label
+- `id="node-type-chips"` (or equivalent) — container for per-group node type toggle chips
 - Settings panel close `<button>` containing `✕` or `×`
-- `Select All` and `Deselect All` predicate controls (buttons or links)
+- `Select All` and `Deselect All` controls for both predicates **and** node types
 
 **JavaScript — must exist as named functions or inline handlers:**
-- `setPredAll` (or equivalent) — function that bulk-checks/unchecks all predicate checkboxes
+- `setPredAll` (or equivalent) — bulk-checks/unchecks all predicate checkboxes
+- `toggleNodeType` (or equivalent) — toggles a single node type chip on/off and re-renders
+- `setNodeTypeAll` (or equivalent) — bulk-selects/deselects all node type chips
+- `aria-pressed` — every node type chip must carry this attribute and update it on toggle
 - `classList.add('kg-active')` — zoom-arm handler adds class to `#kg-explorer`
 - `classList.remove('kg-active')` — zoom-release handler removes class from `#kg-explorer`
-- Dynamic predicate checkbox population — code that reads unique predicates from link data and inserts `<input type="checkbox">` elements into `#pred-filters`
+- Dynamic predicate checkbox population — reads unique predicates from link data and inserts `<input type="checkbox">` elements into `#pred-filters`
+- Dynamic node-type chip population — reads unique groups from node data and inserts chips into the node-type container, each styled with the group colour
 - `simulation.force` wired to slider inputs — physics sliders must call `simulation.force("charge").strength(...)` or equivalent and `simulation.alpha(0.3).restart()`
 
 **Verification method**: Run the following grep against the generated HTML file; every pattern must return at least one match:
@@ -642,6 +646,9 @@ grep -c "kg-explorer.kg-active" file.html        # must be ≥ 1
 grep -c "pred-filters" file.html                  # must be ≥ 2 (HTML + JS)
 grep -c "literal-filter" file.html                # must be ≥ 2 (HTML + JS)
 grep -c "setPredAll\|Select All" file.html        # must be ≥ 2
+grep -c "node-type-chips\|toggleNodeType" file.html # must be ≥ 2 (HTML + JS)
+grep -c "setNodeTypeAll" file.html               # must be ≥ 2 (definition + call)
+grep -c "aria-pressed" file.html                  # must be ≥ 2 (initial HTML + JS update)
 grep -c "kg-active" file.html                     # must be ≥ 3 (CSS + add + remove)
 grep -c "simulation\.force" file.html             # must be ≥ 1
 ```
