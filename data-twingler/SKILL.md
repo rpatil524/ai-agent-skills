@@ -69,6 +69,25 @@ Use default endpoint. Format `text/x-html+tr`. Max 20 rows. Tabulate results.
 ### SPASQL
 Wraps SPARQL inside SQL: `FROM (SPARQL ... WHERE ...) AS <alias>`
 
+**Interactive execution (browser):** When generating HTML infographics or other user-facing documents with live SPASQL query links, use the SPASQL Query Builder (`/spasqlqb/`) endpoint with permalink encoding — not the SPARQL endpoint.
+
+| Item | Value |
+|---|---|
+| Base URL | `https://linkeddata.uriburner.com/spasqlqb/` |
+| Permalink parameter | `permlink_e` |
+| Permlink JSON structure | `{ "v": 1, "url": "/XMLA", "dsn": "DSN=Local_Instance", "uid": "", "pwd": "", "path": null, "tab": "exec", "idx": null, "fkey": null, "ref": null, "exec": { "sql": "<SPASQL query>" } }` |
+| DSN for URIBurner | `DSN=Local_Instance` |
+| DSN for demo.openlinksw.com | `DSN=Local_Instance` |
+| Encoding | URL-encode the entire JSON object as the `permlink_e` query parameter value |
+| SPASQL query format | The `sql` value must be the full `SELECT ... FROM (SPARQL ...) AS ...` statement |
+
+Example permalink URL:
+```
+https://linkeddata.uriburner.com/spasqlqb/?permlink_e=%7B%22v%22%3A1%2C%22url%22%3A%22%2FXMLA%22%2C%22dsn%22%3A%22DSN%3DLocal_Instance%22%2C%22uid%22%3A%22%22%2C%22pwd%22%3A%22%22%2C%22path%22%3Anull%2C%22tab%22%3A%22exec%22%2C%22idx%22%3Anull%2C%22fkey%22%3Anull%2C%22ref%22%3Anull%2C%22exec%22%3A%7B%22sql%22%3A%22SELECT%20movie%5CnFROM%20%28SPARQL%5Cn%20%20PREFIX%20dbr%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fresource%2F%3E%5Cn%20%20PREFIX%20dbo%3A%20%3Chttp%3A%2F%2Fdbpedia.org%2Fontology%2F%3E%5Cn%20%20SELECT%20%3Fmovie%20WHERE%20%7B%5Cn%20%20%20%20SERVICE%20%3Chttp%3A%2F%2Fdbpedia.org%2Fsparql%3E%20%7B%5Cn%20%20%20%20%20%20%3Fmovie%20rdf%3Atype%20dbo%3AFilm%20%3B%20dbo%3Adirector%20dbr%3ASpike_Lee%20.%5Cn%20%20%20%20%7D%5Cn%20%20%7D%5Cn%29%20AS%20movies%22%7D%7D
+```
+
+**Programmatic execution (REST):** For API/agent consumption, use `Demo.demo.execute_spasql_query` via URIBurner REST functions at `https://linkeddata.uriburner.com/chat/functions/execute_spasql_query` with parameters `sql` (required — the SPASQL query string prefixed with `SPARQL`), `max_rows`, `timeout`, `format` (`json`, `jsonl`, or `markdown`).
+
 ### GraphQL
 Endpoint: `https://linkeddata.uriburner.com/graphql`. Depth: 10. Introspection on.
 

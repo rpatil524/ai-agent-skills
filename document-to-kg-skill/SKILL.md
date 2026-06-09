@@ -52,7 +52,7 @@ When active:
 1. **Collect or derive required inputs** — document source, canonical `{page_url}`, output RDF format, destination path, and whether HTML/Markdown companions are required.
 2. **Use `{page_url}` as entity namespace** for generated document-local IRIs, never `file:` IRIs when a canonical HTTP/HTTPS URL exists.
 3. **Generate RDF first** using schema.org and approved vocabularies; RDF is the source of truth for any companion HTML/Markdown.
-4. **Apply authority denotation rules** — `schema:SoftwareApplication` and `schema:Country` entities must use DBpedia/Wikidata-centered IRIs as described below, with `owl:sameAs` for confirmed cross references.
+4. **Apply authority denotation rules** — `schema:SoftwareApplication`, `schema:Organization`, `schema:Country`, and `schema:DefinedTerm`/`skos:Concept` entities must use DBpedia/Wikidata-centered IRIs as described below, with `owl:sameAs` for confirmed cross references.
 5. **Inspect collection sources as collections** — when the source is a manual, documentation site, sitemap-backed site, MkDocs/Docusaurus/VitePress collection, GitBook, docs portal, or other multi-page source, inspect sitemap/search index/navigation for high-signal child pages before finalizing RDF. Always review child pages about APIs, SPARQL, endpoints, query examples, services, reporting workflows, data models, server/runtime platforms, and integration instructions when present.
 6. **Preserve SPARQL-bearing content** — when source content includes SPARQL queries, query examples, endpoint demos, or reporting/query recipes, do not summarize the query body away. Model each material query as a named `schema:SoftwareSourceCode` resource with `schema:programmingLanguage "SPARQL"`, `schema:text`, `schema:codeSampleType`, `schema:target` pointing to the endpoint/service, and `schema:potentialAction` pointing to a correctly URL-encoded live query URL when the endpoint accepts GET query parameters. Preserve documented placeholders visibly.
 7. **Validate before save** — RDF syntax, expanded DBpedia/Wikidata IRIs, no fabricated IRIs, no double-encoded resolver IRIs, no `file:` IRIs, and required prefix declarations.
@@ -150,10 +150,13 @@ Execute all five sub-tasks. Do not skip any. Do not proceed to Step 4 until all 
 - [ ] Glossary terms wrapped in `schema:DefinedTermSet` with `schema:hasDefinedTerm`
 - [ ] Main article has `schema:hasPart` linking FAQPage, DefinedTermSet, HowTo, and all entity group sections
 - [ ] At least 10 `schema:Question` + `schema:Answer` pairs present
+- [ ] Every entity's rdf:type matches its semantic role: HowToStep → schema:HowToStep, Question → schema:Question, Answer → schema:Answer, DefinedTerm → schema:DefinedTerm, ArticleSection → schema:CreativeWork. No entity typed as schema:Thing when a specific type exists.
 - [ ] No blank nodes for `schema:Answer` — every answer is a named entity
 - [ ] Inverse relationships explicit: every `schema:isPartOf` has corresponding `schema:hasPart`
-- [ ] `owl:sameAs` used (not `schema:sameAs`) for DBpedia cross-references
+- [ ] `owl:sameAs` used (not `schema:sameAs`) for DBpedia/Wikidata cross-references
 - [ ] All DBpedia/Wikidata/Wikipedia IRIs fully expanded (not CURIEs)
+- [ ] Every `schema:Organization` subject IRI follows the organization denotation priority rule: DBpedia resource IRI (1st) → Wikidata entity IRI (2nd) → LinkedIn company page `#this` (3rd) → X/Twitter org account `#this` (4th) → official homepage `#this` (5th) → document-local hash IRI (last). The highest-priority available IRI is the primary subject — never a document-local IRI with `owl:sameAs` pointing to the canonical one. `owl:sameAs` links all remaining discovered platform identities.
+- [ ] Every `schema:DefinedTerm` or `skos:Concept` subject IRI follows the concept denotation priority rule: standards-body/platform IRI (1st) → DBpedia resource IRI (2nd) → Wikidata entity IRI (3rd) → document-local hash IRI (last). Document-local is the common case — add `owl:sameAs` for confirmed DBpedia/Wikidata equivalents when the primary IRI is document-local.
 - [ ] Every `schema:SoftwareApplication` subject IRI follows the software denotation priority rule: DBpedia IRI if confirmed, else Wikidata IRI if confirmed, else official application home page URL with `#this`
 - [ ] Any non-DBpedia/non-Wikidata `schema:SoftwareApplication` IRI has `owl:sameAs` links to confirmed DBpedia/Wikidata identities when such identities exist, and `owl:` is declared as `http://www.w3.org/2002/07/owl#`
 - [ ] Every `schema:Country` subject IRI follows the country denotation priority rule: DBpedia IRI if confirmed, else Wikidata IRI if confirmed, else a source-grounded document IRI; add `owl:sameAs` links to confirmed DBpedia/Wikidata equivalents.
@@ -203,6 +206,42 @@ Do not fabricate DBpedia or Wikidata IRIs. If lookup or source evidence does not
 
 ---
 
+### Organization IRI Denotation Rule
+
+When the generated RDF names an organization, company, institution, or other corporate/collective entity as a `schema:Organization`, choose its subject IRI using this priority order:
+
+1. **DBpedia first** — if a confident DBpedia resource exists, use the fully expanded DBpedia IRI as the primary denotation IRI, e.g., `http://dbpedia.org/resource/Microsoft`.
+2. **Wikidata second** — if no confident DBpedia resource exists but a confident Wikidata entity exists, use the fully expanded Wikidata IRI, e.g., `http://www.wikidata.org/entity/Q2283`.
+3. **LinkedIn `#this` third** — if no confident DBpedia or Wikidata identity can be confirmed but a LinkedIn company page URL is available, use the company page URL with `#this` appended, e.g., `https://www.linkedin.com/company/microsoft/#this`.
+4. **X/Twitter `#this` fourth** — if no LinkedIn page is found, use the organization's X/Twitter account URL with `#this` appended.
+5. **Homepage `#this` fifth** — if no platform identity is available, use the organization's official homepage URL with `#this` appended.
+6. **Document-local last resort** — only if no platform identity can be established, use a source-grounded document hash IRI derived from `{page_url}`.
+
+**CRITICAL:** The highest-priority available IRI becomes the PRIMARY SUBJECT — never use a document-local IRI when a canonical platform IRI (DBpedia, Wikidata, LinkedIn, X, homepage) is available. `owl:sameAs` links all remaining discovered platform identities.
+
+When the primary IRI is DBpedia-based and a confident Wikidata equivalent exists, add `owl:sameAs` to the Wikidata entity. When primary IRI is Wikidata-based and a confident DBpedia equivalent exists, normalize to DBpedia or add `owl:sameAs` if normalization would disrupt an existing artifact. Do not use document-local hash IRIs for known organizations when authority IRIs are available.
+
+Organization names must match the source document exactly — no fabricated legal names or suffixes. If the source says "Google", use "Google" — not "Google LLC" or "Alphabet Inc." unless the source explicitly states the full legal name.
+
+Do not fabricate DBpedia or Wikidata IRIs. If lookup or source evidence does not provide a confident match, use the next priority tier and omit `owl:sameAs` until a confident identity is established.
+
+---
+
+### DefinedTerm/Concept IRI Denotation Rule
+
+When the generated RDF names an abstract concept, term, idea, framework, methodology, or ontological class as a `schema:DefinedTerm` or `skos:Concept`, choose its subject IRI using this priority order:
+
+1. **Standards-body or platform IRI first** — if the concept has a well-known W3C, schema.org, IANA, or other standards-body IRI, use that as the primary IRI, e.g., `https://www.w3.org/2001/sw/#this` for Semantic Web.
+2. **DBpedia second** — if no standards-body IRI exists but a confident DBpedia resource exists for the term, use the fully expanded DBpedia IRI, e.g., `http://dbpedia.org/resource/Semantic_Web`.
+3. **Wikidata third** — if no confident DBpedia resource exists but a confident Wikidata entity exists, use the fully expanded Wikidata IRI, e.g., `http://www.wikidata.org/entity/Q...`.
+4. **Document-local last resort** — most common case: use a source-grounded document hash IRI derived from `{page_url}` with a mnemonic fragment, e.g., `#{conceptName}`.
+
+Most concept entities will use the **document-local hash IRI** (tier 4) because abstract concepts rarely have standards-body, DBpedia, or Wikidata IRIs. When the primary IRI is document-local, add `owl:sameAs` for any confirmed DBpedia or Wikidata equivalents. When a standards-body or platform IRI is available (tier 1), it becomes the primary subject — `owl:sameAs` links the document-local representation to the canonical IRI.
+
+Declare `owl:` as `http://www.w3.org/2002/07/owl#` whenever `owl:sameAs` appears.
+
+Do not fabricate DBpedia or Wikidata IRIs. If lookup or source evidence does not provide a confident match, use the document-local fallback and omit `owl:sameAs` until a confident identity is established.
+
 ## Step 4 — Save to Folder
 
 Write the approved RDF to `{destination}`. Derive the filename from `{page_url}` by slugifying the path component and appending the appropriate extension:
@@ -234,6 +273,7 @@ When the user asks for an HTML infographic in addition to the RDF Knowledge Grap
 - Encode `#` as `%23` in resolver `url` parameter values exactly once. `%2523` (double-encoded) is invalid.
 - Every generated HTML anchor whose `href` is not a same-page fragment (`#section`) must open a new tab or view using `target="_blank" rel="noopener noreferrer"`. Same-page navigation fragment links remain same-tab and must not carry `target="_blank"`.
 - FAQ questions, FAQ answers, glossary terms, glossary definitions, HowTo section title, and every HowTo step heading are ALL hyperlinked to their KG entity IRIs via the resolver pattern.
+- Every hyperlinked entity must have a correct rdf:type matching its semantic role: HowToStep headings link to schema:HowToStep entities, FAQ questions link to schema:Question entities, glossary terms link to their declared type (schema:DefinedTerm or appropriate type). Do not link a HowToStep heading to a schema:Question or other mismatched type — content-match alone is insufficient.
 - Visible semantic entities route through the configured resolver using their selected RDF IRIs, including DBpedia/Wikidata IRIs selected under the software denotation rule. The visible link target is the resolver URL; the resolver `url` parameter value is the entity IRI.
 
 ### POSH and JSON-LD Metadata
@@ -248,7 +288,7 @@ When the user asks for an HTML infographic in addition to the RDF Knowledge Grap
 - Collapse-to-header-bar floating navigation: always-visible compact header, toggle button (− / +), draggable, resizable, closed by default.
 - Never persist collapsed dimensions as open dimensions in `localStorage`. Recover from stale or corrupt values. Use page-specific keys.
 - Dark mode: `html[data-theme="dark"]` and `@media (prefers-color-scheme: dark)` must produce equivalent rendering. All colors via CSS variables — no hardcoded hex/rgba values outside `:root`.
-- **GATE: 0 failures required before delivery.** Validate: HTML parse, JS syntax, RDF parse + compliance audit, resolver-link validity, open-tab behavior for non-fragment links, local RDF link existence, nav behavior, skills attribution, dark mode consistency.
+- **GATE: 0 failures required before delivery.** Validate: HTML parse, JS syntax, RDF parse + compliance audit, resolver-link validity, entity type correctness (each hyperlinked entity's rdf:type matches its HTML role), open-tab behavior for non-fragment links, local RDF link existence, nav behavior, skills attribution, dark mode consistency.
 
 ---
 
