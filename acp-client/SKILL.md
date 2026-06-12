@@ -37,11 +37,25 @@ natural-language purchase intents.
 - `ACP_AUTH_TOKEN` environment variable set, or user must obtain one manually
 - `STRIPE_API_KEY` required for `complete` and `spt` flows
 
+## ACP Instances
+
+Known ACP API endpoints. The default is `shop.openlinksw.com`; override via `ACP_BASE_URL`:
+
+| Instance | URL |
+|---|---|
+| **Shop (default)** | `https://shop.openlinksw.com/acp` |
+| QA / Staging | `https://ods-qa.openlinksw.com/acp` |
+
+To use a non-default instance, set `ACP_BASE_URL` before invoking the skill:
+```bash
+export ACP_BASE_URL="https://ods-qa.openlinksw.com/acp"
+```
+
 ## Environment Variables
 
 | Variable | Required | Default |
 |---|---|---|
-| `ACP_BASE_URL` | No | `https://ods-qa.openlinksw.com/acp` |
+| `ACP_BASE_URL` | No | `https://shop.openlinksw.com/acp` |
 | `ACP_API_VERSION` | No | `2026-01-30` |
 | `ACP_AUTH_TOKEN` | **Yes** | Prompted if missing |
 | `ACP_ITEM_ID` | No | Resolved from product catalog or user input |
@@ -98,16 +112,41 @@ If `ACP_AUTH_TOKEN` is missing or invalid:
    - Copy the generated bearer token
    - Export as `ACP_AUTH_TOKEN` or paste when prompted
 
+## Browser Automation
+
+The skill uses [Playwright](https://playwright.dev) (`playwright-cli`) for
+browser automation. PinchTab is a fallback if Playwright is unavailable.
+
+Set the wrapper script path before use:
+```bash
+export PWCLI="/Users/kidehen/Documents/Management/Development/ai-agent-skills/.opencode/skills/playwright/scripts/playwright_cli.sh"
+```
+
+### Prerequisites
+
+- `npx` (comes with Node.js/npm)
+- Playwright browsers installed (first use): `npx playwright install chromium`
+
+### Workflow
+
+1. Open page in headed mode: `"$PWCLI" open <url> --headed`
+2. Snapshot for element refs: `"$PWCLI" snapshot`
+3. Interact with elements by ref (e.g., `"$PWCLI" click e79`)
+4. Capture screenshots or PDFs as needed
+
 ## Subscription Payment Detection
 
 After `complete_checkout`, the response may contain a `links` array with a
-`subscription_payment` entry. If present:
+`subscription_payment` entry. When present:
 
 1. Extract the `href` value from the link with `rel: "subscription_payment"`
-2. Report to the user: "Subscription payment required. Open the link to
-   complete payment and activate: {href}"
-3. This indicates the purchase requires an additional payment step (e.g.,
-   3DS challenge) that must be completed in a browser.
+2. Open the link with Playwright:
+   ```bash
+   "$PWCLI" open <href> --headed
+   "$PWCLI" snapshot
+   ```
+3. Present the snapshot to the user showing the payment form.
+4. Ask the user if they want to proceed with payment.
 
 ## Checkout Body Format
 
@@ -130,6 +169,28 @@ The `create_checkout` and `update_checkout` operations use `items` (not
   receipt, subscription payment link if present)
 - **`--json` flag**: Raw JSON from the API response, stable machine-readable
   output for agent consumption
+
+## Post-Purchase File Access Verification
+
+After a checkout is completed and the subscription payment is processed, verify
+that the purchased file/resource is accessible:
+
+1. **Resolve the resource URL** from the offer IRI — typically the offer's
+   `schema:subjectOf` or the resource's canonical DAV/WebDAV path on the
+   ACP instance.
+
+2. **Fetch with On-Behalf-Of delegation** using the ACP bearer token:
+   ```bash
+   curl -sI -H "Authorization: Bearer ${ACP_AUTH_TOKEN}" \
+     -H "On-Behalf-Of: <resource-iri>" \
+     "<resource-url>"
+   ```
+   - `200 OK` → access granted, file is available
+   - `401 Unauthorized` → provisioning may be async; retry after a short delay
+   - `403 Forbidden` → access not granted; check order/subscription status
+   - `404 Not Found` → wrong resource URL; verify path
+
+3. **Report result** to the user: confirmed accessible, or explain the issue.
 
 ## Error Handling
 

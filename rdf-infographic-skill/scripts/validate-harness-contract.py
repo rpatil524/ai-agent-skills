@@ -160,17 +160,19 @@ def main() -> int:
     else:
         fail("Embedded kgData payload missing (no kgData, _kgDataFull, or kgFull variable found)", failures)
 
-    # KG interactivity contract: edge labels and nodes must be hyperlinked via openInResolver
-    if "openInResolver" not in html:
-        fail("openInResolver function missing — edge labels and nodes must be hyperlinked", failures)
-    # Edge lines and/or labels must wire openInResolver(resolvePredicateIRI(...))
-    if not re.search(r"openInResolver\s*\(\s*resolvePredicateIRI", html):
-        fail("Edge click handlers missing — edge lines and labels must call openInResolver(resolvePredicateIRI(...))", failures)
-    # Edge label text must have cursor:pointer (proves it's interactive, not pointer-events:none)
-    if not re.search(r"linkGs\.append\('text'\).*?\.style\('cursor','pointer'\)", html, re.S):
-        fail("Edge label text missing cursor:pointer — edge labels must be interactive and clickable", failures)
-    if not re.search(r"nodesG\s*\.\s*on\s*\(\s*['\"]click['\"]", html):
-        fail("nodesG missing click handler — nodes must call openInResolver(d.id) on click", failures)
+    # KG interactivity contract — implementation-agnostic outcome checks
+    # Edge labels must be resolver-backed SVG <a> anchors with data-resolver-href
+    if not re.search(r'\.append\(["\']a["\']\)[\s\S]{0,400}data-resolver-href', html):
+        fail("Edge labels not resolver-backed SVG anchors — predAnchor must use .append('a') with data-resolver-href attribute", failures)
+    # .pred-anchor g must contain an <a> element (CSS or JS pattern)
+    if not re.search(r'pred-anchor\s+a|predAnchor[\s\S]{0,200}\.append\(["\']a["\']\)', html):
+        fail("Edge label SVG anchors missing — .pred-anchor a pattern not found in CSS or JS", failures)
+    # SPARQL explore button must be present
+    if 'id="sparqlBtn"' not in html:
+        fail('SPARQL explore button id="sparqlBtn" missing', failures)
+    # Node click handlers must invoke any resolver function (resolver-agnostic)
+    if not re.search(r'\.on\(["\']click["\'][\s\S]{0,200}resolv', html, re.S):
+        fail("Node click handler missing resolver call — nodes must open resolver on click", failures)
 
     validate_rdf(args.ttl, "turtle", failures)
     validate_rdf(args.jsonld, "json-ld", failures)

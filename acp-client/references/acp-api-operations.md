@@ -4,7 +4,7 @@ Compositional `curl` recipes for every ACP endpoint. Derived from `acp_curl.sh`.
 All recipes use these common headers and environment variables:
 
 ```bash
-BASE_URL="${ACP_BASE_URL:-https://ods-qa.openlinksw.com/acp}"
+BASE_URL="${ACP_BASE_URL:-https://shop.openlinksw.com/acp}"
 API_VERSION="${ACP_API_VERSION:-2026-01-30}"
 AUTH_TOKEN="${ACP_AUTH_TOKEN}"
 REQ_ID="req_$(date +%s)"
@@ -338,7 +338,7 @@ Pipe through `_json_str id` to extract the token.
 #!/usr/bin/env bash
 set -euo pipefail
 
-BASE_URL="${ACP_BASE_URL:-https://ods-qa.openlinksw.com/acp}"
+BASE_URL="${ACP_BASE_URL:-https://shop.openlinksw.com/acp}"
 API_VERSION="${ACP_API_VERSION:-2026-01-30}"
 AUTH_TOKEN="${ACP_AUTH_TOKEN}"
 ACP_ITEM_ID="${ACP_ITEM_ID}"

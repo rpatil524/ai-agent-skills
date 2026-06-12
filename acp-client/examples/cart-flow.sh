@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-BASE_URL="${ACP_BASE_URL:-https://ods-qa.openlinksw.com/acp}"
+BASE_URL="${ACP_BASE_URL:-https://shop.openlinksw.com/acp}"
 API_VERSION="${ACP_API_VERSION:-2026-01-30}"
 AUTH_TOKEN="${ACP_AUTH_TOKEN:?ACP_AUTH_TOKEN required}"
 ACP_ITEM_ID="${ACP_ITEM_ID:?ACP_ITEM_ID required}"
