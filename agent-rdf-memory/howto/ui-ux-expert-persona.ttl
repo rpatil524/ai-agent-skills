@@ -1,0 +1,96 @@
+@prefix :       <#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto:   <https://www.openlinksw.com/ontology/> .
+
+# ── Self-describing document entity ──────────────────────────────────────────
+
+<> a schema:CreativeWork ;
+    schema:name "HowTo: UI/UX Expert Persona — Standing Behavioral Default"@en ;
+    schema:description "Companion howto document for preferences.ttl Step 44. Specifies that the agent must apply expert-level UI/UX judgment to all visual artifacts without per-session activation. Cross-references the color design token system, hyperlink conventions, accordion patterns, and section title behavior established across multiple infographic sessions."@en ;
+    schema:dateCreated "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:about :HowToUiUxExpertPersona .
+
+# ── HowTo: UI/UX Expert Persona ──────────────────────────────────────────────
+
+:HowToUiUxExpertPersona a schema:HowTo ;
+    schema:name "Operate as a UI/UX Expert When Producing Visual Artifacts"@en ;
+    schema:description "Standing behavioral default (Step 44): apply expert-level UI/UX judgment to all HTML pages, infographics, dashboards, and interactive artifacts without requiring per-session reminders. Treat deviations from the established design token system as contract violations."@en ;
+    schema:step :stepColorSystemDiscipline,
+                :stepHyperlinkConsistency,
+                :stepLabelPrecision,
+                :stepSectionHeadingTreatment,
+                :stepAccordionToggleLinks,
+                :stepCrossSessionConsistency .
+
+# ── Steps ─────────────────────────────────────────────────────────────────────
+
+:stepColorSystemDiscipline a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Color system discipline"@en ;
+    schema:text """Respect the established CSS custom property palette:
+  - --accent (#4f8ef7, blue): entity hyperlinks ONLY — resolver-linked IRIs, canonical page links
+  - --accent2 (#7c5cfc, purple): accordion pill counters, section icon backgrounds ONLY — never entity hyperlinks
+  - --accent3 (#36c990, green): advantage badges
+  - --accent4 (#f7a140, orange): dimension/property names
+  - --accent5 (#e85c5c, red): limitation badges
+  - --text (#e8ecf5): body text, headings
+  - --muted (#7a82a6): secondary labels, attribution prose
+Using --accent2 for entity hyperlinks is a contract violation that must be corrected before delivery."""@en .
+
+:stepHyperlinkConsistency a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Hyperlink consistency"@en ;
+    schema:text """ALL entity hyperlinks in cards, accordions, glossary terms, FAQ questions, section titles, and body copy MUST carry:
+  - color: var(--accent); text-decoration: none; (default state)
+  - text-decoration: underline; (hover state)
+Never rely on browser-default link styling. The pattern established by .card a, .hero-meta a, and footer a is the canonical reference.
+Apply this rule before delivering any section — do not leave hyperlink color to chance."""@en .
+
+:stepLabelPrecision a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Label precision"@en ;
+    schema:text """UI labels and section headings MUST exactly match their semantic meaning and the contract specification.
+Never shorten, paraphrase, or abbreviate a specified label.
+Example violation: truncating "Explore Knowledge Graph using SPARQL" to "Knowledge Graph Explorer" is a mislabeling error.
+Before writing any heading or label, verify it against the skills contract or companion TTL."""@en .
+
+:stepSectionHeadingTreatment a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Section heading treatment for resolver-linked titles"@en ;
+    schema:text """When a .section-title <a> resolves to a KG entity via URIBurner resolver pattern, apply:
+  - At rest: color: var(--text) — renders as a heading first, link second
+  - On hover: color: var(--accent); text-decoration: underline
+
+CSS rule:
+  .section-title a { color: var(--text); text-decoration: none; }
+  .section-title a:hover { color: var(--accent); text-decoration: underline; }
+
+This preserves visual hierarchy (heading-weight text) while marking the resolver affordance on hover."""@en .
+
+:stepAccordionToggleLinks a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Accordion toggle link styling"@en ;
+    schema:text """<a> tags inside .accordion-toggle buttons MUST be styled explicitly:
+  .accordion-toggle a { color: var(--accent); text-decoration: none; }
+  .accordion-toggle a:hover { text-decoration: underline; }
+
+Without this rule, links inside <button> elements inherit the button's text color, not the design system's link color.
+Failure mode: FAQ question links render as white (#e8ecf5) or unstyled, losing the blue entity-link affordance."""@en .
+
+:stepCrossSessionConsistency a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Cross-section visual consistency"@en ;
+    schema:text """Before producing any new section in a document, grep or read the existing CSS to identify established color and layout conventions.
+New sections MUST visually match existing sections — same accent usage, same link styling, same badge patterns.
+Never introduce ad-hoc color overrides or layout variants that diverge from the already-established design.
+If the user provides feedback about aesthetics, record the specific rule in preferences.ttl immediately rather than relying on conversational context."""@en .
+
+# ── Why This HowTo Was Created ────────────────────────────────────────────────
+
+:OriginContext a schema:CreativeWork ;
+    schema:name "Origin context for UI/UX Expert Persona rule"@en ;
+    schema:description "The user had to request UI/UX expert behavior explicitly across multiple sessions to fix: (1) glossary term links using purple --accent2 instead of blue --accent; (2) FAQ accordion toggle links unstyled/inherited; (3) section headings mislabeled. User stated: 'I don't want to keep on requesting that re aesthetics.' This rule codifies the standing expectation."@en ;
+    schema:dateCreated "2026-06-14T00:00:00Z"^^xsd:dateTime .

@@ -1,0 +1,77 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:CreativeWork ;
+    schema:name "External IRI Verification Gate"@en ;
+    schema:description "Mandatory dereference-before-use procedure for all external IRIs (Wikidata, DBpedia, and any third-party namespace) referenced in RDF. Prevents fabricated or guessed IRIs from entering knowledge graphs."@en ;
+    schema:dateCreated "2026-06-08T15:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-08T15:00:00Z"^^xsd:dateTime ;
+    schema:isPartOf <../preferences.ttl> ;
+    schema:about :externalIriVerification .
+
+:externalIriVerification a schema:HowTo ;
+    schema:name "External IRI Verification Procedure"@en ;
+    schema:description "Three-step mandatory gate: search if unknown, dereference to confirm, then reference. Never skip verification for any external IRI."@en ;
+    schema:step :step-searchExternalIri, :step-dereferenceExternalIri, :step-referenceExternalIri .
+
+# Step 1: Search for correct IRI
+:step-searchExternalIri a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Search for the correct external IRI when one is needed"@en ;
+    schema:text """When an entity needs an external IRI (e.g. a Wikidata Q-ID or DBpedia resource URI for owl:sameAs or rdfs:seeAlso):
+
+1. Search Wikidata using the entity search API:
+   ```
+   curl -s "https://www.wikidata.org/w/api.php?action=wbsearchentities&search={query}&language=en&limit=3&format=json"
+   ```
+   where {query} is the exact entity name (e.g. "Snowflake+Inc.", "Databricks").
+
+2. Parse the response to extract top candidate Q-IDs and their labels.
+
+3. For DBpedia, search via the DBpedia resource namespace by constructing the expected URI pattern: `http://dbpedia.org/resource/{Name}`. Verify by dereferencing.
+
+4. Never guess Q-IDs by pattern. Random-looking Q-IDs cannot be constructed heuristically — they must be looked up."""@en .
+
+# Step 2: Dereference to confirm
+:step-dereferenceExternalIri a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Dereference the IRI to confirm it matches the referent"@en ;
+    schema:text """Before adding any external IRI to RDF, dereference it and inspect the response.
+
+**For Wikidata:**
+```
+curl -s "https://www.wikidata.org/wiki/Special:EntityData/{QID}.json"
+```
+Parse the JSON, extract `entities[QID].labels.en.value` for the English label and optionally `entities[QID].descriptions.en.value` for the description. Confirm the label matches the entity you intend to reference. Example Python one-liner:
+```
+python3 -c "import sys,json; d=json.load(sys.stdin); print(d['entities']['QID']['labels']['en']['value'])"
+```
+
+**For DBpedia:**
+```
+curl -s -H "Accept: text/turtle" "http://dbpedia.org/resource/{Name}"
+# or use the data JSON variant:
+curl -s "http://dbpedia.org/data/{Name}.json"
+```
+Inspect rdfs:label values to confirm the referent.
+
+**Acceptance criteria:** The dereferenced label must EXACTLY match the entity's common name. Close-but-not-quite (e.g., "Greek divination" for a database company) is a FAIL."""@en .
+
+# Step 3: Reference or omit
+:step-referenceExternalIri a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Reference the verified IRI or omit if no match exists"@en ;
+    schema:text """After verification:
+
+1. If the IRI dereferences to the correct entity, add it to the RDF entity as an appropriate property:
+   - For same-entity identity: `owl:sameAs <iri>` (when the external entity is the same real-world thing)
+   - For related reference: `rdfs:seeAlso <iri>` (for supplementary information)
+
+2. If the IRI dereferences to a DIFFERENT entity, do NOT use it. Go back to Step 1 and search again.
+
+3. If no matching external IRI exists for the entity (e.g., theCUBE Research has no Wikidata entry), omit the external reference entirely. Do NOT fabricate an IRI or use an incorrect one as a placeholder. An entity without an external reference is clean; an entity with a fabricated external reference is polluting the knowledge graph.
+
+4. Always use full, expanded URIs for external IRIs — never CURIEs with project-specific prefixes. Example: `<http://www.wikidata.org/entity/Q22078063>` not `wd:Q22078063`."""@en .

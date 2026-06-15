@@ -1,0 +1,1395 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <ontology.ttl#> .
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<> a schema:CreativeWork ;
+    schema:name "preferences.ttl"@en ;
+    schema:description "Configuration for agent RDF memory management and semantic memory skill usage." ;
+    schema:dateModified "2026-06-15T13:10:00Z"^^xsd:dateTime ;
+    schema:dateCreated "2026-05-29T17:22:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :agentBehaviorGuide .
+
+# Identity equivalence — canonical (non-www) IRI and www form are the same person
+<https://linkedin.com/in/kidehen#this>
+    owl:sameAs <https://www.linkedin.com/in/kidehen#this> .
+
+# Tony Seale — canonical IRI is the www LinkedIn form; uk subdomain and trailing-slash variant are aliases
+<https://www.linkedin.com/in/tonyseale#this>
+    owl:sameAs <https://uk.linkedin.com/in/tonyseale#this>,
+               <https://www.linkedin.com/in/tonyseale/#this> .
+
+:agentBehaviorGuide a schema:HowTo ;
+    schema:name "Agent Standing Instructions"@en ;
+    schema:description "Procedural rules the agent must follow in every session. Encoded as structured RDF so rules are queryable, resolvable, and harder to overlook than flat prose alone."@en ;
+    schema:about :topicApprovalWorkflow, :topicArtifactRouting, :topicModelIdentityPreflight,
+        :topicSkillComposition,         :topicEntityResolution, :topicCanonicalEntityIriDenotation,
+        :topicEntityIriDenotationMechanics,
+        :topicMemoryManagement, :topicVersionControl,
+        :topicAttributionStyling, :topicPackaging,
+        :topicThemeImplementation, :topicGraphVisualization,
+        :topicContractValidation, :topicNoFabricatedUrls, :topicCurlAuth,
+        :topicStripeSandboxCard, :topicWhoamiFormat, :topicSecretRedaction,
+        :topicPromptRecording, :topicSemanticFidelity,
+        :topicKGExplorerReuseFirst, :topicOntologyDiscovery, :topicRetrievalToolOrder,
+        :topicVirtuosoSparqlFormats, :topicEntityTypeGate, :topicExternalIriVerification,
+        :topicEntityLinkPlacement, :topicCanonicalIriCompliance,
+        :topicConceptEntityHyperlinking, :topicModelOverEnvironment,
+        :topicNoBlankNodes,
+        :topicRemoteWebdavUpload, :topicMemoryProtocolGate,
+        :topicTokenOptimizedSessionHandoff, :topicOntologyCrossReference,
+        :topicNoUnauthorizedDeletion,
+        :topicNoMemoryMdWrite ;
+    schema:step :step-approval, :step-outputDirs, :step-gpt5ChatCodexOutputDirs, :step-mashupVsMeshup, :step-modelIdentityPreflight, :step-skillChain,
+        :step-kgQueryMode,
+        :step-entityDenotation, :step-memoryProtocol,
+        :step-gitWorkflow, :step-attribution, :step-zipRepackage,
+        :step-darkModeCSS, :step-kgExplorerReuse, :step-templateSelection,
+        :step-kgNavPlacement, :step-kgNavCollapsed, :step-kgControlsMasterClose,
+        :step-kgNoOrphans, :step-kgToolbarGroups, :step-kgSettingsPanel,
+        :step-harnessIds, :step-footerLabels, :step-sparqlFormat,
+        :step-complianceBug, :step-simulationLifecycle,
+        :step-clickGuard, :step-kgDataRegex,
+        :step-documentEntity, :step-noFabricatedUrls, :step-curlAuth,
+        :step-stripeSandboxCard, :step-whoamiFormat, :step-secretRedaction,
+        :step-promptRecording, :step-retrievalToolOrder,
+        :step-defaultOutputRoot, :step-modelOverEnvironment, :step-virtuosoSparqlFormats, :step-entityTypeGate,
+        :step-externalIriVerification, :step-entityLinkPlacement,
+        :step-canonicalIriCompliance, :step-conceptEntityHyperlinking,
+        :step-noBlankNodes,
+        :step-remoteWebdavUpload, :step-memoryProtocolGate,
+        :step-tokenOptimizedSessionHandoff, :step-ontologyCrossReference,
+        :step-noUnauthorizedDeletion,
+        :step-noMemoryMdWrite .
+
+# ── Step 1: Seek Approval ────────────────────────────────────────────────────
+
+:step-approval a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Seek approval before acting unless told otherwise"@en ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 2: Output Directory Routing ─────────────────────────────────────────
+
+:step-outputDirs a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Route artifacts to model-specific output directories under the canonical LLM root"@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+:step-gpt5ChatCodexOutputDirs a schema:HowToStep ;
+    schema:position 2.1 ;
+    schema:name "GPT-5 Chat Codex writes generated collections to GPT5-Chat-Generated root folders"@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+# ── Step 2.2: Terminology — Mashup vs Meshup ─────────────────────────────────
+
+:step-mashupVsMeshup a schema:HowToStep ;
+    schema:position 2.2 ;
+    schema:name "Never use 'mashup' — always use 'meshup' for semantic content fusion, on input and output"@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+# ── Step 2.3: Model Identity Pre-Flight Gate ─────────────────────────────────
+
+:step-modelIdentityPreflight a schema:HowToStep ;
+    schema:position 2.3 ;
+    schema:name "Determine output root folder at session initialization — never re-derive mid-session"@en ;
+    schema:text """Before writing any output file, confirm the session's output root folder has been determined. The output root is resolved once at session initialization, with model identity as the primary input. All artifacts in the session use this determined root consistently. Never re-derive, second-guess, or infer the root from agent environment name, session context, prior filenames, or any source other than the session-initialization determination."""@en ;
+    onto:hasTrigger onto:triggerArtifactGeneration ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+:topicModelIdentityPreflight a schema:Thing ;
+    schema:name "Model Identity Pre-Flight Gate"@en ;
+    schema:description "Session-initialization determination of the output root folder, using model identity as primary input. All artifacts use this consistent root — never re-derived mid-session."@en .
+
+# ── Step 3: Skill Chain ──────────────────────────────────────────────────────
+
+:step-skillChain a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Use kg-generator → rdf-infographic-skill chain for RDF/MD/HTML collections"@en ;
+    rdfs:seeAlso <howto/skill-invocation.ttl> .
+
+# ── Step 3a: KG Query Mode ───────────────────────────────────────────────────
+
+:step-kgQueryMode a schema:HowToStep ;
+    schema:position 3.1 ;
+    schema:name "Use data-twingler for KG question answering — kg-only and kg-hybrid modes, local-first, provenance-linked"@en ;
+    rdfs:seeAlso <howto/skill-invocation.ttl> .
+
+# ── Step 4: Entity Denotation ────────────────────────────────────────────────
+# UNTOUCHED — already has rdfs:seeAlso to canonical-entity-iri-denotation.ttl
+
+:step-entityDenotation a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Assign canonical entity IRIs per denotation rulesets"@en ;
+    schema:text "See howto/canonical-entity-iri-denotation.ttl for the priority ladder, owl:sameAs vs schema:sameAs distinction, and local IRI prohibition. See howto/entity-iri-denotation-mechanics.ttl for fragment placement rules, LinkedIn www/non-www reconciliation, and owl:sameAs self-reference prohibition."@en ;
+    rdfs:seeAlso <howto/canonical-entity-iri-denotation.ttl>,
+        <howto/entity-iri-denotation-mechanics.ttl>,
+        <howto/canonical-iri-compliance-gate.ttl> .
+
+# ── Step 5: Memory Protocol ──────────────────────────────────────────────────
+
+:step-memoryProtocol a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Read agent-rdf-memory/ before tasks, write immediately on trigger events"@en ;
+    onto:hasTrigger
+        onto:triggerPreferencesUpdate ,
+        onto:triggerSkillInvocation ,
+        onto:triggerNamedWorkflow ,
+        onto:triggerBehaviorGapIdentified ,
+        onto:triggerTopicChange ,
+        onto:triggerSessionEnd ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 6: Git Workflow ─────────────────────────────────────────────────────
+
+:step-gitWorkflow a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Commit and push only when explicitly asked"@en ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 7: Footer Attribution ───────────────────────────────────────────────
+
+:step-attribution a schema:HowToStep ;
+    schema:position 7 ;
+    schema:name "Use <p> prose format for footer attribution, never chip <div>"@en ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+# ── Step 8: ZIP Repackage ────────────────────────────────────────────────────
+
+:step-zipRepackage a schema:HowToStep ;
+    schema:position 8 ;
+    schema:name "Delete ZIP before recreating — zip -r on existing archive does not remove deleted files"@en ;
+    rdfs:seeAlso <howto/skill-invocation.ttl> .
+
+# ── Step 9: Dark Mode CSS ────────────────────────────────────────────────────
+
+:step-darkModeCSS a schema:HowToStep ;
+    schema:position 9 ;
+    schema:name "Dark mode: two-block CSS, link contrast, general a rule, bright accent"@en ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+# ── Step 10: KG Explorer Template Reuse ──────────────────────────────────────
+
+:step-kgExplorerReuse a schema:HowToStep ;
+    schema:position 10 ;
+    schema:name "Reuse the validated template for KG Explorer — never regenerate from scratch"@en ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+# ── Step 10.05: Template Selection by Content Type ───────────────────────────
+
+:step-templateSelection a schema:HowToStep ;
+    schema:position 10.05 ;
+    schema:name "Select the correct template from assets/templates/ based on content type"@en ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+# ── Step 10.1: KG Explorer — Nav placement ───────────────────────────────────
+
+:step-kgNavPlacement a schema:HowToStep ;
+    schema:position 10.1 ;
+    schema:name "Float nav must be top-LEFT; KG Explorer Controls button is always top-RIGHT"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 10.2: KG Explorer — Float nav starts collapsed ──────────────────────
+
+:step-kgNavCollapsed a schema:HowToStep ;
+    schema:position 10.2 ;
+    schema:name "Float nav must start COLLAPSED per rdf-infographic-skill contract"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 10.3: KG Explorer — Controls as master reset ────────────────────────
+
+:step-kgControlsMasterClose a schema:HowToStep ;
+    schema:position 10.3 ;
+    schema:name "toggleToolbar() must be a master reset — close all child panels when collapsing the tray"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 10.4: KG Explorer — No orphan nodes ─────────────────────────────────
+
+:step-kgNoOrphans a schema:HowToStep ;
+    schema:position 10.4 ;
+    schema:name "getFilteredData() must restrict nodes to those appearing in at least one active link"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 10.5: KG Explorer — Toolbar group labels ────────────────────────────
+
+:step-kgToolbarGroups a schema:HowToStep ;
+    schema:position 10.5 ;
+    schema:name "Wrap toolbar controls in .tb-group + .tb-label for visual hierarchy"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 10.6: KG Explorer — Settings panel UX ───────────────────────────────
+
+:step-kgSettingsPanel a schema:HowToStep ;
+    schema:position 10.6 ;
+    schema:name "Settings panel: slider cards with live value readouts, predicate grid, state-reflecting gear button"@en ;
+    rdfs:seeAlso <howto/kg-explorer-ui-patterns.ttl> .
+
+# ── Step 11: Harness Validator ID Conventions ────────────────────────────────
+
+:step-harnessIds a schema:HowToStep ;
+    schema:position 11 ;
+    schema:name "Match exact HTML IDs and attributes expected by the harness validator"@en ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+# ── Step 12: Footer Attribution Label Casing ─────────────────────────────────
+
+:step-footerLabels a schema:HowToStep ;
+    schema:position 12 ;
+    schema:name "Use exact lowercase label strings in footer attribution cards"@en ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+# ── Step 13: SPARQL Format Guidance Text ─────────────────────────────────────
+
+:step-sparqlFormat a schema:HowToStep ;
+    schema:position 13 ;
+    schema:name "Include visible SPARQL result format guidance prose in HTML"@en ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+# ── Step 14: KG Compliance Script ERE Regex Bug ──────────────────────────────
+
+:step-complianceBug a schema:HowToStep ;
+    schema:position 14 ;
+    schema:name "Work around macOS ERE regex bug in validate-kg-compliance.sh"@en ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+# ── Step 15: KG Explorer Simulation Lifecycle ────────────────────────────────
+
+:step-simulationLifecycle a schema:HowToStep ;
+    schema:position 15 ;
+    schema:name "Create D3 forceSimulation once and reuse it across renders"@en ;
+    rdfs:seeAlso <howto/kg-explorer-d3-patterns.ttl> .
+
+# ── Step 16: Click-Distance Guard ────────────────────────────────────────────
+
+:step-clickGuard a schema:HowToStep ;
+    schema:position 16 ;
+    schema:name "Use a click-distance guard to distinguish drag from click"@en ;
+    rdfs:seeAlso <howto/kg-explorer-d3-patterns.ttl> .
+
+# ── Step 17: kgData to IIFE Regex Constraint ─────────────────────────────────
+
+:step-kgDataRegex a schema:HowToStep ;
+    schema:position 17 ;
+    schema:name "Place kgData immediately adjacent to the IIFE opening"@en ;
+    rdfs:seeAlso <howto/kg-explorer-d3-patterns.ttl> .
+
+# ── Step 18: Document Entity Declaration ─────────────────────────────────────
+
+:step-documentEntity a schema:HowToStep ;
+    schema:position 18 ;
+    schema:name "Declare the document entity in every TTL file using <>"@en ;
+    rdfs:seeAlso <howto/rdf-document-authoring.ttl> .
+
+# ── Step 19: Document Entity schema:about ────────────────────────────────────
+
+:step-documentAbout a schema:HowToStep ;
+    schema:position 19 ;
+    schema:name "Use schema:about for the document entity"@en ;
+    rdfs:seeAlso <howto/rdf-document-authoring.ttl> .
+
+# ── Step 20: No Fabricated URLs ──────────────────────────────────────────────
+
+:step-noFabricatedUrls a schema:HowToStep ;
+    schema:position 20 ;
+    schema:name "Never fabricate, guess, or hallucinate URLs"@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 21: Authenticated curl in Skill Workflows ───────────────────────────
+
+:step-curlAuth a schema:HowToStep ;
+    schema:position 21 ;
+    schema:name "Elicit user confirmation before optionally using authenticated curl with PKCS#12/PEM certificate and/or On-Behalf-Of"@en ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 22: Stripe Sandbox Card ─────────────────────────────────────────────
+
+:step-stripeSandboxCard a schema:HowToStep ;
+    schema:position 22 ;
+    schema:name "Use Stripe sandbox card credentials for ACP test payments"@en ;
+    rdfs:seeAlso <howto/agent-identity.ttl> .
+
+# ── Step 23: Whoami Format ────────────────────────────────────────────────────
+
+:step-whoamiFormat a schema:HowToStep ;
+    schema:position 23 ;
+    schema:name "Present whoami responses in the canonical two-section bullet format"@en ;
+    rdfs:seeAlso <howto/agent-identity.ttl> .
+
+# ── Step 24: Secret Redaction ────────────────────────────────────────────────
+
+:step-secretRedaction a schema:HowToStep ;
+    schema:position 24 ;
+    schema:name "Redact passwords, API secrets, and credentials in all session memory, lessons, trace, and log documents"@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 25: Prompt Recording ─────────────────────────────────────────────────
+
+:step-promptRecording a schema:HowToStep ;
+    schema:position 25 ;
+    schema:name "Record verbatim user prompts in session memory files for intent-to-outcome traceability"@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerNamedWorkflow, onto:triggerBehaviorGapIdentified, onto:triggerSessionEnd ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 26: Retrieval Tool Order ────────────────────────────────────────────
+
+:step-retrievalToolOrder a schema:HowToStep ;
+    schema:position 26 ;
+    schema:name "Content retrieval tool order: Chrome MCP → Playwright → PinchTab → Sponger last resort"@en ;
+    rdfs:seeAlso <howto/skill-invocation.ttl> .
+
+# ── Step 27: Default Output Root ─────────────────────────────────────────────
+
+:step-defaultOutputRoot a schema:HowToStep ;
+    schema:position 27 ;
+    schema:name "Default output root for HTML infographic artifacts — defer to model-specific routing"@en ;
+    schema:text """There is no single default output root. The output root is always determined by :step-outputDirs (position 2): identify the active LLM from the system prompt model identifier, then route to the corresponding model-specific directory under /Users/kidehen/Documents/LLMs/. Never hardcode a single model's output path as the universal default. Do not use kg-output/, the repo root, or /tmp as the final artifact destination. HTML infographic artifacts follow the same model-specific routing as RDF and Markdown artifacts."""@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+# ── Step 27.1: Model Identity vs Agent Environment Tiebreaker ──────────────
+
+:step-modelOverEnvironment a schema:HowToStep ;
+    schema:position 27.1 ;
+    schema:name "Model identity always wins over agent environment for output routing"@en ;
+    schema:text """When the LLM model and the agent environment differ, the model identity from the system prompt determines the output path, never the agent environment name. The agent environment is a multi-model runtime — it can host many different models — so it cannot determine where artifacts should land. Only the model knows its own output directory. Example: DeepSeek V4 Pro running in Claude Code routes to DeepSeek/ (not Claude Generated/). Same principle applies for any model+environment combination. The system prompt model identifier is authoritative. Inferring the model from session filenames or context is prohibited — use only the system prompt."""@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/artifact-routing.ttl> .
+
+# ── Topic Entities (schema:about targets for the container document) ─────────
+
+:topicApprovalWorkflow a schema:Thing ;
+    schema:name "Approval Workflow"@en ;
+    schema:description "Process of seeking user approval before acting or modifying documents."@en .
+
+:topicArtifactRouting a schema:Thing ;
+    schema:name "Artifact Output Routing"@en ;
+    schema:description "Rules for directing generated RDF, HTML, and Markdown artifacts to model-specific output directories."@en .
+
+:topicSkillComposition a schema:Thing ;
+    schema:name "Skill Chain Composition"@en ;
+    schema:description "Patterns for invoking kg-generator, rdf-infographic-skill, and other skills in sequence with proper hand-off and gate compliance."@en .
+
+:topicEntityResolution a schema:Thing ;
+    schema:name "Entity IRI Resolution"@en ;
+    schema:description "Priority rules for assigning IRIs to people, organizations, software, and countries using LinkedIn, DBpedia, Wikidata, and hash-based fallbacks."@en .
+
+:topicCanonicalEntityIriDenotation a schema:Thing ;
+    schema:name "Canonical Entity IRI Denotation"@en ;
+    schema:description "Expanded rules for canonical IRI assignment including the owl:sameAs vs schema:sameAs distinction (owl:sameAs connects entity IRIs with #this fragments; schema:sameAs connects an entity IRI to a document URL) and the prohibition on document-local IRIs when a canonical platform IRI is available."@en ;
+    rdfs:seeAlso <howto/canonical-entity-iri-denotation.ttl> .
+
+:topicEntityIriDenotationMechanics a schema:Thing ;
+    schema:name "Entity IRI Denotation Mechanics"@en ;
+    schema:description "Practical mechanical rules for entity IRI formation: fragment placement (append #this directly to canonical URI, never insert/remove trailing slash), LinkedIn www/non-www reconciliation via owl:sameAs, and owl:sameAs self-reference prohibition."@en ;
+    rdfs:seeAlso <howto/entity-iri-denotation-mechanics.ttl> .
+
+:topicMemoryManagement a schema:Thing ;
+    schema:name "RDF Memory Management"@en ;
+    schema:description "Protocol for reading and writing agent-rdf-memory files before and after tasks, including retrieval and storage rules."@en .
+
+:topicVersionControl a schema:Thing ;
+    schema:name "Git Workflow"@en ;
+    schema:description "Rules for committing, pushing, amending, and repackaging skill ZIP bundles without side effects."@en .
+
+:topicAttributionStyling a schema:Thing ;
+    schema:name "Footer Attribution Styling"@en ;
+    schema:description "HTML footer formatting rules, including <p> prose attribution, canonical homepage links, and exact label casing for validator compliance."@en .
+
+:topicPackaging a schema:Thing ;
+    schema:name "Skill Packaging"@en ;
+    schema:description "ZIP bundle creation and repackaging rules, including deletion before recreation and .DS_Store exclusion."@en .
+
+:topicThemeImplementation a schema:Thing ;
+    schema:name "Theme Implementation"@en ;
+    schema:description "Dark mode CSS requirements: separate blocks for explicit toggle and system preference (not comma-combined); general a { color: var(--accent) } rule so inline links don't fall through to browser-default blue; bright/saturated accent color for dark mode (e.g. #7dd3fc) — never muted indigo/blue that blends into dark backgrounds."@en .
+
+:topicGraphVisualization a schema:Thing ;
+    schema:name "Knowledge Graph Visualization"@en ;
+    schema:description "KG Explorer patterns, including D3 simulation lifecycle, click-distance guard, zoom isolation, SVG resolver links, and template reuse."@en .
+
+:topicContractValidation a schema:Thing ;
+    schema:name "Harness Contract Validation"@en ;
+    schema:description "Validator-specific requirements, including exact HTML IDs, footer label casing, SPARQL format guidance text, and macOS ERE regex workarounds."@en .
+
+:topicNoFabricatedUrls a schema:Thing ;
+    schema:name "No Fabricated URLs"@en ;
+    schema:description "Absolute prohibition on fabricating, guessing, or hallucinating URLs of any kind. All URLs must be sourced verbatim, computed with tools, or constructed from validated patterns — otherwise omitted and the user asked."@en .
+
+:topicCurlAuth a schema:Thing ;
+    schema:name "Authenticated curl Usage"@en ;
+    schema:description "Convention for optionally issuing curl commands with PKCS#12 or PEM client certificates and an On-Behalf-Of header — only after explicit user elicitation and confirmation that they apply — to assert a WebID principal."@en .
+
+:topicStripeSandboxCard a schema:Thing ;
+    schema:name "Stripe Sandbox Card"@en ;
+    schema:description "Stripe test mode card credentials for ACP subscription payment validation."@en .
+
+:topicWhoamiFormat a schema:Thing ;
+    schema:name "Whoami Response Format"@en ;
+    schema:description "Canonical two-section bullet format for whoami responses, covering user principal and agent identity with artifact routing, memory store, and behavioral contract."@en .
+
+:topicSecretRedaction a schema:Thing ;
+    schema:name "Secret Redaction in Memory Documents"@en ;
+    schema:description "Mandatory redaction of passwords and API secrets (to [REDACTED] form) in session memory .ttl, MD reports, traces, and logs for security."@en .
+
+:topicPromptRecording a schema:Thing ;
+    schema:name "Prompt Recording in Session Memory"@en ;
+    schema:description "Mandatory recording of verbatim user prompts as onto:Prompt entities in session memory files, linked via prov:wasInformedBy, for intent-to-outcome traceability."@en .
+
+:topicSemanticFidelity a schema:Thing ;
+    schema:name "Semantic Fidelity Gate"@en ;
+    schema:description "Five-step contract gate (in howto/semantic-fidelity-gates.ttl) preventing prior-task content contamination — ensures kgData payload and HTML body prose describe the same topic as the companion TTL."@en ;
+    rdfs:seeAlso <howto/semantic-fidelity-gates.ttl> .
+
+:topicOntologyDiscovery a schema:Thing ;
+    schema:name "Shared Ontology Discovery via prefix.cc"@en ;
+    schema:description "Four-step protocol (in howto/ontology-discovery.ttl) for discovering existing shared ontologies before inventing new RDF predicates: query prefix.cc, evaluate fitness, present suggestions for user acceptance/rejection, and apply accepted ontologies consistently. Promotes ontology reuse over ad-hoc vocabulary invention."@en ;
+    rdfs:seeAlso <howto/ontology-discovery.ttl> .
+
+:topicRetrievalToolOrder a schema:Thing ;
+    schema:name "Content Retrieval Tool Order"@en ;
+    schema:description "Mandatory retrieval tool priority: (1) Chrome MCP, (2) Playwright, (3) PinchTab, (4) Sponger only as absolute last resort after all others are tried and unavailable."@en .
+
+:claudeCodeSettings a schema:PropertyValue ;
+    schema:name "Claude Code Settings"@en ;
+    schema:propertyID "contextThreshold" ;
+    schema:value "500000"^^xsd:integer ;
+    schema:description "Context threshold restored to 500k tokens on 2026-06-04 after prior session was compacted prematurely at a lower threshold."@en .
+
+:topicKGExplorerReuseFirst a schema:Thing ;
+    schema:name "KG Explorer Reuse-First Protocol"@en ;
+    schema:description "Four-step protocol (in howto/kg-explorer-reuse-first.ttl) for constructing KG Explorer visualizations: search for the 3 most recent working implementations, validate candidates against contract, adapt the first passing shell to new kgData, and only build afresh as a last resort. Optimizes for token economy by reusing proven D3 patterns."@en ;
+    rdfs:seeAlso <howto/kg-explorer-reuse-first.ttl> .
+
+# ── Step 28: Virtuoso SPARQL URL Format Parameters ───────────────────────────
+
+:step-virtuosoSparqlFormats a schema:HowToStep ;
+    schema:position 28 ;
+    schema:name "Use correct &format= parameter for each SPARQL query type on Virtuoso endpoints"@en ;
+    schema:text "SELECT → text/x-html+tr (format=text%2Fx-html%2Btr). CONSTRUCT → text/x-html-nice-turtle (format=text%2Fx-html-nice-turtle). DESCRIBE → text/x-html-nice-turtle. Never apply the SELECT format to CONSTRUCT/DESCRIBE or vice versa."@en ;
+    rdfs:seeAlso <howto/virtuoso-sparql-formats.ttl> .
+
+:topicEntityTypeGate a schema:Thing ;
+    schema:name "Entity, Property, and Type IRI Gate"@en ;
+    schema:description "Every RDF entity must have the correct rdf:type for its semantic role. Every property and type IRI used must be a real term in its declared vocabulary — never fabricated or guessed. schema:HowToStep for HowTo steps, schema:Question for FAQ questions, schema:DefinedTerm for glossary terms, but also: never use schema:ceo (not a real schema.org property) or schema:ArticleSection (not a real schema.org type). Content-match alone is insufficient; the term must exist in the namespace. This applies during KG generation (entity creation), hyperlinking (linking HTML to entities), and property/type IRI authoring (any vocabulary use)."@en ;
+    rdfs:seeAlso <howto/entity-type-gate.ttl> .
+
+:topicVirtuosoSparqlFormats a schema:Thing ;
+    schema:name "Virtuoso SPARQL URL Format Parameters"@en ;
+    schema:description "Default &format= parameter values for SPARQL URLs targeting Virtuoso endpoints: SELECT → text/x-html+tr; CONSTRUCT/DESCRIBE → text/x-html-nice-turtle. Always percent-encode the value."@en ;
+    rdfs:seeAlso <howto/virtuoso-sparql-formats.ttl> .
+
+# ── Step 29: Entity, Property, and Type IRI Gate ──────────────────────────────
+
+:step-entityTypeGate a schema:HowToStep ;
+    schema:position 29 ;
+    schema:name "Verify every entity type, property IRI, and type IRI against the declared vocabulary"@en ;
+    schema:text """Every RDF entity must be declared as the correct rdf:type for its semantic role. Additionally, every property and type IRI used must be a real term in its declared namespace — never fabricated, guessed, or assumed. This gate applies in three contexts:
+
+**A. When creating entities during KG generation:**
+- HowToStep entities must be typed `a schema:HowToStep` — never `schema:Question` or any other type.
+- FAQ question entities must be typed `a schema:Question`.
+- FAQ answer entities must be typed `a schema:Answer`.
+- Glossary term entities must be typed `a schema:DefinedTerm` or their appropriate semantic type.
+- Other entities must use their most specific schema.org type.
+
+**B. When hyperlinking HTML elements to existing RDF entities:**
+1. Read the entity's rdf:type declaration from the TTL file.
+2. Verify it matches the semantic role of the HTML element:
+   - HowToStep heading → must be a schema:HowToStep
+   - FAQ question text → must be a schema:Question
+   - Glossary term → must match the entity's declared type
+3. If no entity of the correct type has matching content, leave the element unlinked.
+4. Do NOT accept a content-only match when types conflict.
+
+**C. When authoring any property or type IRI (at any point):**
+1. Every property (predicate) IRI like `schema:ceo`, `schema:founder`, `schema:name` must be a real term defined in its namespace. The prefix alone (`schema:`) is not a license to invent.
+2. Every type (class) IRI like `schema:ArticleSection`, `schema:HowTo`, `schema:Organization` must be a real type in the declared vocabulary.
+3. Before using a term from an unfamiliar vocabulary, verify it exists via the vocabulary's canonical documentation or prefix.cc.
+4. If a term does not exist in the vocabulary, find the correct standard term or ask the user — do not use it as-is.
+5. Standard namespaces (rdf:, rdfs:, owl:, xsd:) and commonly-audited namespaces (schema:) do not require lookup for well-known terms, but any term whose existence is uncertain must be verified.
+
+This expanded gate exists because on 2026-06-08 two fabricated IRIs were introduced in the Big Pickle infographic RDF: `schema:ceo` (not a real schema.org property — replaced with `schema:employee`) and `schema:ArticleSection` (not a real schema.org type — replaced with `schema:CreativeWork`). The earlier entity-type gate only checked role-level correctness and missed vocabulary-level validity."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/entity-type-gate.ttl> .
+
+:topicExternalIriVerification a schema:Thing ;
+    schema:name "External IRI Verification Gate"@en ;
+    schema:description "Every external IRI (Wikidata, DBpedia, or any third-party namespace) used in RDF must be verified by dereferencing it and confirming the returned entity matches the referent. Fabricated or guessed external IRIs are prohibited — a prefix or Q-ID pattern alone is insufficient. Verification is done via curl against the IRI's content-negotiation endpoint (e.g. wikidata.org/wiki/Special:EntityData/{qid}.json) and inspecting the returned labels/descriptions."@en .
+
+# ── Step 30: External IRI Verification Gate ────────────────────────────────────
+
+:step-externalIriVerification a schema:HowToStep ;
+    schema:position 30 ;
+    schema:name "Verify every external IRI (Wikidata, DBpedia) by dereferencing before use"@en ;
+    schema:text """Never assign or reference an external IRI (Wikidata Q-ID, DBpedia URI, or any third-party namespace) without verifying it actually describes the intended referent. A string like Q22908752 that "looks right" is not sufficient.
+
+**Verification procedure:**
+
+1. Before adding any external IRI to RDF (as owl:sameAs, rdfs:seeAlso, schema:sameAs, or any other reference), dereference it to confirm the referent.
+
+2. For Wikidata IRIs, use:
+   ```
+   curl -s "https://www.wikidata.org/wiki/Special:EntityData/{QID}.json"
+   ```
+   Inspect the labels/descriptions in the response JSON. The English label must match the entity being referenced.
+
+3. For DBpedia IRIs, use:
+   ```
+   curl -s -H "Accept: text/turtle" "http://dbpedia.org/resource/{Name}"
+   ```
+   Or use the JSON version. Inspect rdfs:label to confirm the referent.
+
+4. If the IRI dereferences to a different entity, do NOT use it. Search for the correct IRI via:
+   - Wikidata API: `https://www.wikidata.org/w/api.php?action=wbsearchentities&search={query}&language=en&limit=3&format=json`
+   - DBpedia: browse or search the resource namespace.
+
+5. If no matching external IRI exists for an entity, omit the external reference entirely. Do not fabricate one.
+
+6. After correcting any fabricated IRIs, update the dateModified on the file and document the correction in session memory.
+
+**Historical note:** On 2026-06-08, 12 of 15 Wikidata Q-IDs in the Big Pickle infographic RDF were fabricated (dereferenced to wrong entities like "Greek divination" for Snowflake, "Michael Russell" for Clayton Christensen, "Intan Jaya" for SAP, etc.). Fixing each one required: (1) searching the correct Q-ID, (2) dereferencing to confirm, and (3) replacing the IRI. Only the Microsoft (Q2283) and Google (Q95) Q-IDs happened to be correct by chance."""@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/external-iri-verification.ttl> .
+
+:topicEntityLinkPlacement a schema:Thing ;
+    schema:name "Entity Hyperlink Placement Gate"@en ;
+    schema:description "Rules for placing entity-link hyperlinks in HTML infographics. Two selectable modes: Mode A (first-reference-only — link each entity at most once, on its first DOM occurrence) and Mode B (all references — link every occurrence of every entity). Mode is elicited from the user before applying links. The gate verifies the chosen mode is applied correctly and completely."@en ;
+    rdfs:seeAlso <howto/entity-link-placement.ttl> .
+
+# ── Step 31: Entity Hyperlink Placement Gate ──────────────────────────────────
+
+:step-entityLinkPlacement a schema:HowToStep ;
+    schema:position 31 ;
+    schema:name "Elicit hyperlink mode, then verify entity-link placement in HTML"@en ;
+    schema:text """Entity-link hyperlinks in HTML must follow one of two selectable modes. Before adding or fixing entity links, ASK the user which mode to apply — do not assume.
+
+**Mode A — First-reference-only (default):**
+- Each entity is linked at most once, on its first DOM occurrence.
+- Subsequent mentions of the same entity in prose use plain text, never a second entity-link.
+- Exceptions: HowTo accordion — the accordion TOGGLE heading is the first reference; repeated same text in the expanded step body is NOT relinked. FAQ Q&A: question and answer count as one unit (Q gets the link, A does not re-link the same entity).
+
+**Mode B — All references:**
+- Every occurrence of every entity in the HTML body is hyperlinked.
+- No deduplication — link every `<a class="entity-link">` wherever the entity name appears.
+- Entities in meta tags, JSON-LD, and plain navigation elements are excluded — only body prose.
+
+**Verification checklist (applied to whichever mode was chosen):**
+1. Every entity in the RDF that has a corresponding text mention in the HTML body must be linked at least once (Mode A) or every time (Mode B).
+2. The href must use the resolver URL pattern (linkeddata.uriburner.com/describe/?url={url-encoded-entity-iri}).
+3. Entity display text in the HTML must match the entity's schema:name in the RDF (case-insensitive substring match sufficient).
+4. No bare unprefixed entity name at the first reference position (Mode A) or any position (Mode B) should be unlinked.
+5. Entities that have no RDF entity definition should NOT be linked (linking requires a resolvable entity IRI).
+
+**Trigger:** Before adding or fixing entity-link hyperlinks in an HTML infographic, elicit the mode from the user and record the choice in session memory."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/entity-link-placement.ttl> .
+
+:topicCanonicalIriCompliance a schema:Thing ;
+    schema:name "Canonical IRI Compliance Gate"@en ;
+    schema:description "Post-generation audit that verifies every entity uses the highest-priority canonical platform IRI available — never a document-local IRI when DBpedia, Wikidata, LinkedIn, or other platform IRI exists. Covers audit procedure, priority ladder enforcement, cross-reference updates, exception approval, and HTML resolver URL sync."@en ;
+    rdfs:seeAlso <howto/canonical-iri-compliance-gate.ttl> .
+
+# ── Step 32: Canonical IRI Compliance Gate ───────────────────────────────────
+
+:step-canonicalIriCompliance a schema:HowToStep ;
+    schema:position 32 ;
+    schema:name "Audit every entity for canonical IRI compliance after KG generation"@en ;
+    schema:text """After generating RDF, audit every entity to ensure it uses the highest-priority canonical platform IRI available per canonical-entity-iri-denotation.ttl. This gate exists because on 2026-06-08, all 10 organizations with available DBpedia/Wikidata IRIs (Microsoft, Google, OpenAI, Anthropic, Snowflake, Databricks, Salesforce, SAP, ServiceNow, Harvard University) were using document-local IRIs instead — a step 4 violation that the pre-existing instruction did not catch.
+
+**Audit procedure:**
+
+1. For every entity in the generated RDF, read its primary subject IRI.
+2. If it is a document-local IRI (inside the @prefix : namespace), check whether a canonical platform IRI exists:
+   a. Check `owl:sameAs` values — if any point to DBpedia, Wikidata, LinkedIn, or another platform entity IRI, that is the canonical IRI.
+   b. Check `rdfs:seeAlso` values — same rule.
+   c. If the entity has a DBpedia or Wikidata IRI, search for it (it may not yet be referenced via owl:sameAs).
+3. If a canonical IRI exists, the subject MUST be changed to it:
+   a. Replace the subject IRI in the entity definition.
+   b. Remove any `owl:sameAs` that has the canonical IRI as object (self-reference).
+   c. Promote any `rdfs:seeAlso` Wikidata/DBpedia IRI to `owl:sameAs`.
+   d. Add `schema:sameAs` for the homepage document URL.
+   e. Add `schema:url` and `schema:identifier` as appropriate.
+4. Update all cross-references (property values) from the old document-local IRI to the new canonical IRI.
+5. If no canonical IRI exists, keep the document-local IRI and document as an approved exception.
+6. Update all HTML entity-link resolver URLs to use the new canonical IRIs.
+7. Re-validate Turtle syntax after all changes.
+8. Document the audit in session memory with the count of entities changed and any exceptions.
+
+**Entity-type-specific priority ladder (from canonical-entity-iri-denotation.ttl):**
+  - Organization: DBpedia (1) → Wikidata (2) → LinkedIn #this (3) → X/Twitter #this (4) → Homepage #this (5)
+  - Person: LinkedIn #this (1) → X/Twitter #this (2) → Substack #this (3) → DBpedia (4) → Other platform #this (5)
+  - Software/Product: DBpedia (1) → Wikidata (2) → Homepage #this (3)
+
+**Known exceptions (no canonical IRI available):**
+  - theCUBE Research, SiliconANGLE Media, OpenLink Software — no DBpedia, Wikidata, or LinkedIn presence found.
+
+See howto/canonical-iri-compliance-gate.ttl for the full companion with step-by-step audit checklist."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/canonical-iri-compliance-gate.ttl> .
+
+:topicConceptEntityHyperlinking a schema:Thing ;
+    schema:name "Concept/Term Entity Hyperlinking Gate"@en ;
+    schema:description "Rules for hyperlinking concept and term entities (schema:DefinedTerm, custom ontology classes, schema:Thing concepts) in HTML infographics. Analogous to the person and organization entity-linking rules but for abstract concepts like 'System of Intelligence', 'Agentic Client', 'Co-Design', 'Semantic Web', etc. Covers canonical IRI selection for concepts (standards-body → DBpedia → Wikidata → document-local), first-reference hyperlinking, and verification checklist."@en ;
+    rdfs:seeAlso <howto/concept-entity-hyperlinking.ttl> .
+
+# ── Step 33: Concept/Term Entity Hyperlinking Gate ─────────────────────────────
+
+:step-conceptEntityHyperlinking a schema:HowToStep ;
+    schema:position 33 ;
+    schema:name "Hyperlink concept/term entities (DefinedTerm, custom ontology classes) in HTML on first reference"@en ;
+    schema:text """Concepts and terms (schema:DefinedTerm, custom ontology classes, schema:Thing concepts) must be hyperlinked in HTML infographics following rules analogous to person and organization entity linking. This gate applies to entities like 'System of Intelligence', 'Agentic Client', 'Co-Design', 'Semantic Web', 'Federation of Intelligence', and all other abstract or conceptual entities.
+
+**Canonical IRI selection for concepts (priority order):**
+1. Standards-body or platform IRI (e.g., Semantic Web → W3C, RDF → W3C, schema.org terms) — use this as the primary IRI with owl:sameAs linking to the document-local entity.
+2. DBpedia resource IRI — for well-known abstract concepts with DBpedia coverage.
+3. Wikidata entity IRI — for well-known concepts without DBpedia coverage but with Wikidata coverage.
+4. Document-local hash IRI derived from @prefix : (e.g., #systemOfIntelligence, #agenticClient) — when no platform, DBpedia, or Wikidata IRI exists.
+5. If the concept is also a glossary term (schema:DefinedTerm in a DefinedTermSet), it should have a glossary entity defined in the RDF — the HTML hyperlink targets the entity IRI.
+
+**Hyperlink placement (Mode A compatible):**
+- Link the concept on its FIRST occurrence in the visible HTML body.
+- Hero badges, taglines, section headings, and body paragraphs all count as DOM positions.
+- One link per concept per document (Mode A default — do not re-link subsequent mentions).
+- The link uses the resolver URL pattern: linkeddata.uriburner.com/describe/?url={url-encoded-iri}
+
+**Verification checklist:**
+1. Every concept entity in the RDF that has a corresponding text mention in the HTML body must be linked at least once.
+2. The href must use the resolver URL pattern with correct url-encoding.
+3. Entity display text in the HTML must match (or closely describe) the entity's schema:name in the RDF.
+4. If a concept/term has no corresponding RDF entity, create one before linking (linking without an entity definition is invalid).
+5. Custom ontology class entities (:SystemOfIntelligence, :AgenticClient) are concept entities — they must be linked on first reference like any other entity.
+
+**Known coverage gap discovered 2026-06-08:**
+The hero badges in the Big Pickle Snowflake/Databricks infographic had 4 concept badges (System of Intelligence, Agentic Client, Co-Design, Semantic Web) that were not hyperlinked despite having corresponding RDF entities. This step fills the gap that prior entity-link rules only covered Person and Organization entities."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerBehaviorGapIdentified ;
+    rdfs:seeAlso <howto/concept-entity-hyperlinking.ttl> .
+
+# ── Step 34: Generated Artifact Placement ──────────────────────────────────────
+
+:topicModelOverEnvironment a schema:Thing ;
+    schema:name "Model Identity vs Agent Environment Tiebreaker"@en ;
+    schema:description "Rule that model identity from the system prompt always takes precedence over the agent environment name for output routing. Claude Code and Codex Desktop are multi-model runtimes — the model determines the output path, not the environment."@en .
+
+:topicArtifactPlacement a schema:Thing ;
+    schema:name "Generated Artifact Placement"@en ;
+    schema:description "Decision about where generated output artifacts (HTML, RDF, Markdown) should be placed relative to each other and to the source content. Locations depend on publication intent — they may share a folder or use dedicated subfolders (rdf/, webpages/, md/). Elicit user preference before assuming placement."@en .
+
+:step-rdfInfographicGateEnforcement a schema:HowToStep ;
+    schema:position 35 ;
+    schema:name "Run validate-harness-contract.py before delivering any rdf-infographic-skill HTML artifact"@en ;
+    schema:text """Before reporting any rdf-infographic-skill HTML artifact as complete or delivering it to the user, you MUST run the harness contract validator. This is a blocking gate — do not deliver if any check fails.
+
+**Command:**
+```
+python3 rdf-infographic-skill/scripts/validate-harness-contract.py {html} --ttl {ttl} --jsonld {jsonld}
+```
+
+**GATE: 0 failures required.** If the script outputs FAIL, fix all listed issues and re-run until it outputs PASS.
+
+**Checked by the gate (as of 2026-06-10):**
+- POSH class attributes and nav panel IDs
+- Theme toggle and KG Explorer controls (correct IDs and data-mode/data-density values)
+- Resolver-backed node anchors (SVG <a> with data-resolver-href)
+- Resolver-backed edge label anchors (.pred-anchor SVG <a> with data-resolver-href)
+- SPARQL explore button (id="sparqlBtn")
+- Node click handlers invoking a resolver function
+- Attribution footer labels (exact casing)
+- URIBurner and Virtuoso URLs in footer
+- Open-in-new-tab link behavior
+- Embedded kgData payload (no orphan links)
+- Companion TTL and JSON-LD validity
+
+**Why this rule exists:** In session 2026-06-10, both a missing SPARQL button and missing edge label hyperlinking were delivered to the user because the validator was never run. The validator would have caught both defects. Batch generation without section-by-section re-reads caused them; not running the gate allowed delivery."""@en ;
+    onto:hasTrigger onto:triggerArtifactGeneration ;
+    rdfs:seeAlso <howto/rdf-infographic-compliance-gate.ttl> .
+
+:topicRdfInfographicGate a schema:Thing ;
+    schema:name "rdf-infographic-skill Harness Gate Enforcement"@en ;
+    schema:description "Requirement to run validate-harness-contract.py and achieve 0 failures before delivering any rdf-infographic-skill HTML artifact. Added 2026-06-10 after edge-label and SPARQL button defects were delivered without gate execution."@en .
+
+:step-artifactPlacement a schema:HowToStep ;
+    schema:position 34 ;
+    schema:name "Elicit user preference for generated file placement before writing outputs"@en ;
+    schema:text """Generated output artifacts (HTML infographic, RDF Turtle, Markdown companion) may be placed in the same folder or in separate dedicated folders (e.g., rdf/, webpages/, md/). The correct placement depends on publication intent and user workflow conventions.
+
+**Procedure:**
+1. Before generating any output file, ask the user (or check preferences.ttl if previously recorded) where each artifact type should be placed.
+2. Do NOT default to a skill's hardcoded "same folder" rule without consulting the user first.
+3. If the user has an established pattern from prior sessions (recorded in preferences.ttl or session memory), use that.
+4. Document the chosen layout in session memory for future reference.
+
+**Known layout options:**
+- All files in the same directory (flat layout)
+- Subfolder per type: rdf/ for Turtle, webpages/ for HTML, md/ for Markdown
+- Source-folder-proxied: HTML goes alongside source documents, RDF and MD in subfolders
+- Custom layout specified by the user
+
+**The key rule: Do not assume. Ask.**
+
+**Kingsley's preference (recorded 2026-06-08):**
+- **Local saves:** rdf/ for Turtle files, webpages/ for HTML infographics, md/ for Markdown companions — separate subfolders per type.
+- **Publication:** All artifacts (HTML, RDF, MD) published to a common folder when deployed.
+- This applies to the Snowflake/Databricks infographic and similar future works unless overridden."""@en ;
+    onto:hasTrigger onto:triggerArtifactGeneration, onto:triggerPreferencesUpdate .
+
+:step-opalSessionVocabulary a schema:HowToStep ;
+    schema:position 36 ;
+    schema:name "Use OPAL Analytics Ontology vocabulary as default in all session log TTL files"@en ;
+    schema:text """All session memory files in agent-rdf-memory/sessions/ MUST use terms from the OPAL Analytics Ontology (prefix opal: <https://www.openlinksw.com/ontology/opal/>) as the primary vocabulary for modeling the session, model, provider, user, and message entities. This is the default and applies unless overridden by the operator for a specific session.
+
+**Mandatory prefix declarations in every session TTL:**
+```turtle
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+```
+
+**Required entity mappings:**
+
+| What | OPAL type | Key properties |
+|---|---|---|
+| The session itself | `opal:ChatSession` | `opal:chatModel`, `opal:user`, `opal:lastUsed`, `opal:assistantId` |
+| The LLM used | `opal:ChatModel` | `schema:name`, `opal:provider` |
+| The LLM provider | `opal:LLMProvider` | `schema:name`, `schema:url` |
+| Each task/exchange | `schema:Action` + `opal:ChatMessage` | `opal:messageRole`, `opal:usesTools`, `opal:toolId`, `opal:timestamp` |
+
+**Standard session skeleton:**
+```turtle
+:session a opal:ChatSession ;
+    opal:chatModel :chatModel ;
+    opal:user <https://linkedin.com/in/kidehen#this> ;
+    opal:lastUsed "{end-timestamp}"^^xsd:dateTime ;
+    opal:assistantId "claude-code"^^xsd:string ;
+    schema:name "..."@en ;
+    schema:hasPart :task1, :task2 .
+
+:chatModel a opal:ChatModel ;
+    schema:name "{model display name}"@en ;
+    opal:provider :llmProvider .
+
+:llmProvider a opal:LLMProvider ;
+    schema:name "Anthropic"@en ;
+    schema:url <https://www.anthropic.com/> .
+```
+
+**For tasks that invoke tools, add OPAL message properties:**
+```turtle
+:taskFoo a schema:Action, opal:ChatMessage ;
+    opal:messageRole "assistant"^^xsd:string ;
+    opal:usesTools true ;
+    opal:toolId "Read, Edit, Bash"^^xsd:string ;
+    opal:timestamp "{timestamp}"^^xsd:dateTime ;
+    schema:name "..."@en ;
+    schema:actionStatus schema:CompletedActionStatus .
+```
+
+**Ontology source:** `/Users/kidehen/Documents/RDF_Ontologies/OpenLink/opal-analytics-ontology-2.ttl`
+**Ontology IRI:** `https://www.openlinksw.com/ontology/opal/`
+
+**Override rule:** An operator (not the user) may explicitly override this default for a specific session by stating so in a system prompt or task instruction. Absent such override, OPAL vocabulary is always used."""@en ;
+    onto:hasTrigger onto:triggerSessionWrite ;
+    rdfs:seeAlso <howto/opal-session-vocabulary.ttl> .
+
+:topicOpalSessionVocabulary a schema:Thing ;
+    schema:name "OPAL Analytics Ontology for Session Logs"@en ;
+    schema:description "Standing requirement to use opal:ChatSession, opal:ChatModel, opal:LLMProvider, opal:ChatMessage and related OPAL properties in all session memory TTL files. Default unless overridden by operator. Ontology at /Users/kidehen/Documents/RDF_Ontologies/OpenLink/opal-analytics-ontology-2.ttl"@en .
+
+# ── Step 37: No Blank Nodes in RDF Output ─────────────────────────────────────
+
+:step-noBlankNodes a schema:HowToStep ;
+    schema:position 37 ;
+    schema:name "Never use blank nodes in generated RDF Turtle — all resources must be named IRIs"@en ;
+    schema:text """Every resource in generated RDF MUST be a named IRI. Blank nodes are prohibited in all forms:
+
+**Prohibited patterns:**
+1. Turtle `[ ... ]` inline blank node syntax — e.g., `:x :p [ a :Class ; :q "v" ]` is prohibited.
+2. Turtle `_:id` blank node labels — e.g., `_:b1 a :Class` is prohibited.
+3. Turtle `( ... )` collection syntax — e.g., `:x :p (:a :b)` desugars to blank node list cells; use comma-separated objects instead: `:x :p :a, :b`.
+4. Any other blank node construct (e.g., `rdf:first`/`rdf:rest` chains from collections).
+
+**Always use comma-separated object lists for multiple values:**
+- Correct: `:glossarySection schema:hasDefinedTerm :term1, :term2, :term3 .`
+- Wrong: `:glossarySection schema:hasDefinedTerm (:term1 :term2 :term3) .`
+
+**Verification gate (run after every RDF generation):**
+```
+grep -cE '\\\\[|\\\\(:|_: ' {ttl-file}
+```
+If the count is > 0, fix all blank nodes before delivering the RDF.
+
+**Why:** Named IRIs are queryable, referencable, and resolvable. Blank nodes cannot be addressed from outside the file, cannot be resolved via content negotiation, and break the hyperlinked-data model that is the foundation of the Semantic Web."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/rdf-document-authoring.ttl> .
+
+:topicNoBlankNodes a schema:Thing ;
+    schema:name "No Blank Nodes in RDF Output"@en ;
+    schema:description "Absolute prohibition on blank nodes in generated RDF Turtle. All resources must be named IRIs. Collections use comma-separated objects, never Turtle (...) syntax or explicit blank node labels."@en .
+
+# ── Step 38: Remote WebDAV Upload ─────────────────────────────────────────────
+
+:step-remoteWebdavUpload a schema:HowToStep ;
+    schema:position 38 ;
+    schema:name "After generating artifacts, offer to upload to remote WebDAV (URIBurner default)"@en ;
+    schema:text """After completing any artifact (HTML, RDF Turtle, or Markdown), offer to upload it to a remote WebDAV server. URIBurner DAV is the default; the user may designate an alternative endpoint.
+
+**Workflow:**
+1. Offer upload with the artifact path.
+2. Confirm or choose endpoint (URIBurner daas_paid/, daas/, or custom URL).
+3. Elicit PKCS#12 credentials, optional On-Behalf-Of WebID.
+4. Construct curl PUT command with --upload-file.
+5. Show the command to the user and ask for confirmation before executing.
+6. Report success/failure and record in session memory.
+
+See howto/remote-webdav-upload.ttl for the full 5-step procedure with command templates and error handling."""@en ;
+    onto:hasTrigger onto:triggerArtifactGeneration ;
+    rdfs:seeAlso <howto/remote-webdav-upload.ttl> .
+
+:topicRemoteWebdavUpload a schema:Thing ;
+    schema:name "Remote WebDAV Upload"@en ;
+    schema:description "Workflow for uploading locally generated artifacts to a remote WebDAV server using curl PUT with mTLS authentication. URIBurner is the default endpoint; user may designate alternatives. Supports On-Behalf-Of identity delegation."@en .
+
+# ── Topic: Memory Protocol Validation Gate ────────────────────────────────────
+
+:topicMemoryProtocolGate a schema:Thing ;
+    schema:name "Memory Protocol Validation Gate"@en ;
+    schema:description "Post-session audit gate that validates every Claude Code session transcript against the 5-step Agent RDF Memory Protocol using validate-memory-protocol.py. Programmatic backstop to the SessionStart hook injection. Added 2026-06-10 after protocol violation on a whoami query."@en .
+
+# ── Step 39: Memory Protocol Validation Gate ─────────────────────────────────
+
+:step-memoryProtocolGate a schema:HowToStep ;
+    schema:position 39 ;
+    schema:name "Validate memory protocol compliance with transcript audit gate"@en ;
+    schema:text """After every Claude Code session, run the memory protocol validator on the session transcript. This is a programmatic backstop — the SessionStart hook injection (load_memory.py) is the primary prevention mechanism; this validator is the audit trail that proves compliance.
+
+**Command:**
+```
+python3 agent-rdf-memory/scripts/validate-memory-protocol.py ~/.claude/projects/-Users-kidehen-Documents-Management-Development-ai-agent-skills/{uuid}.jsonl --verbose
+```
+
+**GATE: 0 failures required before considering a session protocol-compliant.**
+
+**Checked by the gate (5 mandatory protocol steps):**
+1. Directory listing of agent-rdf-memory/ (Bash ls call)
+2. Read core.ttl (user identity and output routing)
+3. Read preferences.ttl (the queryable behavioral contract)
+4. Read index.ttl (session index with cross-references)
+5. Followed index.ttl references to at least one additional file beyond the core three (howto/, sessions/, projects/, or entities/)
+
+**Optional --strict mode** additionally verifies that all protocol reads occurred before the agent's first substantive text response — catches "read-after-respond" violations where the agent answers from stale context first and only executes the protocol retroactively.
+
+**Why this rule exists:** In a prior session, a simple "whoami" query was answered from CLAUDE.md prose instead of the canonical format in howto/agent-identity.ttl. The SessionStart hook injection had provided compact step names but NOT the whoami format spec (it lived in a howto/ file the hook didn't load). The agent treated the compact injection as "memory already loaded" and skipped the full-read protocol. This validator proves compliance after the fact and drives hook injection improvements when failures recur.
+
+**Two-layer defense model:**
+- **Hook injection** (load_memory.py) = primary prevention — injects GATE instruction + critical specs at session start
+- **Validator** (validate-memory-protocol.py) = audit trail — proves whether prevention worked
+- Together they form a closed loop: hook prevents → validator confirms → if validation fails, hook improves → next session passes"""@en ;
+    onto:hasTrigger onto:triggerSessionEnd ;
+    rdfs:seeAlso <howto/memory-protocol-gate.ttl> .
+
+# ── Topic: Token-Optimized Session Handoff ───────────────────────────────────
+
+:topicTokenOptimizedSessionHandoff a schema:Thing ;
+    schema:name "Token-Optimized Session Handoff"@en ;
+    schema:description "Best practice for reducing token usage across repeated artifact-generation tasks: use a new session with a compact handoff for similar next articles, and keep the current session only for small edits to the same artifact. Added 2026-06-12 after repeated RDF/HTML collection generation and Graph IRI contract correction."@en .
+
+# ── Step 40: Token-Optimized Session Handoff ─────────────────────────────────
+
+:step-tokenOptimizedSessionHandoff a schema:HowToStep ;
+    schema:position 40 ;
+    schema:name "For repeated similar generation tasks, start a fresh session with a compact validated-pattern handoff"@en ;
+    schema:text """When the user asks whether to continue in the current session or start a new session for additional similar tasks, optimize for token usage and contract fidelity:
+
+1. Continue the current session only for small edits, repairs, or validation of the same artifact currently under discussion.
+2. Start a new session for a new but similar article/source collection when the current thread already carries substantial debugging, validation, or correction history.
+3. Seed the new session with a compact handoff that names the latest validated generator/template, critical contract fixes, output routing, graph IRI pattern, and validation gates.
+4. For GPT-5 Chat Codex RDF/HTML collection work in the showcases project, the handoff should include:
+   - latest validated generator path;
+   - output root /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/{rdf,webpages}/;
+   - kg-generator plus rdf-infographic-skill contract;
+   - SPARQL Graph IRI pattern https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl, never the source article URL;
+   - validate-harness-contract.py, RDF parse, JSON-LD parse, no-blank-node, HTML parser, and JavaScript syntax gates;
+   - RDF/HTML only unless Markdown is explicitly requested.
+5. Do not use a new session to avoid the Agent RDF Memory Protocol; every new session still reloads AGENT.md, core.ttl, preferences.ttl, index.ttl, relevant project/session memory, and applicable howto files.
+6. Record any new reusable handoff pattern or contract correction back into preferences.ttl/howto when it should persist beyond the immediate task.
+
+This rule balances token economy with reliability: the new session avoids hauling a long transcript, while the compact handoff preserves the hard-won task-specific constraints."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerSkillInvocation, onto:triggerNamedWorkflow ;
+    rdfs:seeAlso <howto/token-optimized-session-handoff.ttl> .
+
+# ── Topic: Virtuoso Workbench Query Deduplication ────────────────────────────
+
+:topicVirtuosoWorkbenchQueryDedup a schema:Thing ;
+    schema:name "Virtuoso Workbench Query Deduplication"@en ;
+    schema:description "Virtuoso is a quad store: duplicate triples can appear across multiple named graphs. All workbench SPARQL queries must be scoped to the derived named graph (as specified in the active skill) to avoid cross-graph duplicates in results."@en .
+
+# ── Step 41: Virtuoso Workbench Query Deduplication ──────────────────────────
+
+:step-virtuosoWorkbenchQueryDedup a schema:HowToStep ;
+    schema:position 41 ;
+    schema:name "Scope all Virtuoso workbench SPARQL queries to the derived named graph to prevent cross-graph duplicates"@en ;
+    schema:text """Virtuoso is a quad store. Any triple may appear in multiple named graphs simultaneously. Without graph scoping, a SELECT or CONSTRUCT query runs against the union of all named graphs and returns duplicate rows — one per named graph that contains the triple.
+
+Rules for every workbench SPARQL query:
+
+1. Always scope the query to the relevant named graph using FROM <{graph-iri}> (for a single graph) or FROM NAMED <{graph-iri}> with a GRAPH {} clause (for explicit quad patterns).
+2. Derive the graph IRI from the active skill spec — never guess or construct it from the source article URL. For rdf-infographic-skill and kg-generator outputs, the graph IRI follows the DAV path pattern specified in the skill (e.g., https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl).
+3. When querying across multiple graphs intentionally (federation, comparison), use DISTINCT as an additional safety measure, but graph scoping is still preferred.
+4. For "Explore KG using SPARQL" workbench links embedded in HTML infographics, the FROM clause must use the DAV named-graph IRI of the companion TTL file, not the source URL or the local file path.
+5. If the graph IRI is not yet known at HTML generation time (e.g., the file has not been uploaded), include a TODO comment in the query template and document the required IRI substitution in the infographic attribution section.
+
+Failure mode prevented: without this rule, workbench queries return N copies of every result (where N is the number of named graphs containing the data), making the output appear correct but silently inflated."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerSkillInvocation ;
+    rdfs:seeAlso <howto/virtuoso-workbench-query-dedup.ttl> .
+
+:step-faqEntityIriGate a schema:HowToStep ;
+    schema:position 42 ;
+    schema:name "FAQ entity IRI pre-build gate: confirm schema:Question entities exist in companion TTL before writing FAQ HTML"@en ;
+    schema:text """Before generating any FAQ HTML section:
+
+1. Grep the companion TTL for `schema:Question` and `schema:FAQPage` entities. If none exist, do NOT proceed to HTML — create them first.
+2. For each FAQ item, derive a slug from the question text and add a `schema:Question` entity with `schema:name`, `schema:acceptedAnswer`, and `schema:parentItem` in the companion TTL. Link all questions to a `schema:FAQPage` via `schema:mainEntity`.
+3. Once all `schema:Question` entities exist, derive the full absolute entity IRI for each (base-TTL-IRI + `#faq-{slug}`), percent-encode it, and wrap it in the resolver pattern `https://linkeddata.uriburner.com/describe/?url={encoded}`.
+4. Write FAQ question HTML with `<div class="faq-q" role="button" tabindex="0">` (NOT `<button>`) containing `<a href="{resolver-url}" onclick="event.stopPropagation()">`. Label is "Lookup" (not "Resolve").
+5. Verify: grep for `.faq-q.*href` in the generated HTML — every match MUST contain the DAV TTL base IRI, never dbpedia.org, wikidata.org, w3.org, or any external concept IRI.
+
+Root cause this gate prevents: in session 2026-06-12, schema:Question entities were absent from the companion TTL when HTML was generated. Rather than creating them first, DBpedia concept IRIs were substituted as FAQ question hrefs. These are topically adjacent but are the wrong entity type and wrong source — a violation of the RDF-source-of-truth contract (SKILL.md item 1, lines 43 and 1081). The correct entity for an FAQ question href is always the schema:Question entity IRI in the companion RDF, never an external concept IRI."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerSkillInvocation ;
+    rdfs:seeAlso <howto/faq-entity-iri-gate.ttl>, <howto/rdf-infographic-compliance-gate.ttl> .
+
+# ── Step 43: Ontology Cross-Reference Gate ────────────────────────────────────
+
+:step-ontologyCrossReference a schema:HowToStep ;
+    schema:position 43 ;
+    schema:name "Cross-reference custom ontology terms against shared vocabularies via OWL equivalence and alignment properties; mandate domain, range, and annotations"@en ;
+    schema:text """When a custom ontology is defined during KG generation (classes and properties beyond those in standard vocabularies), every custom term MUST satisfy three requirements:
+
+**Requirement A — Annotations:** Every custom class and property MUST carry `rdfs:label` (human-readable name) and `rdfs:comment` (description) alongside its type declaration. The ontology itself MUST have `schema:name`, `schema:description`, `rdfs:label`, and `rdfs:comment`.
+
+**Requirement B — Domain and Range:** Every custom property (`rdf:Property`) MUST declare `rdfs:domain` and `rdfs:range`. The domain MUST be the most specific custom class or `schema:Thing`. The range MUST be the most specific type (`xsd:string`, `xsd:integer`, or a custom class where applicable). Neither may be omitted or defaulted.
+
+**Requirement C — External Cross-References:** Every custom term MUST be cross-referenced against schema.org, DBpedia, and Wikidata:
+
+**For custom classes (rdfs:Class):**
+1. Search schema.org for an `owl:equivalentClass` or `rdfs:subClassOf` match.
+2. Search DBpedia for the closest class resource via `owl:equivalentClass` or `rdfs:seeAlso`.
+3. Search Wikidata for the closest class entity (Q-item) via `rdfs:seeAlso`.
+
+**For custom properties (rdf:Property):**
+1. Search schema.org for an `owl:equivalentProperty` match.
+2. Search DBpedia for the closest property or ontology term via `rdfs:subPropertyOf` or `rdfs:seeAlso`.
+3. Search Wikidata for the closest property (P-item) via `rdfs:seeAlso`.
+
+**Gate rules:**
+1. Every custom class and property in the generated RDF MUST have: (a) `rdfs:label` + `rdfs:comment`; (b) `rdfs:domain` + `rdfs:range` (properties only); (c) at least one external cross-reference — unless explicitly waived by the user.
+2. The cross-reference IRI MUST be verified before use (see :step-externalIriVerification). A guessed or fabricated schema.org/DBpedia/Wikidata URI is a contract violation.
+3. If no shared vocabulary term exists at an appropriate semantic distance, document the gap in `rdfs:comment` rather than leaving the term isolated.
+4. `rdfs:isDefinedBy` MUST point to the document-local ontology entity. External cross-references complement, not replace, this annotation.
+5. `rdfs:domain` must use the most specific class available — never default to `schema:Thing` when a custom class from the same ontology fits.
+
+**Example:**
+```turtle
+:StartupEra a rdfs:Class ;
+    rdfs:label "Startup Era"@en ;
+    rdfs:comment "An era of startup formation characterized by a dominant technological paradigm."@en ;
+    rdfs:subClassOf schema:Thing ;
+    rdfs:isDefinedBy :analysisOntology ;
+    rdfs:seeAlso <http://dbpedia.org/resource/Business_cycle> .
+
+:hasTechnologistAdvantage a rdf:Property ;
+    rdfs:label "has technologist advantage"@en ;
+    rdfs:comment "Structural leverage technologists have over non-technologists in a given era."@en ;
+    rdfs:domain :StartupEra ;
+    rdfs:range xsd:string ;
+    rdfs:isDefinedBy :analysisOntology ;
+    rdfs:seeAlso <http://dbpedia.org/resource/Skill_(labor)> .
+```
+
+**Why this gate exists:** In session 2026-06-13, a custom ontology was generated where (a) properties lacked `rdfs:domain` and `rdfs:range` (defaulted to `schema:Thing` and `xsd:string`), (b) only the ontology entity had annotations — individual classes and properties relied on schema:name alone, and (c) zero external cross-references existed. This gate ensures every ontology term is fully described, properly constrained, and semantically aligned with the broader vocabulary ecosystem."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerSkillInvocation ;
+    rdfs:seeAlso <howto/ontology-cross-reference-gate.ttl> .
+
+:topicOntologyCrossReference a schema:Thing ;
+    schema:name "Ontology Cross-Reference Gate"@en ;
+    schema:description "Requirement to cross-reference every custom ontology class and property against schema.org, DBpedia, and Wikidata using OWL equivalence and alignment properties; plus mandatory rdfs:label, rdfs:comment, rdfs:domain, and rdfs:range on every custom term. Ensures generated ontologies are fully described, properly constrained, and semantically aligned."@en .
+
+# ── Step 44: UI/UX Expert Persona ─────────────────────────────────────────────
+
+:step-uiUxExpertPersona a schema:HowToStep ;
+    schema:position 44 ;
+    schema:name "Operate as a UI/UX expert when producing any visual or interactive artifact"@en ;
+    schema:text """Whenever generating or editing an HTML page, interactive infographic, dashboard, or any other visual artifact, operate as a UI/UX expert without being asked. This is a standing behavioral default — not a per-session request.
+
+**What this means in practice:**
+
+1. **Color system discipline:** Respect the established `--accent` / `--accent2` / `--accent3` / `--accent4` / `--accent5` palette. Entity hyperlinks (resolver-linked IRIs, canonical page links) MUST use `--accent` (`#4f8ef7`, blue) — never purple (`--accent2`) or other accent colors, which carry distinct semantic meaning in the design system.
+
+2. **Hyperlink consistency:** ALL entity hyperlinks in cards, accordions, glossary terms, FAQ questions, section titles, and body copy MUST carry explicit `color: var(--accent); text-decoration: none;` via CSS rules. Never rely on browser-default link styling. Hover states MUST add `text-decoration: underline;`. Match the convention established by `.card a`, `.hero-meta a`, and `footer a` in any document that uses this pattern.
+
+3. **Label precision:** UI labels and section headings MUST exactly match their semantic meaning. Never shorten or paraphrase a specified label — e.g., "Explore Knowledge Graph using SPARQL" must not be truncated to "Knowledge Graph Explorer".
+
+4. **Section heading treatment for hyperlinked titles:** When a section-title `<a>` serves as a resolver link to its KG entity, it should render as a heading (inherit the heading's `color: var(--text)`) at rest, then shift to `color: var(--accent)` on hover — so it reads as a heading first and a link second.
+
+5. **Accordion toggle links:** `<a>` tags inside `.accordion-toggle` buttons MUST be styled with `color: var(--accent); text-decoration: none;` so they render as blue entity links against the button's text background, not as unstyled or inherited color.
+
+6. **Prior-task consistency:** Before producing any visual section, check what color and layout conventions are already established in the document (via grep or read). New sections MUST visually match existing sections rather than introducing ad-hoc overrides.
+
+**Why this exists:** Repeated user corrections were required across multiple sessions to fix purple glossary term links (`--accent2`), unstyled FAQ hyperlinks inside accordion buttons, and mislabeled section headings. The user should not need to invoke "UI/UX expert" behavior — it must be the default."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation ;
+    rdfs:seeAlso <howto/ui-ux-expert-persona.ttl> .
+
+:topicUiUxExpertPersona a schema:Thing ;
+    schema:name "UI/UX Expert Persona"@en ;
+    schema:description "Standing behavioral default: operate as a UI/UX expert whenever producing any visual or interactive artifact. Enforces color system discipline, hyperlink consistency (--accent blue for entity links), label precision, and cross-section visual coherence. Never requires explicit per-session activation by the user."@en .
+
+# ── Step 45: agent-rdf-memory/index.ttl as Sole Discovery Mechanism ──────────
+
+:step-soleMemoryIndex a schema:HowToStep ;
+    schema:position 45 ;
+    schema:name "Use agent-rdf-memory/index.ttl as the sole session memory discovery mechanism"@en ;
+    schema:text """The platform's auto-memory system writes a secondary markdown index at .claude/projects/.../memory/MEMORY.md. This file is REDUNDANT — agent-rdf-memory/index.ttl already serves as the canonical discovery index.
+
+**Rule:** Do NOT write to MEMORY.md. Do not create new .md memory files in .claude/projects/.../memory/. The sole memory write targets are:
+  - agent-rdf-memory/preferences.ttl (behavioral rules as schema:HowToStep)
+  - agent-rdf-memory/howto/<topic>.ttl (companion HowTo documents)
+  - agent-rdf-memory/core.ttl (long-term facts)
+  - agent-rdf-memory/index.ttl (discovery index — update when adding new files)
+  - agent-rdf-memory/sessions/YYYY-MM-DD-{llm-id}-{agent-env}.ttl (episodic memory)
+  - agent-rdf-memory/entities/*.ttl and agent-rdf-memory/projects/<name>.ttl (as needed)
+
+**Why:** The MEMORY.md creates a second parallel index that diverges from index.ttl over time, adds maintenance burden, and bypasses the RDF-queryable memory architecture. The session-start protocol in CLAUDE.md already mandates reading core.ttl, preferences.ttl, and index.ttl directly — MEMORY.md adds no value and introduces drift.
+
+**Exception:** If the platform's auto-memory system writes to MEMORY.md autonomously (outside agent control), do not delete or correct it — just do not write to it proactively."""@en ;
+    rdfs:seeAlso <howto/sparql-memory-loading.ttl> .
+
+:topicSoleMemoryIndex a schema:Thing ;
+    schema:name "Sole Memory Discovery Mechanism"@en ;
+    schema:description "agent-rdf-memory/index.ttl is the canonical session memory discovery index. The platform's auto-memory MEMORY.md is redundant and must not be written to proactively."@en .
+
+# ── Step 46: SPARQL-Based Session Memory Loading ──────────────────────────────
+
+:step-sparqlMemoryLoading a schema:HowToStep ;
+    schema:position 46 ;
+    schema:name "Support SPARQL-based session memory loading via elicited endpoint selection"@en ;
+    schema:text """At session initialization, check for a stored loading preference (onto:usedSparqlEndpoint or onto:usedFileReads in the most recent session TTL). If found, reuse it. If not found, present the elicitation below.
+
+File reads is the pre-selected default — overridden only if the user actively chooses SPARQL or another method. Elicitation always occurs on the first session; the default never applies silently without presenting the choice.
+
+**Elicitation (present on first session / no stored preference):**
+  "Memory loading preference:
+   (1) File reads  [default — no Virtuoso required]
+   (2) SPARQL — localhost:8890/sparql  [local Virtuoso, file:// URIs]
+   (3) SPARQL — other endpoint / other URI"
+
+**Once endpoint is selected — use Virtuoso Sponger pragmas for progressive loading:**
+
+Query 1 bootstraps preferences AND simultaneously sponges all companion howto files:
+
+  DEFINE get:soft "soft"
+  DEFINE input:grab-iri "{preferences-ttl-url}"
+  DEFINE input:grab-var "seeAlso"
+
+  SELECT ?pos ?name ?text ?seeAlso
+  FROM <{preferences-ttl-url}>
+  WHERE {
+    ?step a <http://schema.org/HowToStep> ;
+          <http://schema.org/position> ?pos ;
+          <http://schema.org/name> ?name ;
+          <http://schema.org/text> ?text .
+    OPTIONAL { ?step <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?seeAlso }
+  } ORDER BY ?pos
+
+  - input:grab-iri: Sponger fetches preferences.ttl and loads it as a named graph
+  - get:soft "soft": uses cached named graph on subsequent calls, re-fetches only if absent
+  - input:grab-var "seeAlso": Sponger dereferences every ?seeAlso binding (howto/*.ttl) during query execution
+
+This replaces N sequential file reads with one SPARQL round-trip that progressively loads the full preference hierarchy. See howto/sparql-memory-loading.ttl for Query 2 (cross-graph howto harvest) and Query 3 (core.ttl DESCRIBE).
+
+**{preferences-ttl-url} resolution:** localhost:8890/sparql → file:// or DAV path; linkeddata.uriburner.com/sparql → publicly accessible URL (GitHub raw, DAV upload). Named graph IRI = the resource URL the Sponger loaded.
+
+**Named graph convention:** TTL files uploaded to Virtuoso DAV are reachable at their DAV graph IRI — use FROM <dav-graph-iri> to scope queries. Do not query the default graph.
+
+**Fallback:** If the endpoint is unreachable or returns no results, fall back to sequential file reads per the existing CLAUDE.md startup protocol. Never fail silently — report the endpoint error and the fallback path taken.
+
+**Why:** File-read startup protocol issues N sequential read_file calls. A single SPARQL query against a loaded endpoint can retrieve all relevant preference steps, howto content, and session context in one round-trip, significantly reducing startup latency in long-running agent environments."""@en ;
+    rdfs:seeAlso <howto/sparql-memory-loading.ttl> .
+
+:topicSparqlMemoryLoading a schema:Thing ;
+    schema:name "SPARQL-Based Session Memory Loading"@en ;
+    schema:description "Elicited SPARQL endpoint selection (localhost:8890/sparql or linkeddata.uriburner.com/sparql) for loading preferences, howto steps, and session context in a single query round-trip rather than N sequential file reads."@en .
+
+# ── Step 47: KG Curation Attribution Pattern ──────────────────────────────────
+
+:step-kgCurationAttribution a schema:HowToStep ;
+    schema:position 47 ;
+    schema:name "Apply KG curation attribution pattern in hero-meta and infographic headers"@en ;
+    schema:text """When a knowledge graph infographic displays a curation credit in the hero-meta line or document header, use this pattern:
+
+  KG curated by {relevant-skills} and {relevant-ai-agent} on behalf of [Kingsley Idehen]({resolver-IRI})
+
+**Expanded HTML form:**
+
+  KG curated by
+  <a href="{skill-1-github-url}">{skill-1-name}</a>,
+  [<a href="{skill-N-github-url}">{skill-N-name}</a>,]*
+  and <a href="{llm-url}">{llm-name}</a>
+  on behalf of
+  <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fkidehen%23this"
+     target="_blank" rel="noopener noreferrer">Kingsley Idehen</a>
+
+**Substitution rules:**
+  - {relevant-skills}: comma-separated hyperlinked skill names using their canonical GitHub repo URLs
+    (https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/{skill-name})
+  - {relevant-ai-agent}: the LLM/model used, hyperlinked to its canonical product page
+  - resolver-IRI: https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fkidehen%23this
+    (Kingsley's LinkedIn IRI encoded via the URIBurner resolver pattern)
+  - All link attributes: target="_blank" rel="noopener noreferrer"
+  - All link colors: inherit .hero-meta a { color: var(--accent); text-decoration: none; }
+
+**What NOT to do:**
+  - Never use bare text "Kingsley Idehen" without the resolver hyperlink
+  - Never omit the skill names — they are the agents of curation
+  - Never omit the LLM — it is part of the curation provenance chain
+  - Never abbreviate "on behalf of" — the phrase establishes human principal / agent delegation
+
+**Why:** The prior pattern "KG curated by Kingsley Idehen" credited only the human, hiding the actual computational agents (skills, LLM) that performed the curation. The new pattern makes the full provenance chain explicit: skills + AI agent acted on behalf of the human principal."""@en ;
+    rdfs:seeAlso <howto/kg-curation-attribution.ttl> .
+
+:topicKgCurationAttribution a schema:Thing ;
+    schema:name "KG Curation Attribution Pattern"@en ;
+    schema:description "Hero-meta and infographic header attribution pattern: 'KG curated by {skills} and {llm} on behalf of [Kingsley Idehen](resolver-IRI)' — exposes the full provenance chain of skills, AI agent, and human principal."@en .
+
+# ── Step 48: Use schema:author — Never foaf:maker ─────────────────────────────
+
+:step-schemaAuthorOverFoafMaker a schema:HowToStep ;
+    schema:position 48 ;
+    schema:name "Use schema:author instead of foaf:maker — always"@en ;
+    schema:text """When attributing document authorship in any RDF serialization or embedded JSON-LD, use schema:author. Never use foaf:maker.
+
+**In Turtle (.ttl):**
+  schema:author <https://www.linkedin.com/in/kidehen#this> ;
+
+**In JSON-LD (@context uses @vocab: http://schema.org/):**
+  "author": { "@type": "Person", "@id": "https://www.linkedin.com/in/kidehen#this", "name": "Kingsley Uyi Idehen" }
+
+**What NOT to do:**
+  - Never add foaf:maker to any document entity
+  - Never add "foaf": "http://xmlns.com/foaf/0.1/" to @context solely to support foaf:maker
+  - Do not use foaf:maker as a "WebID-native" complement to schema:author — schema:author already carries that role
+
+**Applies to:**
+  - <> (self-describing CreativeWork) in all .ttl session, howto, and project files
+  - <script type="application/ld+json"> blocks in HTML infographics
+  - Any WebPage, CreativeWork, or Dataset entity in generated RDF
+
+**Why:** The user confirmed schema:author is the sole authorship term. foaf:maker adds no value that schema:author does not already cover and introduces an unnecessary vocabulary dependency."""@en .
+
+:topicSchemaAuthorOverFoafMaker a schema:Thing ;
+    schema:name "schema:author over foaf:maker"@en ;
+    schema:description "Standing rule: always use schema:author for document/creative work attribution. foaf:maker is never used."@en .
+
+:step-entityHrefCompanionTTL a schema:HowToStep ;
+    schema:position 49 ;
+    schema:name "Entity hrefs in HTML infographics must resolve from the companion TTL via the resolver pattern"@en ;
+    schema:text """All entity hyperlinks in generated HTML infographics MUST be resolver-wrapped IRIs sourced from the companion TTL — never external Wikipedia, W3C, schema.org, or GitHub IRIs.
+
+**Resolver pattern:**
+  https://linkeddata.uriburner.com/describe/?url={url-encoded-entity-IRI}
+
+**Source of truth for entity IRIs:**
+  The companion .ttl file published at:
+  https://linkeddata.uriburner.com/DAV/demos/daas/{filename}.ttl
+  (DAV path derived from rdf-infographic-skill/SKILL.md — do NOT ask the user; read it from the skill contract.)
+
+**Applies to:**
+  - Comparison table dimension cells (e.g., Entity Identity → #DimIdentity)
+  - Advantages/features section headings (e.g., Global Identity → #AdvGlobalIdentity)
+  - HowTo step headings and titles (e.g., #StepExtractYAML)
+  - Any entity whose hash IRI exists in the companion TTL
+
+**What stays external (intentional external references):**
+  - OKF vocabulary terms (GitHub OKF ontology IRIs) — defined in an external spec, not the companion TTL
+  - FAQ/glossary entities from a dedicated FAQ TTL — correct to reference their own TTL
+  - owl:sameAs, foaf:page inline code references — W3C namespace, not entity subjects
+
+**Pre-build gate:**
+  Before writing any entity href, grep the companion TTL for the entity name.
+  If it exists as a hash IRI, use the resolver-wrapped DAV IRI.
+  If it does not exist, add it to the companion TTL first, then link.
+
+**Why:** The skills contract (rdf-infographic-skill semantic fidelity gate) requires HTML entity hrefs to be grounded in the companion TTL, making the infographic a queryable extension of the knowledge graph — not a collection of external Wikipedia links."""@en ;
+    schema:url <howto/entity-href-companion-ttl.ttl> .
+
+:topicEntityHrefCompanionTTL a schema:Thing ;
+    schema:name "Entity href sourcing from companion TTL"@en ;
+    schema:description "Standing rule: all HTML infographic entity hrefs must be resolver-wrapped IRIs from the companion TTL, not external sources."@en .
+
+:step-sparqlAbsolutePrefixIRI a schema:HowToStep ;
+    schema:position 50 ;
+    schema:name "SPARQL accordion PREFIX IRIs must always be absolute DAV IRIs — never relative IRIs"@en ;
+    schema:text """All PREFIX declarations in SPARQL queries embedded in HTML infographic accordion blocks MUST use absolute IRIs derived from the DAV path pattern in the skills contract — never relative file IRIs or relative path strings.
+
+**Rule:**
+  PREFIX <name>: <absolute-IRI>   ✓
+  PREFIX <name>: <relative-path.ttl#fragment>  ✗
+
+**Correct pattern (derived from rdf-infographic-skill/SKILL.md DAV path):**
+  PREFIX okf: <https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl#okf->
+
+**Wrong pattern (relative IRI — invalid at a remote SPARQL endpoint):**
+  PREFIX okf: <okf-open-knowledge-format-ontology.ttl#okf->
+
+**Why relative IRIs fail:**
+  The query string is sent to a remote SPARQL endpoint (e.g., https://linkeddata.uriburner.com/sparql).
+  A relative IRI in a PREFIX declaration is resolved relative to the base of that remote endpoint, not the
+  local filesystem. There is no local file to resolve against — the endpoint receives only the query text.
+  The result is a malformed IRI that causes the endpoint to return no results or an error.
+
+**How to derive the absolute IRI:**
+  1. Read the DAV path pattern from the active skill (rdf-infographic-skill/SKILL.md or kg-generator/SKILL.md):
+       https://linkeddata.uriburner.com/DAV/demos/daas/{filename}.ttl
+  2. Substitute the ontology/vocabulary TTL filename (no path prefix, no leading slash).
+  3. Append the fragment separator and any class/property prefix fragment (e.g., #okf-).
+  4. Use the resulting absolute IRI in every PREFIX declaration in the HTML.
+  NEVER ask the user for this path — it is always derivable from the skills contract.
+
+**Applies to:**
+  - All SPARQL accordion code blocks (sparql-code divs in HTML infographics)
+  - All sparql-run-btn href URL-encoded query strings
+  - Any SPARQL query template generated in a skills workflow
+
+**Additional gate (Step 41 cross-reference):**
+  Together with absolute PREFIX IRIs, every accordion SPARQL query MUST also include:
+  FROM <https://linkeddata.uriburner.com/DAV/demos/daas/{instance-data-filename}.ttl>
+  to scope the query to the correct named graph in the Virtuoso quad store.
+  See :step-virtuosoWorkbenchQueryDedup (position 41) for the full deduplication rule."""@en ;
+    schema:url <howto/sparql-absolute-prefix-iri.ttl> .
+
+:topicSparqlAbsolutePrefixIRI a schema:Thing ;
+    schema:name "SPARQL accordion absolute PREFIX IRIs"@en ;
+    schema:description "Standing rule: all PREFIX declarations in SPARQL accordion queries must use absolute DAV IRIs derived from the skills contract — never relative IRIs."@en .
+
+# ── Step 51: No Unauthorized File Deletion ─────────────────────────────────────
+
+:step-noUnauthorizedDeletion a schema:HowToStep ;
+    schema:position 51 ;
+    schema:name "Never delete files without explicit user approval"@en ;
+    schema:text """Files must never be deleted without the user's explicit, unambiguous approval. This prohibition applies regardless of the agent's assessment of a file's relevance, staleness, correctness, or relationship to the current task.
+
+**Rule:**
+  Do NOT delete any file unless the user has explicitly asked you to delete that specific file.
+  Flag and ask — never delete and explain.
+
+**What this covers:**
+  - Any file on the filesystem, regardless of location or extension
+  - Files the agent created in a prior session
+  - Files that appear to be "stale leftovers" from prior renames or reorganizations
+  - Files with "incorrect" names or in "wrong" directories
+  - Temporary or intermediate files
+  - Any file the agent did not personally create in the current session
+
+**What to do instead:**
+  If you encounter a file that looks like it should be deleted:
+  1. Flag it to the user explicitly — state the path, why it looks deletable, and ask
+  2. Wait for explicit approval before acting
+  3. Never bundle the delete with an unrelated operation
+  4. Never assume consent from context or prior instructions
+
+**Even "obvious" cleanup requires approval:**
+  A file left behind from a rename operation (e.g., an HTML infographic still bearing the
+  old {llm-id} stem after a corrected rename) is NOT safe to delete. The user may want to
+  keep it for comparison, use it as a reference, or have other reasons. The correct action
+  is to flag it and ask.
+
+**Why:** The user invoked this rule after an agent deleted okf-infographic-claude_sonnet_4_6-1.html
+from Claude Generated/webpages/ without explicit approval during the OKF model attribution
+correction task. The user's response: "Why would you delete that file? It had nothing to do
+with your task." A file that seems like a stale leftover to the agent may be a deliberate
+artifact to the user. Deletion is irreversible and requires authorization.
+
+**Cross-reference:** This complements :step-approval (position 1 — seek approval before acting
+unless told otherwise). Unauthorized deletion is a specific, severe case of the broader
+approval principle."""@en ;
+    schema:url <howto/no-unauthorized-deletion.ttl> .
+
+:topicNoUnauthorizedDeletion a schema:Thing ;
+    schema:name "No unauthorized file deletion"@en ;
+    schema:description "Standing rule: never delete any file without explicit user approval — flag and ask, never delete and explain."@en .
+
+# ── Step 52: MEMORY.md Is a Fallback, Not a Write Target ──────────────────────
+
+:step-noMemoryMdWrite a schema:HowToStep ;
+    schema:position 52 ;
+    schema:name "MEMORY.md is a read-only fallback — never write to it unless preferences.ttl is inaccessible"@en ;
+    schema:text """The flat markdown index at `.claude/projects/…/memory/MEMORY.md` is a secondary fallback index, not an active write target. The agent must never write to it under normal operating conditions.
+
+**Rule:**
+  Do NOT write to MEMORY.md unless agent-rdf-memory/preferences.ttl is genuinely inaccessible or corrupted.
+  Under normal operation, preferences.ttl (and its companion howto/*.ttl files) is the sole canonical write target.
+
+**Why MEMORY.md exists:**
+  MEMORY.md is loaded into context at session start as a safety net — the agent can read it to get
+  a quick index of what rules exist. It is NOT the agent's file to maintain. The canonical source
+  of truth is always agent-rdf-memory/preferences.ttl.
+
+**What to do instead:**
+  When you need to record a behavioral rule, preference, or reference:
+  1. Write to preferences.ttl (new schema:HowToStep + schema:Thing topic)
+  2. Create companion howto/<topic>.ttl if the rule warrants detailed substeps
+  3. Stop. Do NOT also update MEMORY.md.
+  4. Do NOT create new .md files under .claude/projects/…/memory/ — those are system-generated.
+
+**When it IS ok to touch MEMORY.md:**
+  ONLY if preferences.ttl is missing, unreadable, or corrupt — and then only to record that fact
+  until preferences.ttl can be repaired. This is a last-resort fallback, not a parallel channel.
+
+**Why:** The agent wrote to MEMORY.md after adding Step 51 to preferences.ttl, assuming it was a
+dual-write setup. The user corrected this: MEMORY.md should not be used if there aren't issues
+with preferences.ttl. Writing to both creates an unnecessary synchronization burden and the
+markdown file is not the agent's primary interface."""@en ;
+    schema:url <howto/no-memory-md-write.ttl> .
+
+:topicNoMemoryMdWrite a schema:Thing ;
+    schema:name "MEMORY.md is fallback, not write target"@en ;
+    schema:description "Standing rule: never write to MEMORY.md unless preferences.ttl is inaccessible or corrupted — stop at preferences.ttl + howto/*.ttl."@en .
+
+# ── Step 53: owl:sameAs vs skos:related assignment rule ──────────────────────
+
+:step-owlSameAsVsSkosRelated a schema:HowToStep ;
+    schema:position 53 ;
+    schema:name "owl:sameAs vs skos:related for LOD cross-references"@en ;
+    schema:text """**Rule:** When adding DBpedia/Wikidata cross-references to a KG entity, choose
+the linking predicate based on whether the KG entity *directly denotes* the same individual
+as the LOD resource, or merely *describes or relates to* it.
+
+**Algorithm:**
+1. Ask: does this KG entity IRI co-denote the exact same thing as the DBpedia/Wikidata IRI?
+   - If YES → use owl:sameAs (they are the same individual in the OWL sense)
+   - If NO  → use skos:related (associative link; the entity is about, describes, or is
+              contextually related to the LOD concept, but is not identical to it)
+
+**owl:sameAs applies when:**
+- The entity represents a well-known standard, language, or technology and the DBpedia/Wikidata
+  resource IS that same standard/language/technology (e.g., :AdvSPARQL owl:sameAs dbpedia:SPARQL;
+  :OKFAdvMarkdown owl:sameAs dbpedia:Markdown; :AdvLinkedDataWeb owl:sameAs dbpedia:Linked_data)
+- Person platform IRIs are known aliases for the same person (LinkedIn, X, Substack profiles)
+
+**skos:related applies when:**
+- The entity is a schema:ListItem, schema:PropertyValue, or descriptive wrapper that is *about*
+  or *illustrates* a concept but is not the concept itself (e.g., :AdvGlobalIdentity describes
+  the value of IRI-based identity but is not itself the IRI standard)
+- The mapping is approximate, contextual, or the entities are from different conceptual levels
+
+**What NOT to do:**
+- Do not use owl:sameAs for every LOD cross-reference — it is a strong identity assertion
+- Do not use skos:related when the entity genuinely IS the same individual as the LOD resource
+- Do not fabricate DBpedia/Wikidata IRIs; verify all with HTTP HEAD/GET or SPARQL before use"""@en ;
+    schema:url <howto/owl-sameas-vs-skos-related.ttl> .
+
+:topicOwlSameAsVsSkosRelated a schema:Thing ;
+    schema:name "owl:sameAs vs skos:related predicate selection"@en ;
+    schema:description "Algorithm for choosing between owl:sameAs and skos:related when cross-referencing KG entities with DBpedia/Wikidata LOD resources."@en .

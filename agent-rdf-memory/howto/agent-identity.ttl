@@ -1,0 +1,46 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "Agent Identity — Whoami Format and Stripe Sandbox Card"@en ;
+    schema:description "Two rules for agent identity presentation: the canonical two-section bullet response to whoami queries, and the Stripe sandbox card credentials for ACP test payments."@en ;
+    schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-whoamiFormat, :step-stripeSandboxCard ;
+    schema:step :step-whoamiFormat, :step-stripeSandboxCard ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Whoami Format ─────────────────────────────────────────────────────
+
+:step-whoamiFormat a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Present whoami responses in the canonical two-section bullet format"@en ;
+    schema:text """When asked 'whoami?', always respond in this exact format:
+
+**User (principal)**
+• Name: {user full name}
+• Email: {email}
+• Role: {job title}, {organization}
+• WebID: {primary LinkedIn profile with #this}
+• Aliases: {X/Twitter with #this}, {Substack with #this}
+
+**Agent (me)**
+• Model: {model name} ({llm-id used in session filenames})
+• Environment: {agent environment name}
+• Artifact output root: {canonical LLM output path from step-outputDirs} (rdf/, md/, webpages/)
+• Active project: {current task/project or 'none yet this session'}
+• Memory store: {absolute path to agent-rdf-memory/}
+• Behavioral contract: preferences.ttl ({count} standing instructions, incl. {notable recent additions})
+• On-Behalf-Of WebID: https://www.linkedin.com/in/kidehen#this
+
+Use the current session's model and environment — never copy from a prior session. Fill the artifact output root from step-outputDirs rules based on the active LLM model ID."""@en .
+
+# ── Step 2: Stripe Sandbox Card ──────────────────────────────────────────────
+
+:step-stripeSandboxCard a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Use Stripe sandbox card credentials for ACP test payments"@en ;
+    schema:text "When filling Stripe invoice payment forms for ACP subscription payments in test/sandbox mode, use these credentials: Card number 4242 4242 4242 4242, Expiration 01/27, Security code 123, Country United States, ZIP 12345. These are Stripe's standard test mode card details for validating subscription payment flows."@en .

@@ -1,0 +1,83 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:HowTo ;
+    schema:name "Entity IRI Denotation — Fragment Placement & Platform Mechanics"@en ;
+    schema:description "Mechanical rules for correct entity IRI formation: fragment placement on the canonical document URI, platform-specific reconciliation (LinkedIn www/non-www), and owl:sameAs self-reference prohibition. Complements the priority ladder and property-selection rules in canonical-entity-iri-denotation.ttl."@en ;
+    schema:dateCreated "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-fragmentPlacement, :step-wwwNonWwwReconciliation,
+        :step-sameAsSelfRefProhibition ;
+    schema:step :step-fragmentPlacement, :step-wwwNonWwwReconciliation,
+        :step-sameAsSelfRefProhibition ;
+    rdfs:seeAlso <../preferences.ttl>, <canonical-entity-iri-denotation.ttl> .
+
+# ── Step 1: Fragment Placement ──────────────────────────────────────────────
+
+:step-fragmentPlacement a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Append #this directly to the canonical document URI — never insert or remove a trailing slash"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """The #this fragment identifies a thing (person, organization, software) within a document. It belongs directly on the document's canonical URI — inserting or removing a trailing slash changes the base URI, pointing the fragment at a different document.
+
+CORRECT — fragment on the canonical URI as-is:
+  https://linkedin.com/in/kidehen#this       (LinkedIn, no trailing slash)
+  https://kidehen.substack.com/#this          (Substack, URI canonically ends with /)
+  https://github.com/kidehen#this             (GitHub, no trailing slash)
+
+WRONG — inserted slash before fragment:
+  https://linkedin.com/in/kidehen/#this       ⛔ changes base URI to a redirecting page
+  https://github.com/kidehen/#this            ⛔ same flaw
+
+WRONG — removed trailing slash before fragment:
+  https://kidehen.substack.com#this            ⛨ wrong base URI
+
+RULE: Use the canonical document URI verbatim. Append #this directly. Do not add, remove, or modify any path component before the fragment.
+
+RATIONALE: https://linkedin.com/in/kidehen and https://linkedin.com/in/kidehen/ are different URIs (the second redirects to the first). An entity IRI of https://linkedin.com/in/kidehen/#this would resolve the redirecting page, not the real profile document — producing an unresolvable entity IRI that breaks Linked Data discovery."""@en .
+
+# ── Step 2: LinkedIn www/non-www Reconciliation ─────────────────────────────
+
+:step-wwwNonWwwReconciliation a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Link LinkedIn www and non-www profile IRIs via owl:sameAs"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """LinkedIn serves profile content at both linkedin.com/in/{username} and www.linkedin.com/in/{username}. These are separate HTTP URIs that resolve to the same profile. Both forms appear in practice because users copy URLs from address bars, share links, and reference profiles differently.
+
+RULE: When either form is encountered, add owl:sameAs linking both forms:
+
+  <https://linkedin.com/in/kidehen#this>
+      owl:sameAs  <https://www.linkedin.com/in/kidehen#this> .
+
+If only one form is known, the owl:sameAs is still correct for the known form alone — but add a comment noting the other form likely exists.
+
+Do NOT use schema:sameAs for this — it is an entity-to-entity identity relationship (both sides are the same person entity), not an entity-to-document link.
+
+RATIONALE: Knowledge graphs that reference LinkedIn profiles from different sources may use different www forms. Without explicit owl:sameAs, a reasoner cannot infer that <linkedin.com/in/kidehen#this> and <www.linkedin.com/in/kidehen#this> denote the same person, producing duplicate entities."""@en .
+
+# ── Step 3: owl:sameAs Self-Reference Prohibition ───────────────────────────
+
+:step-sameAsSelfRefProhibition a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Never emit owl:sameAs linking an entity to itself"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerBehaviorGapIdentified ;
+    schema:text """owl:sameAs expresses that two DISTINCT identifiers refer to the same entity. An IRI linked to itself is a tautology — it conveys zero information, bloats the graph, and causes reasoners to enter infinite loops.
+
+WRONG — self-references (all convey nothing):
+  <#alice> owl:sameAs <#alice> .
+  <https://linkedin.com/in/kidehen#this> owl:sameAs <https://linkedin.com/in/kidehen#this> .
+  <http://dbpedia.org/resource/OpenLink_Software> owl:sameAs <http://dbpedia.org/resource/OpenLink_Software> .
+
+RULE: Before writing any owl:sameAs triple, verify the subject IRI and object IRI are not equal (lexical string comparison, case-sensitive). If equal, suppress the triple.
+
+SCENARIOS:
+  - Single platform IRI known: zero owl:sameAs triples for that entity (nothing to link to).
+  - Multiple platform IRIs known: one owl:sameAs triple per unique pair — never A→A.
+  - After deduplication (see step-wwwNonWwwReconciliation): ensure the deduped IRI is not then self-referenced.
+
+This check is mechanical and must be automated — never rely on manual inspection for self-reference detection in generated Turtle."""@en .

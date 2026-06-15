@@ -1,0 +1,136 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:HowTo ;
+    schema:name "Canonical IRI Compliance Gate"@en ;
+    schema:description "Post-generation compliance audit for canonical IRI denotation. Verifies every RDF entity uses the highest-priority canonical platform IRI available — never a document-local IRI when a DBpedia, Wikidata, LinkedIn, or other platform IRI exists."@en ;
+    schema:dateCreated "2026-06-08T16:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-08T16:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-auditAllEntities, :step-priorityLadderEnforcement, :step-crossReferenceAudit ;
+    schema:step :step-auditAllEntities, :step-priorityLadderEnforcement, :step-crossReferenceAudit ;
+    schema:step :step-approveExceptions, :step-htmlResolverUrlSync ;
+    rdfs:seeAlso <../preferences.ttl>,
+        <canonical-entity-iri-denotation.ttl>,
+        <entity-iri-denotation-mechanics.ttl> .
+
+# ── Step 1: Audit all entities ──────────────────────────────────────────────
+
+:step-auditAllEntities a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Audit every entity in the RDF for canonical IRI compliance"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """After KG generation, audit every entity in the RDF. For each entity:
+
+1. Read the entity's primary subject IRI (what comes before `a schema:Person` / `a schema:Organization` etc.).
+2. Check if it is a document-local IRI — a hash IRI inside the article's own @prefix : namespace.
+3. If document-local, search for `owl:sameAs` and `rdfs:seeAlso` values on the entity — these may contain canonical platform IRIs (DBpedia, Wikidata, LinkedIn #this, etc.).
+4. Also check for values that LOOK like canonical IRIs but are used only as owl:sameAs/rdfs:seeAlso targets rather than the primary subject.
+
+If a canonical platform IRI is available (via owl:sameAs, rdfs:seeAlso, or known from entity metadata):
+  - The primary subject MUST be the canonical IRI, not the document-local one.
+  - The canonical IRI must be used as the subject for ALL triples about the entity.
+  - ALL cross-references (other entities' properties that point to this entity) must use the canonical IRI.
+
+If no canonical platform IRI exists:
+  - Document-local IRIs are acceptable (see step-approveExceptions).
+  - Document this exception in the session memory."""@en .
+
+# ── Step 2: Priority ladder enforcement ─────────────────────────────────────
+
+:step-priorityLadderEnforcement a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Enforce the entity-type-specific priority ladder when selecting canonical IRIs"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """Each entity type has a specific IRI priority ladder. When multiple platform IRIs are available, use the highest-priority one as the primary subject:
+
+**Organizations:**
+  1. DBpedia resource IRI (e.g., http://dbpedia.org/resource/Microsoft) — highest
+  2. Wikidata entity IRI (e.g., https://www.wikidata.org/entity/Q2283)
+  3. LinkedIn company page with #this
+  4. X/Twitter org profile with #this
+  5. Homepage URL with #this — lowest
+
+**Persons:**
+  1. LinkedIn profile with #this (e.g., https://linkedin.com/in/kidehen#this) — highest
+  2. X/Twitter profile with #this
+  3. Substack profile with #this
+  4. DBpedia resource IRI (e.g., http://dbpedia.org/resource/Tim_Berners-Lee)
+  5. Other platform profile with #this — lowest
+
+**Software/Products:**
+  1. DBpedia resource IRI
+  2. Wikidata entity IRI
+  3. Homepage URL with #this
+
+**When changing a subject to a canonical IRI:**
+  a) Remove any `owl:sameAs` whose object is the same canonical IRI (self-reference — unnecessary).
+  b) Promote any `rdfs:seeAlso` to `owl:sameAs` when the target is a Wikidata or DBpedia IRI.
+  c) Add `schema:sameAs` pointing to the homepage document URL (no fragment).
+  d) Add `schema:url` pointing to the homepage or profile document URL.
+  e) Add `schema:identifier` as a string version of the primary identifier.
+
+**Self-reference suppression:** When the primary subject becomes e.g. `<http://dbpedia.org/resource/Microsoft>`, remove `owl:sameAs dbo:Microsoft` (same entity). Keep `owl:sameAs` for the Wikidata IRI.
+
+**www/non-www reconciliation:** For LinkedIn IRIs, add:
+    owl:sameAs <https://linkedin.com/in/username#this>
+when the primary is <https://www.linkedin.com/in/username#this> (or vice versa)."""@en .
+
+# ── Step 3: Cross-reference audit ────────────────────────────────────────────
+
+:step-crossReferenceAudit a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Update all cross-references after changing a primary subject IRI"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """After changing an entity's primary subject from a document-local IRI to a canonical platform IRI, search the entire RDF file for any remaining references to the old document-local IRI:
+
+1. Grep for the old document-local name (e.g., `:microsoft`, `:snowflake`).
+2. Every occurrence that is a reference (property value pointing to the entity) must be updated to the new canonical IRI.
+3. Do NOT update occurrences that are different entities (e.g., `:databricksGenie` is a product entity, not a reference to the `:databricks` organization).
+4. Use `<http://dbpedia.org/resource/Microsoft>` etc. as the reference form (full IRI in angle brackets), not a prefixed form.
+
+After updating all cross-references, re-validate the Turtle syntax."""@en .
+
+# ── Step 4: Approve exceptions ──────────────────────────────────────────────
+
+:step-approveExceptions a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Document and approve entities that stay document-local"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """Some entities have no canonical platform IRI available and must use document-local IRIs. These are exceptions that must be explicitly documented:
+
+**Known exceptions (no platform IRI found):**
+  - theCUBE Research — no DBpedia resource, no Wikidata entry, no LinkedIn company page known
+  - SiliconANGLE Media — no DBpedia resource, no Wikidata entry, no LinkedIn company page known
+  - OpenLink Software — no DBpedia resource, no Wikidata entry, no LinkedIn company page known (but has a homepage)
+  - Benoit Dageville — no LinkedIn/X/Substack/DBpedia/Wikidata presence found
+  - Thierry Cruanes — no LinkedIn/X/Substack/DBpedia/Wikidata presence found
+
+**Verification rule:** Before declaring an entity a "no platform IRI found" exception, search at minimum:
+  1. DBpedia (http://dbpedia.org/resource/{Name}) — dereference with curl
+  2. Wikidata (https://www.wikidata.org/w/api.php?action=wbsearchentities&search={name})
+  3. LinkedIn (https://www.linkedin.com/in/{username} for persons)
+  4. X/Twitter (https://x.com/{username})
+
+If any search succeeds, the entity is NOT an exception and must use the canonical IRI."""@en .
+
+# ── Step 5: HTML resolver URL sync ──────────────────────────────────────────
+
+:step-htmlResolverUrlSync a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Sync HTML entity-link resolver URLs with new canonical IRIs"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """After changing entity IRIs in the RDF, every HTML entity-link that referenced the old IRI must be updated:
+
+1. Each `<a class="entity-link" href="https://linkeddata.uriburner.com/describe/?url={url-encoded-iri}">` must point to the new canonical IRI.
+2. URL-encode the canonical IRI: replace `://` with `%3A%2F%2F`, `/` with `%2F`, `#` with `%23`.
+3. Use the pattern: `https://linkeddata.uriburner.com/describe/?url={url-encoded-canonical-iri}`
+4. Verify each updated URL resolves (returns HTTP 200) before considering the task complete.
+5. Only update entity-links for organizations, persons, and software — document-local entities (FAQ Q&A, HowTo steps, glossary terms, concepts) stay on document-local IRIs.
+
+**Verification:**
+  - After all HTML updates, grep for old entity IRI patterns to ensure none remain.
+  - Re-validate HTML structure (no broken `<a>` tags from partial replacements)."""@en .

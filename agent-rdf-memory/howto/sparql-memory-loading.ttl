@@ -1,0 +1,180 @@
+@prefix :       <#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto:   <https://www.openlinksw.com/ontology/> .
+
+# ── Self-describing document entity ──────────────────────────────────────────
+
+<> a schema:CreativeWork ;
+    schema:name "HowTo: SPARQL-Based Session Memory Loading"@en ;
+    schema:description "Companion howto for preferences.ttl Steps 45 and 46. Specifies that agent-rdf-memory/index.ttl is the sole memory discovery index (MEMORY.md is not written to), and that SPARQL-based memory loading via elicited endpoint selection is the preferred alternative to sequential file reads at session initialization."@en ;
+    schema:dateCreated "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:about :HowToSparqlMemoryLoading .
+
+# ── HowTo ─────────────────────────────────────────────────────────────────────
+
+:HowToSparqlMemoryLoading a schema:HowTo ;
+    schema:name "SPARQL-Based Session Memory Loading with Endpoint Elicitation"@en ;
+    schema:description "At session start, elicit a SPARQL endpoint from the user and load preferences, howto steps, and session context via SPARQL query rather than sequential file reads. Fallback to file reads if endpoint is unreachable."@en ;
+    schema:step :stepNoMemoryMd,
+                :stepEndpointElicitation,
+                :stepSparqlQueries,
+                :stepNamedGraphConvention,
+                :stepFallback .
+
+# ── Steps ─────────────────────────────────────────────────────────────────────
+
+:stepNoMemoryMd a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Do not write to MEMORY.md"@en ;
+    schema:text """agent-rdf-memory/index.ttl is the canonical discovery index. The platform's .claude/projects/.../memory/MEMORY.md is redundant and must not be written to proactively.
+
+All memory writes go exclusively to:
+  - agent-rdf-memory/preferences.ttl
+  - agent-rdf-memory/howto/<topic>.ttl
+  - agent-rdf-memory/core.ttl
+  - agent-rdf-memory/index.ttl
+  - agent-rdf-memory/sessions/YYYY-MM-DD-{llm-id}-{agent-env}.ttl
+  - agent-rdf-memory/entities/*.ttl
+  - agent-rdf-memory/projects/<name>.ttl
+
+If the platform writes to MEMORY.md autonomously, do not delete or correct it — just do not write to it proactively."""@en .
+
+:stepEndpointElicitation a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Determine memory loading path at session start"@en ;
+    schema:text """At session initialization, check the most recent session TTL (via index.ttl pointers) for onto:usedSparqlEndpoint or onto:usedFileReads.
+
+If a stored preference is found: reuse it — skip elicitation.
+
+If no stored preference exists (first session), present this elicitation:
+
+  "Memory loading preference:
+   (1) File reads  [default — no Virtuoso required]
+   (2) SPARQL — localhost:8890/sparql  [local Virtuoso, file:// URIs]
+   (3) SPARQL — other endpoint / other URI"
+
+File reads (option 1) is the pre-selected default. It is overridden if the user actively chooses SPARQL or any other method via elicitation. The elicitation occurs on every first session — the default does not silently apply without presenting the choice.
+
+For option 2, the agent constructs file:// URIs from the known agent-rdf-memory/ path:
+  file:///Users/kidehen/Documents/Management/Development/ai-agent-skills/agent-rdf-memory/preferences.ttl
+  (and equivalents for core.ttl, index.ttl, howto/*.ttl)
+
+For option 3, the user supplies the endpoint URL and the base URI for the TTL files.
+
+Record the selected path in the session TTL as onto:usedSparqlEndpoint (SPARQL) or onto:usedFileReads "true"^^xsd:boolean (file reads). Wait for selection before loading memory."""@en .
+
+:stepSparqlQueries a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "SPARQL queries with Sponger pragmas for progressive memory loading"@en ;
+    schema:text """Use two queries. The first bootstraps preferences and simultaneously sponges all companion howto files. The second harvests the loaded howto content.
+
+── Query 1: Bootstrap ────────────────────────────────────────────────────────
+
+DEFINE get:soft "soft"
+DEFINE input:grab-iri "{preferences-ttl-url}"
+DEFINE input:grab-var "seeAlso"
+
+SELECT ?pos ?name ?text ?seeAlso
+FROM <{preferences-ttl-url}>
+WHERE {
+  ?step a <http://schema.org/HowToStep> ;
+        <http://schema.org/position> ?pos ;
+        <http://schema.org/name> ?name ;
+        <http://schema.org/text> ?text .
+  OPTIONAL { ?step <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?seeAlso }
+}
+ORDER BY ?pos
+
+What this does:
+  - input:grab-iri loads preferences.ttl into Virtuoso's quad store as a named graph before the query runs
+  - get:soft "soft" uses the cached version on subsequent calls (avoids re-fetching on every session)
+  - input:grab-var "seeAlso" tells the Sponger to dereference every ?seeAlso binding (i.e., every howto/*.ttl referenced from a step) and load them as named graphs during query execution
+  - One round-trip loads preferences.ttl AND all companion howto files progressively
+
+── Query 2: Harvest howto content ────────────────────────────────────────────
+
+DEFINE get:soft "soft"
+
+SELECT ?howto ?stepPos ?stepName ?stepText
+FROM <{preferences-ttl-url}>
+WHERE {
+  ?step <http://www.w3.org/2000/01/rdf-schema#seeAlso> ?howtoGraph .
+  GRAPH ?howtoGraph {
+    ?howto a <http://schema.org/HowTo> .
+    ?howtoStep a <http://schema.org/HowToStep> ;
+               <http://schema.org/position> ?stepPos ;
+               <http://schema.org/name> ?stepName ;
+               <http://schema.org/text> ?stepText .
+  }
+}
+ORDER BY ?howtoGraph ?stepPos
+
+What this does:
+  - Queries across all named graphs loaded by Query 1
+  - Retrieves the full step-by-step content from each howto/*.ttl
+  - get:soft "soft" ensures cached graphs are reused without re-fetching
+
+── Query 3: core.ttl facts ───────────────────────────────────────────────────
+
+DEFINE get:soft "soft"
+DEFINE input:grab-iri "{core-ttl-url}"
+
+DESCRIBE <{core-ttl-url}>
+
+── URL placeholder resolution ────────────────────────────────────────────────
+
+{preferences-ttl-url} = "file:///Users/kidehen/Documents/Management/Development/ai-agent-skills/agent-rdf-memory/preferences.ttl"
+{core-ttl-url}        = "file:///Users/kidehen/Documents/Management/Development/ai-agent-skills/agent-rdf-memory/core.ttl"
+
+These are the standard values for local Virtuoso at localhost:8890/sparql.
+The user substitutes a different URI only if the default file:// path does not match their setup
+(e.g., different filesystem root, DAV upload, or remote public URL).
+
+The Sponger fetches file:// URIs from the local filesystem and loads them as named graphs.
+The named graph IRI is the file:// URI itself — use FROM <file:///…/preferences.ttl> in all queries."""@en .
+
+:stepNamedGraphConvention a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Named graph IRIs for agent-rdf-memory TTL files"@en ;
+    schema:text """The named graph IRI is always the URI the Sponger was given to fetch.
+
+Standard case (local Virtuoso, file:// URIs):
+  FROM <file:///Users/kidehen/Documents/Management/Development/ai-agent-skills/agent-rdf-memory/preferences.ttl>
+  FROM <file:///Users/kidehen/Documents/Management/Development/ai-agent-skills/agent-rdf-memory/core.ttl>
+
+DAV case (files uploaded to Virtuoso's WebDAV store):
+  FROM <http://localhost:8890/DAV/home/dba/agent-rdf-memory/preferences.ttl>
+
+Remote / public case (URIBurner or GitHub raw):
+  FROM <https://linkeddata.uriburner.com/DAV/home/kidehen/agent-rdf-memory/preferences.ttl>
+  FROM <https://raw.githubusercontent.com/{owner}/{repo}/{branch}/agent-rdf-memory/preferences.ttl>
+
+Always use an explicit FROM <named-graph-iri> to scope queries. Never query the default graph —
+Virtuoso is a quad store and the default graph union may return stale or unrelated content."""@en .
+
+:stepFallback a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Fall back to sequential file reads if endpoint is unreachable"@en ;
+    schema:text """If the selected SPARQL endpoint returns an error or empty results:
+1. Report the failure: "SPARQL endpoint {url} unreachable — falling back to file reads."
+2. Execute the standard CLAUDE.md startup protocol:
+   - Read agent-rdf-memory/core.ttl
+   - Read agent-rdf-memory/preferences.ttl
+   - Read agent-rdf-memory/index.ttl
+   - Follow index.ttl references to relevant session/project/entity files
+3. Never fail silently — the user must know which loading path was taken."""@en .
+
+# ── Registered Endpoints ──────────────────────────────────────────────────────
+
+:EndpointLocalVirtuoso a schema:EntryPoint ;
+    schema:name "Local Virtuoso SPARQL Endpoint"@en ;
+    schema:url <http://localhost:8890/sparql> ;
+    schema:description "Default local Virtuoso instance. Available when the user runs Virtuoso locally."@en .
+
+:EndpointURIBurner a schema:EntryPoint ;
+    schema:name "URIBurner SPARQL Endpoint"@en ;
+    schema:url <https://linkeddata.uriburner.com/sparql> ;
+    schema:description "Public Virtuoso-backed SPARQL endpoint hosted by OpenLink Software. Used when local Virtuoso is not running."@en .

@@ -1,0 +1,41 @@
+@prefix :       <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto:   <https://www.openlinksw.com/schemas/agent-memory#> .
+
+<> a schema:CreativeWork ;
+    schema:name "HowTo: Virtuoso Workbench Query Deduplication"@en ;
+    schema:dateCreated "2026-06-12T16:20:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-12T16:20:00Z"^^xsd:dateTime ;
+    schema:about :howto .
+
+:howto a schema:HowTo ;
+    schema:name "Scope Virtuoso workbench SPARQL queries to the derived named graph"@en ;
+    schema:description "Virtuoso is a quad store: any triple may exist in multiple named graphs simultaneously. Workbench queries must be scoped to the relevant named graph to prevent duplicate result rows. This HowTo records the rule and its correct application patterns."@en ;
+    schema:step :step1, :step2, :step3, :step4, :step5 .
+
+:step1 a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Understand the root cause"@en ;
+    schema:text "Virtuoso stores RDF as quads (subject, predicate, object, graph). A triple uploaded to the DAV named graph for an artifact also appears in the default graph and possibly in sponger graphs. A query without a FROM clause hits the union of all graphs and returns one result row per named-graph occurrence — silently inflating counts and duplicating bindings."@en .
+
+:step2 a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Always scope to the named graph"@en ;
+    schema:text "Add a FROM clause using the artifact's DAV named-graph IRI. Example for a kg-generator artifact: FROM <https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl>. Derive the stem from the companion TTL filename, not from the source article URL. The graph IRI pattern is specified in the active skill (rdf-infographic-skill, kg-generator, etc.)."@en .
+
+:step3 a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Use DISTINCT as a secondary safeguard when multi-graph queries are intentional"@en ;
+    schema:text "When querying across multiple named graphs (e.g., federation or comparative analysis), add SELECT DISTINCT to eliminate duplicates that survive graph-scoped access. This is a secondary measure: named-graph scoping is always preferred as the primary deduplication strategy."@en .
+
+:step4 a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Apply the rule to HTML workbench links"@en ;
+    schema:text "For 'Explore KG using SPARQL' links embedded in HTML infographics, the FROM clause in the URL-encoded query must use the DAV named-graph IRI of the companion TTL, not the source article URL or a local file path. Construct the encoded query with the correct graph IRI before embedding."@en .
+
+:step5 a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Handle unknown graph IRIs at generation time"@en ;
+    schema:text "If the companion TTL has not yet been uploaded to DAV when the HTML is generated, include a placeholder in the query and a visible TODO in the infographic attribution section: 'Replace {graph-iri} with the DAV path of the uploaded TTL before use.' Never fabricate a graph IRI."@en .

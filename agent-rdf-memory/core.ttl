@@ -1,0 +1,103 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Agent RDF Memory Core"@en ;
+    schema:description "Core ontology and user identity for the agent RDF memory system."@en ;
+    schema:dateModified "2026-06-03T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :agentMemory .
+
+:agentMemory a owl:Ontology ;
+    schema:name "Agent RDF Memory"@en ;
+    schema:description "Session memory store for AI agent tasks, tracking generated artifacts, skill usage, task provenance, and user preferences."@en ;
+    schema:dateCreated "2026-05-27T00:00:00"^^xsd:dateTime ;
+    rdfs:seeAlso <preferences.ttl> .
+
+# ── Agent Identity (template — fill at runtime) ────────────────────────────────
+#
+# Template for agent self-identification. At session start, fill the
+# placeholders below with the current model, environment, and output path.
+#
+# Example (filled for GLM-5.1 + OpenCode):
+#   :agent a schema:SoftwareApplication ;
+#       schema:name "OpenCode"@en ;
+#       schema:version "GLM-5.1" ;
+#       ...
+#
+# Example (filled for Claude Sonnet 4.6 + Claude Code):
+#   :agent a schema:SoftwareApplication ;
+#       schema:name "Claude Code CLI"@en ;
+#       schema:version "claude-sonnet-4-6" ;
+#       ...
+
+:agent a schema:SoftwareApplication ;
+    schema:name "{AGENT_ENV_NAME}"@en ;
+    schema:description "AI agent environment running {LLM_MODEL} for task execution, operating under the ai-agent-skills repository contract and RDF memory preferences."@en ;
+    schema:version "{LLM_MODEL}" ;
+    schema:operatingSystem "macOS" ;
+    schema:applicationCategory "AI Agent"@en ;
+    schema:author <http://dbpedia.org/resource/OpenLink_Software> .
+
+# ── Agent–User Connection (template — fill at runtime) ────────────────────────
+#
+# Describes the relationship between the running agent and its principal user.
+# At session start, fill {LLM_MODEL}, {AGENT_ENV_NAME}, and {OUTPUT_PATH}.
+#
+# Example (filled):
+#   :connection a schema:Relationship ;
+#       schema:description "OpenCode agent (running GLM-5.1) connected to Kingsley Uyi Idehen ..."@en ;
+#       schema:additionalType "operates-for"@en .
+
+:connection a schema:Relationship ;
+    schema:description "{AGENT_ENV_NAME} agent (running {LLM_MODEL}) connected to Kingsley Uyi Idehen (Founder & CEO, OpenLink Software) as its operator and principal user. The agent executes tasks per the behavioral contract in preferences.ttl, maintains session memory in agent-rdf-memory/, and routes artifacts to {OUTPUT_PATH}."@en ;
+    schema:subject :agent ;
+    schema:object :user ;
+    schema:additionalType "operates-for"@en .
+
+# ── User Identity ────────────────────────────────────────────────────────────
+
+:user a schema:Person ;
+    schema:name "Kingsley Uyi Idehen"@en ;
+    schema:email "kidehen@openlinksw.com" ;
+    schema:jobTitle "Founder & CEO"@en ;
+    schema:worksFor <http://dbpedia.org/resource/OpenLink_Software> ;
+    owl:sameAs <https://www.linkedin.com/in/kidehen#this> ,
+               <https://x.com/kidehen#this> ,
+               <https://substack.com/@kidehen#this> .
+
+# ── Output Paths ─────────────────────────────────────────────────────────────
+
+:deepseekOutputPath a schema:PropertyValue ;
+    schema:name "DeepSeek V4 Pro output path"@en ;
+    schema:description "Generated artifacts (RDF, MD, HTML) from DeepSeek V4 Pro sessions go to /Users/kidehen/Documents/LLMs/DeepSeek/ with subfolders rdf/, md/, webpages/."@en ;
+    schema:value "/Users/kidehen/Documents/LLMs/DeepSeek/" ;
+    schema:dateCreated "2026-05-28"^^xsd:date .
+
+:minimaxOutputPath a schema:PropertyValue ;
+    schema:name "MiniMax output path"@en ;
+    schema:description "Generated artifacts from MiniMax sessions go to /Users/kidehen/Documents/LLMs/MiniMax Generated/ with subfolders rdf/, md/, webpages/."@en ;
+    schema:value "/Users/kidehen/Documents/LLMs/MiniMax Generated/" ;
+    schema:dateCreated "2026-05-28"^^xsd:date .
+
+:claudeOutputPath a schema:PropertyValue ;
+    schema:name "Claude output path"@en ;
+    schema:description "Generated artifacts from Claude sessions go to /Users/kidehen/Documents/LLMs/Claude Generated/ with subfolders RDF/, md/, webpages/."@en ;
+    schema:value "/Users/kidehen/Documents/LLMs/Claude Generated/" ;
+    schema:dateCreated "2026-05-28"^^xsd:date .
+
+:kimiOutputPath a schema:PropertyValue ;
+    schema:name "kimi output path"@en ;
+    schema:description "Generated artifacts from kimi sessions go to /Users/kidehen/Documents/LLMs/kimi/ with subfolders rdf/, md/, webpages/. Default destination until further notice."@en ;
+    schema:value "/Users/kidehen/Documents/LLMs/kimi/" ;
+    schema:dateCreated "2026-05-28"^^xsd:date .
+
+:grokOutputPath a schema:PropertyValue ;
+    schema:name "Grok 4.3 output path"@en ;
+    schema:description "Generated artifacts (RDF, MD, HTML) from Grok 4.3 sessions operating in Full Contract Mode go to /Users/kidehen/Documents/LLMs/Grok/ with subfolders rdf/, md/, webpages/."@en ;
+    schema:value "/Users/kidehen/Documents/LLMs/Grok/" ;
+    schema:dateCreated "2026-05-30"^^xsd:date .

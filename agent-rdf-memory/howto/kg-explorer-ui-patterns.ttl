@@ -1,0 +1,60 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "KG Explorer UI Patterns — Nav, Controls, Orphans, Toolbar, and Settings"@en ;
+    schema:description "Six rules governing the KG Explorer user interface: nav placement, collapsed-start, master-close controls, orphan-node prevention, toolbar group labels, and settings panel UX."@en ;
+    schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-kgNavPlacement, :step-kgNavCollapsed,
+        :step-kgControlsMasterClose, :step-kgNoOrphans,
+        :step-kgToolbarGroups, :step-kgSettingsPanel ;
+    schema:step :step-kgNavPlacement, :step-kgNavCollapsed,
+        :step-kgControlsMasterClose, :step-kgNoOrphans,
+        :step-kgToolbarGroups, :step-kgSettingsPanel ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: KG Explorer — Nav placement ─────────────────────────────────────
+
+:step-kgNavPlacement a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Float nav must be top-LEFT; KG Explorer Controls button is always top-RIGHT"@en ;
+    schema:text """The floating navigation panel MUST be positioned at top:16px LEFT:16px — never top-right. The KG Explorer header always places its Controls button and node/link count badge at the top-right of the explorer card. A top-right nav (z-index:900) physically overlaps the Controls button, making it unclickable — the bug manifests as 'Controls opens but cannot be closed' because the second click lands on the nav instead of the button. Rule: nav top-left, KG controls top-right. These must never share the same corner."""@en .
+
+# ── Step 2: KG Explorer — Float nav starts collapsed ────────────────────────
+
+:step-kgNavCollapsed a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Float nav must start COLLAPSED per rdf-infographic-skill contract"@en ;
+    schema:text """The floating nav body MUST start collapsed on page load. In HTML: add class='collapsed' to #float-nav-body and set the toggle button's initial aria-expanded='false' and text '＋' (not '－'). Starting expanded violates the rdf-infographic-skill contract (SKILL.md §6, line 251) and bloats the initial viewport."""@en .
+
+# ── Step 3: KG Explorer — Controls as master reset ──────────────────────────
+
+:step-kgControlsMasterClose a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "toggleToolbar() must be a master reset — close all child panels when collapsing the tray"@en ;
+    schema:text """The Controls button owns the entire controls tray. When closing (willOpen=false), toggleToolbar() MUST: (1) set settingsPanel.hidden=true, (2) set kgSettings.aria-expanded='false', (3) set all [data-advanced-control] elements hidden=true. Pattern: determine willOpen=tb.hidden BEFORE toggling; if !willOpen (closing), reset all children first, then set tb.hidden=true. Failure leaves child panels stale-open and the tray re-opens in an inconsistent state."""@en .
+
+# ── Step 4: KG Explorer — No orphan nodes ───────────────────────────────────
+
+:step-kgNoOrphans a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "getFilteredData() must restrict nodes to those appearing in at least one active link"@en ;
+    schema:text """Orphan nodes appear when coreIds contains a node whose links all point outside coreIds. Fix: in getFilteredData(), build linkedSet from the active link set FIRST, then restrict the node pool to only those IDs in linkedSet before any search/type filtering. Pattern: const linkedSet=new Set(); links.forEach(l=>{linkedSet.add(nid(l.source));linkedSet.add(nid(l.target));}); const baseNodes=typed.filter(n=>linkedSet.has(n.id)). This guarantees zero orphans in any mode/density/type-chip combination."""@en .
+
+# ── Step 5: KG Explorer — Toolbar group labels ──────────────────────────────
+
+:step-kgToolbarGroups a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Wrap toolbar controls in .tb-group + .tb-label for visual hierarchy"@en ;
+    schema:text """Each toolbar control group (Mode, Density, Filter by type, Search, Advanced/Settings) MUST be wrapped in a <div class='tb-group'> with a <span class='tb-label'> above the control. Labels use tiny uppercase text (0.64rem, letter-spacing:.09em, muted). Use .tb-sep (1px vertical divider) between Mode and Density groups. Push the Settings group to the right with margin-left:auto on its tb-group. Flat sibling controls produce mixed heights and no visual grouping — the tb-group pattern is required."""@en .
+
+# ── Step 6: KG Explorer — Settings panel UX ─────────────────────────────────
+
+:step-kgSettingsPanel a schema:HowToStep ;
+    schema:position "6"^^xsd:integer ;
+    schema:name "Settings panel: slider cards with live value readouts, predicate grid, state-reflecting gear button"@en ;
+    schema:text """Three required patterns for the settings panel: (1) Sliders — wrap each in a .slider-field card with a flex header row: <span class='slider-label'> left and <span class='slider-val' id='X-out'> right wired via oninput='document.getElementById(\"X-out\").textContent=this.value; updatePhysics()'. Custom-style the range thumb with accent colour via ::-webkit-slider-thumb. (2) Predicate checkboxes — use CSS grid with grid-template-columns:repeat(auto-fill,minmax(130px,1fr)), not flex-wrap, for a clean multi-column layout. (3) Settings gear button — reflect open/closed state: #kgSettings[aria-expanded='true']{background:var(--accent);border-color:var(--accent);color:#fff}. Close button (✕) is a circular pill, right-aligned via justify-content:space-between in .settings-actions."""@en .

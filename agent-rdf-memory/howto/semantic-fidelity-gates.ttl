@@ -1,0 +1,59 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:HowTo ;
+    schema:name "Semantic Fidelity Gates for KG Explorer Generation"@en ;
+    schema:description "Five contract-gate verification steps that prevent prior-task content contamination — kgData payloads and HTML body prose that describe a different topic than the companion TTL. Each step is individually queryable, individually enforceable, and carries a behavior-gap trigger for automatic session-memory recording."@en ;
+    schema:dateCreated "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-kgTopicBaseUri, :step-kgTopicTitleMatch,
+        :step-kgTopicForeignEntities, :step-kgTopicNoReuse,
+        :step-kgTopicValidatorCrossCheck ;
+    schema:step :step-kgTopicBaseUri, :step-kgTopicTitleMatch,
+        :step-kgTopicForeignEntities, :step-kgTopicNoReuse,
+        :step-kgTopicValidatorCrossCheck ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Gate 1: Base URI ───────────────────────────────────────────────────────
+
+:step-kgTopicBaseUri a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Verify kgData entity IRIs share a prefix with the companion TTL base"@en ;
+    schema:text "Extract the first five kgData node IDs and the companion TTL @base or primary entity IRI. Require at least one kgData node IRI to share the @base prefix. Counter-example: an HTML whose TTL @base is https://neo4j.com/blog/...virtual-graph# but kgData nodes mention https://sparql-noipa.mef.gov.it/ — the payload came from a different task. Fail if zero overlap."@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .
+
+# ── Gate 2: Title / Heading ────────────────────────────────────────────────
+
+:step-kgTopicTitleMatch a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Verify HTML <title> and first <h2> match the companion TTL schema:name"@en ;
+    schema:text "Read the HTML <title> and the text content of the first <h2>. Read the companion TTL's schema:name on the <> schema:CreativeWork document entity. Both HTML headings must describe the same topic as the TTL schema:name. A mismatch (e.g. HTML title says 'Neo4j vs Virtuoso' but <h2> says 'About the NOIPA Knowledge Graph') is a contamination signal."@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .
+
+# ── Gate 3: Foreign Entities ───────────────────────────────────────────────
+
+:step-kgTopicForeignEntities a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Verify every kgData entity IRI appears in the companion TTL"@en ;
+    schema:text "Build the set of all entity IRIs from the companion TTL (subjects and resource objects). Build the set of all kgData node IDs. Compute kgData IDs minus TTL IRIs. If the difference is non-empty, those are foreign entities — they belong to a different knowledge graph. Fail if any kgData node ID cannot be traced to a subject or resource object in the companion TTL."@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .
+
+# ── Gate 4: Provenance ─────────────────────────────────────────────────────
+
+:step-kgTopicNoReuse a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Never reuse kgData from a different HTML file — derive from companion TTL"@en ;
+    schema:text "Generate kgData by parsing the companion TTL with rdflib, not by copying an existing const _kgDataFull block from another HTML file. If rdflib is available, use it. If not, construct nodes and links by walking the TTL triples. A copied kgData block carries the prior document's entity IRIs, labels, and topic — guaranteeing contamination. This step is a process rule, not a post-hoc check."@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .
+
+# ── Gate 5: Validator Net ──────────────────────────────────────────────────
+
+:step-kgTopicValidatorCrossCheck a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Warn when kgData node IDs share no common prefix with the TTL base"@en ;
+    schema:text "The harness validator must compute the longest common prefix shared by the TTL @base and the first five kgData node IDs. If no common prefix exists, emit a warning: 'kgData payload may be from a different task — node IRIs share no prefix with companion TTL base.' This is the automated safety net for when manual checks (gates 1–4) are skipped."@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .

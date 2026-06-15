@@ -1,0 +1,86 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:HowTo ;
+    schema:name "Shared Ontology Discovery via prefix.cc"@en ;
+    schema:description "Protocol for discovering existing, shared ontologies before inventing new RDF predicates or classes. Uses https://prefix.cc as a prefix-to-namespace lookup service. Promotes ontology reuse — a core Linked Data principle — over ad-hoc vocabulary invention. Discovered ontologies are presented as suggestions for user acceptance or rejection."@en ;
+    schema:dateCreated "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-prefixCCLookup, :step-ontologyEvaluate,
+        :step-ontologySuggest, :step-ontologyApply ;
+    schema:step :step-prefixCCLookup, :step-ontologyEvaluate,
+        :step-ontologySuggest, :step-ontologyApply ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Lookup at prefix.cc ────────────────────────────────────────────
+
+:step-prefixCCLookup a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Query prefix.cc to discover ontologies for a domain concept"@en ;
+    schema:text """When building a knowledge graph or generating RDF for a domain (product comparisons, feature descriptions, benefit analysis, etc.), first check https://prefix.cc for existing ontologies that already model those concepts. The service resolves a prefix to its namespace IRI and returns the associated vocabulary metadata.
+
+Pattern: https://prefix.cc/{prefix} returns the namespace IRI for that prefix, which can then be dereferenced to retrieve the full ontology (classes, properties, domain/range constraints).
+
+Domain-specific examples:
+  https://prefix.cc/oplfeat → OpenLink Product Feature ontology — classes and predicates for describing product features
+  https://prefix.cc/oplben  → OpenLink Product Benefit ontology — classes and predicates for describing product benefits
+  https://prefix.cc/oplprod → OpenLink Product ontology — classes for product types and categories
+  https://prefix.cc/schema  → Schema.org — general-purpose vocabulary for products, organizations, reviews
+  https://prefix.cc/dbpedia → DBpedia ontology — broad cross-domain classes and properties
+
+General approach: for a domain concept X, attempt https://prefix.cc/{concept} and https://prefix.cc/{abbreviation} to discover relevant shared ontologies. If a prefix resolves to a dereferenceable namespace IRI, fetch the ontology document to inspect its terms. Always prefer an existing shared ontology over inventing new predicates — ontology reuse is a core Linked Data principle and produces Knowledge Graphs that interoperate with the wider Web of Data."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 2: Evaluate ontology fitness ──────────────────────────────────────
+
+:step-ontologyEvaluate a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Evaluate discovered ontologies for fitness to the current task"@en ;
+    schema:text """Once a candidate ontology is discovered via prefix.cc, evaluate it against the current task:
+(a) Does its namespace IRI dereference to a machine-readable ontology document (RDF/XML, Turtle, or JSON-LD)?
+(b) Do its classes cover the entity types needed for the current knowledge graph?
+(c) Do its predicates cover the relationships needed?
+(d) Is the ontology actively maintained? Check for recent modification dates or version history.
+(e) Does it align with other vocabularies already in use (schema.org, DBpedia, RDFS, OWL)?
+
+If multiple ontologies cover the same domain, prefer the one that: is dereferenceable, has broader adoption, and aligns with standards. If none are suitable, only then fall back to custom predicates — but document them clearly with rdfs:label and rdfs:comment."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 3: Suggest to user ────────────────────────────────────────────────
+
+:step-ontologySuggest a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Present discovered ontologies to the user for acceptance or rejection"@en ;
+    schema:text """After evaluating candidate ontologies, present them to the user with a clear summary:
+(a) The ontology name and namespace IRI
+(b) Which classes and predicates it provides relevant to the current task
+(c) A concrete example showing how it would be used in the RDF output
+(d) The rationale for recommending it (adoption, standards alignment, interoperability)
+
+The user may accept the recommendation (use it), reject it (invent custom predicates instead), or ask for alternatives. Never silently adopt an ontology without user awareness — the choice of vocabulary shapes how the Knowledge Graph links to the wider Linked Data ecosystem and is a design decision the user should own.
+
+Example suggestion format:
+"Discovered the OpenLink Product Feature ontology (prefix: oplfeat) at https://prefix.cc/oplfeat. It provides oplfeat:Feature and oplfeat:hasFeature which can replace the ad-hoc :feature predicate in the current graph. Using a shared ontology means our feature descriptions can link to other datasets that also use oplfeat terms. Accept this suggestion?"""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 4: Apply accepted ontology ────────────────────────────────────────
+
+:step-ontologyApply a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Apply accepted ontologies consistently across the RDF knowledge graph"@en ;
+    schema:text """When the user accepts an ontology:
+(a) Add the @prefix declaration to the Turtle document with the canonical prefix from prefix.cc.
+(b) Use the ontology's IRIs for classes and predicates — do not create local aliases that obscure provenance.
+(c) Add rdfs:isDefinedBy links from the knowledge graph's ontology section to the external ontology's namespace IRI, establishing provenance.
+(d) If the ontology provides domain/range constraints, honour them — don't use a feature predicate on an organization if the domain is Product.
+(e) Record the ontology choice in the session memory file so future tasks can discover that this ontology was previously accepted for this domain.
+
+If the user rejects an ontology and prefers custom predicates:
+(a) Still add @prefix declarations for any referenced ontologies (schema.org at minimum).
+(b) Document custom predicates with rdfs:label, rdfs:comment, rdfs:domain, and rdfs:range.
+(c) Note in session memory that a shared ontology was considered but rejected, so future tasks don't re-suggest it without cause."""@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate .

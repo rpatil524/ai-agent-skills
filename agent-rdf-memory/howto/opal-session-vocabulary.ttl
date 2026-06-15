@@ -1,0 +1,168 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<> a schema:CreativeWork ;
+    schema:name "OPAL Analytics Ontology — Session Log Vocabulary Guide"@en ;
+    schema:description "Reference HowTo for applying OPAL Analytics Ontology terms (opal:ChatSession, opal:ChatModel, opal:LLMProvider, opal:ChatMessage, etc.) as the default vocabulary in all agent-rdf-memory session log TTL files."@en ;
+    schema:dateCreated "2026-06-10T12:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-10T12:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :opalSessionGuide ;
+    schema:step :step-prefixes, :step-sessionEntity, :step-modelAndProvider,
+                :step-taskMessages, :step-dataProperties, :step-override ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Ontology reference ────────────────────────────────────────────────────────
+
+:opalOntology a opal: ;
+    schema:name "OpenLink AI Layer Analytics Ontology"@en ;
+    schema:description "Ontology for modeling sessions, prompts, tool calls, and analytics for LLM-based chat assistants."@en ;
+    schema:url <https://www.openlinksw.com/ontology/opal/> ;
+    schema:encodingFormat "text/turtle" .
+
+:opalOntologyFile a schema:DigitalDocument ;
+    schema:name "opal-analytics-ontology-2.ttl"@en ;
+    schema:url <../../../../../../RDF_Ontologies/OpenLink/opal-analytics-ontology-2.ttl> .
+
+# ── Primary guide ─────────────────────────────────────────────────────────────
+
+:opalSessionGuide a schema:HowTo ;
+    schema:name "OPAL Session Vocabulary — Application Guide"@en ;
+    schema:description "How to apply OPAL Analytics Ontology terms in agent-rdf-memory session files. Default for all sessions unless overridden by operator."@en ;
+    schema:step :step-prefixes, :step-sessionEntity, :step-modelAndProvider,
+                :step-taskMessages, :step-dataProperties, :step-override .
+
+# ── Step 1: Declare required prefixes ────────────────────────────────────────
+
+:step-prefixes a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Add opal: and foaf: prefixes to every session TTL"@en ;
+    schema:text """Every session file MUST declare these two additional prefixes alongside the standard set:
+
+```turtle
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+```
+
+These join the standard set: :, schema:, xsd:, rdfs:, rdf:, owl:, prov:. Do not omit them even if a particular session uses only some OPAL terms — the prefix declarations signal intent and make the file queryable."""@en .
+
+# ── Step 2: Type the session as opal:ChatSession ─────────────────────────────
+
+:step-sessionEntity a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Type the primary session entity as opal:ChatSession"@en ;
+    schema:text """The main session entity MUST be typed `opal:ChatSession` (not just `schema:Event`). It MAY carry both types if `schema:Event` was already present.
+
+Required properties:
+- `opal:chatModel` — points to the :chatModel entity (see step 3)
+- `opal:user` — IRI of the authenticated user, e.g. `<https://linkedin.com/in/kidehen#this>`
+- `opal:lastUsed` — timestamp of last session activity (xsd:dateTime)
+- `opal:assistantId` — string identifier for the agent environment, e.g. `"claude-code"^^xsd:string`
+
+Example:
+```turtle
+:session a opal:ChatSession ;
+    opal:chatModel :chatModel ;
+    opal:user <https://linkedin.com/in/kidehen#this> ;
+    opal:lastUsed "2026-06-10T12:00:00Z"^^xsd:dateTime ;
+    opal:assistantId "claude-code"^^xsd:string ;
+    schema:name "..."@en ;
+    schema:startDate "2026-06-10T00:00:00Z"^^xsd:dateTime ;
+    schema:hasPart :task1, :task2 .
+```"""@en .
+
+# ── Step 3: Declare ChatModel and LLMProvider ─────────────────────────────────
+
+:step-modelAndProvider a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Declare opal:ChatModel and opal:LLMProvider entities"@en ;
+    schema:text """Every session file MUST declare the model and its provider as first-class OPAL entities, not just as bare IRIs in schema:agent.
+
+```turtle
+:chatModel a opal:ChatModel ;
+    schema:name "{Model display name}"@en ;
+    opal:provider :llmProvider .
+
+:llmProvider a opal:LLMProvider ;
+    schema:name "{Provider name}"@en ;
+    schema:url <{provider homepage IRI}> .
+```
+
+Standard provider entries for this project:
+
+| Model display name | Provider name | Provider URL |
+|---|---|---|
+| Claude Sonnet 4.6 | Anthropic | https://www.anthropic.com/ |
+| Claude Opus 4.7 | Anthropic | https://www.anthropic.com/ |
+| Claude Haiku 4.5 | Anthropic | https://www.anthropic.com/ |
+| GPT-4o | OpenAI | https://openai.com/ |
+| DeepSeek V4 Pro | DeepSeek | https://www.deepseek.com/ |
+| Qwen 3 6 Plus | Alibaba | https://www.alibabacloud.com/ |
+
+**Never fabricate provider URLs.** Use only the entries above or verified URLs provided by the user."""@en .
+
+# ── Step 4: Tag tasks as opal:ChatMessage where appropriate ──────────────────
+
+:step-taskMessages a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Add opal:ChatMessage type and properties to tasks that use tools or produce output"@en ;
+    schema:text """Tasks that invoke tools or produce assistant output SHOULD carry both `schema:Action` and `opal:ChatMessage` types. This enriches the session for analytics queries.
+
+Required OPAL message properties:
+- `opal:messageRole` — `"assistant"^^xsd:string` for agent-generated tasks; `"user"^^xsd:string` for user-initiated inputs
+- `opal:usesTools` — `true` if the task invoked any tool; `false` otherwise (xsd:boolean)
+- `opal:toolId` — comma-separated tool names if tools were used (xsd:string)
+- `opal:timestamp` — approximate timestamp when the action occurred (xsd:dateTime)
+
+Example:
+```turtle
+:taskGenerateTTL a schema:Action, opal:ChatMessage ;
+    opal:messageRole "assistant"^^xsd:string ;
+    opal:usesTools true ;
+    opal:toolId "Read, Write, Bash"^^xsd:string ;
+    opal:timestamp "2026-06-10T02:00:00Z"^^xsd:dateTime ;
+    schema:name "Generate RDF-Turtle KG artifact"@en ;
+    schema:actionStatus schema:CompletedActionStatus .
+```"""@en .
+
+# ── Step 5: Optional data properties ─────────────────────────────────────────
+
+:step-dataProperties a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Add optional OPAL data properties when values are known"@en ;
+    schema:text """Add these OPAL datatype properties to the session or message entities when values are available:
+
+On `opal:ChatSession`:
+- `opal:tokens` — total tokens consumed in the session (xsd:nonNegativeInteger), if reported by the runtime
+- `opal:archived` — `false` for active sessions (xsd:boolean)
+
+On `opal:ChatModel`:
+- `opal:temperature` — temperature used during generation (xsd:decimal), if known
+- `opal:top_p` — top-p parameter (xsd:decimal), if known
+
+On `opal:ChatMessage`:
+- `opal:usesImages` — `true` if images were attached (xsd:boolean)
+- `opal:usesFiles` — `true` if files were attached (xsd:boolean)
+- `opal:duration` — processing duration (xsd:duration), if known
+
+These are optional but improve analytics query coverage."""@en .
+
+# ── Step 6: Override rule ─────────────────────────────────────────────────────
+
+:step-override a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Override rule — when OPAL vocabulary may be omitted"@en ;
+    schema:text """OPAL vocabulary is the default for all session files and MUST be applied unless an operator (not the user) explicitly overrides it for a specific session via a system prompt or task instruction.
+
+A user preference stated during a session is not an operator override. The operator override must come from a durable instruction source (system prompt, CLAUDE.md, or a project-level configuration file).
+
+If OPAL vocabulary is omitted due to operator override, record the reason in the session file as:
+```turtle
+:session schema:description "OPAL vocabulary omitted: {reason for override}"@en .
+```
+
+Absent any override, non-compliance is a contract violation. If opal: terms are missing from a session file being written, add them before writing — do not patch after delivery."""@en .

@@ -1,0 +1,51 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "Artifact Routing — Output Directories and Terminology"@en ;
+    schema:description "Rules for routing generated artifacts (RDF, HTML, Markdown) to the correct model-specific output directories, plus the meshup vs mashup terminology rule."@en ;
+    schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-09T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-outputDirs, :step-gpt5ChatCodexOutputDirs,
+        :step-mashupVsMeshup, :step-defaultOutputRoot, :step-modelOverEnvironment ;
+    schema:step :step-outputDirs, :step-gpt5ChatCodexOutputDirs,
+        :step-mashupVsMeshup, :step-defaultOutputRoot, :step-modelOverEnvironment ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Output Directory Routing ─────────────────────────────────────────
+
+:step-outputDirs a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Route artifacts to model-specific output directories under the canonical LLM root"@en ;
+    schema:text """CANONICAL LLM ROOT: /Users/kidehen/Documents/LLMs/ — all generated artifacts are written beneath this root, and all local RDF searches (step-kgQueryMode) scan beneath this same root. This symmetry is intentional: the write path and the read path share one root, so any artifact written in a generation workflow is automatically discoverable in a subsequent query workflow. Model-specific subdirectories: DeepSeek V4 Pro → /Users/kidehen/Documents/LLMs/DeepSeek/{rdf,md,webpages}/. Claude Sonnet/Opus → /Users/kidehen/Documents/LLMs/Claude Generated/{RDF,md,webpages}/. MiniMax → /Users/kidehen/Documents/LLMs/MiniMax Generated/{rdf,md,webpages}/. GPT-5 Chat in Codex Desktop → /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/{rdf,md,webpages}/. Kimi → /Users/kidehen/Documents/LLMs/kimi/{rdf,md,webpages}/. Grok → /Users/kidehen/Documents/LLMs/Grok/{rdf,md,webpages}/. Determine the output root from the active LLM model ID before writing any file. Do not use kg-output/, the repo root, or a generator work folder as the final artifact destination. Identify the active LLM from the system prompt model identifier — never infer it from session file names, surrounding conversation context, or memory entries."""@en .
+
+# ── Step 2: GPT-5 Chat Codex Output Dirs ─────────────────────────────────────
+
+:step-gpt5ChatCodexOutputDirs a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "GPT-5 Chat Codex writes generated collections to GPT5-Chat-Generated root folders"@en ;
+    schema:text """For GPT-5 Chat running in Codex Desktop, write generated RDF, Markdown, and HTML document collections to /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/rdf/, /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/md/, and /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/webpages/. Keep generator scripts in their project/work folders under showcases when appropriate, but never treat showcases/{rdf,md,webpages}/ as the canonical collection destination."""@en .
+
+# ── Step 3: Mashup vs Meshup Terminology ─────────────────────────────────────
+
+:step-mashupVsMeshup a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Never use 'mashup' — always use 'meshup' for semantic content fusion, on input and output"@en ;
+    schema:text """MASHUP: brute-force recombination of content from multiple sources without a unifying semantic layer. MESHUP: content fusion informed by a semantic layer — specifically, knowledge graphs deployed in Semantic Web form using dereferenceable hyperlinks as entity and relationship identifiers. INPUT RULE: if the user writes 'mashup' in any message, silently treat it as 'meshup' — recognize the intent, do not use the incorrect term in any response or artifact, and do not flag or correct the user unless they explicitly ask about the distinction. OUTPUT RULE: never produce the word 'mashup' in any response, RDF literal, session memory entry, generated artifact (HTML, MD, TTL), provenance narrative, or description. Always use 'meshup' when describing combination of content across sources informed by a semantic layer. This rule is bidirectional and non-negotiable."""@en .
+
+# ── Step 4: Default Output Root ──────────────────────────────────────────────
+
+:step-defaultOutputRoot a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "No hardcoded default output root — always route by model"@en ;
+    schema:text """There is no single default output root. The output root is always determined by :step-outputDirs (position 1 above): identify the active LLM from the system prompt model identifier, then route to the corresponding model-specific directory under /Users/kidehen/Documents/LLMs/. Never hardcode a single model's output path (e.g., Claude Generated/webpages) as the universal default — that was a bug fixed 2026-06-09. HTML infographic artifacts follow the same model-specific routing as RDF and Markdown artifacts. Do not use kg-output/, the repo root, or /tmp as the final artifact destination."""@en .
+
+# ── Step 5: Model Identity vs Agent Environment Tiebreaker ─────────────────
+
+:step-modelOverEnvironment a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Model identity always wins over agent environment for output routing"@en ;
+    schema:text """When the LLM model and the agent environment differ, the model identity from the system prompt determines the output path, never the agent environment name. The agent environment is a multi-model runtime — it can host many different models — so it cannot determine where artifacts should land. Only the model knows its own output directory. Example: DeepSeek V4 Pro running in Claude Code routes to DeepSeek/ (not Claude Generated/). Same principle applies for any model+environment combination. The system prompt model identifier (e.g., 'You are powered by the model deepseek-v4-pro') is authoritative. Inferring the model from session filenames, surrounding conversation context, or memory entries is prohibited. Added 2026-06-09 after World Cup 2026 meshup was misrouted to Claude Generated/ instead of DeepSeek/."""@en .

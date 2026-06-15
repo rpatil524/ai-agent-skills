@@ -1,0 +1,65 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Token-Optimized Session Handoff HowTo"@en ;
+    schema:description "Best-practice procedure for deciding whether to continue a current agent session or start a fresh one when performing repeated, similar artifact-generation tasks."@en ;
+    schema:dateCreated "2026-06-12T12:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-12T12:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :tokenOptimizedSessionHandoff ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+:tokenOptimizedSessionHandoff a schema:HowTo ;
+    schema:name "Use Fresh Sessions with Compact Handoffs for Similar Repeated Tasks"@en ;
+    schema:description "A token-usage optimization pattern that preserves validated workflow constraints while avoiding long-thread context drag."@en ;
+    schema:step :stepAssessTaskContinuity,
+        :stepContinueForSameArtifact,
+        :stepStartFreshForNewSimilarSource,
+        :stepProvideCompactHandoff,
+        :stepReloadMemoryInNewSession,
+        :stepValidateAndRecordCorrections .
+
+:stepAssessTaskContinuity a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Assess whether the next task edits the same artifact or starts a new source collection"@en ;
+    schema:text "Classify the next user request before recommending session continuity. If it is a small repair, validation, browser refresh, or content tweak to the currently open artifact, continuing the current session is token-efficient. If it is a new article, new source URL, or new collection that only reuses the pattern, prefer a new session."@en .
+
+:stepContinueForSameArtifact a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Continue current session for small edits to the same artifact"@en ;
+    schema:text "Keep the current session when working on the same generated collection because the active artifact path, current browser URL, known defects, validation state, and generator file are already in context. Examples: fix a Graph IRI, change a heading, rerun harness validation, refresh local HTML, or adjust a specific omission section in the current artifact."@en .
+
+:stepStartFreshForNewSimilarSource a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Start a new session for a new but similar source collection"@en ;
+    schema:text "Start a fresh session when the next task is another 'redo for this URL' or similar RDF/HTML collection request. A long prior transcript usually contains debugging and correction history that raises token cost without improving the new source analysis. A new session plus a concise handoff gives lower token usage while preserving the validated pattern."@en .
+
+:stepProvideCompactHandoff a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Seed the new session with a compact validated-pattern handoff"@en ;
+    schema:text """Use a compact handoff instead of copying the whole thread. For GPT-5 Chat Codex showcases RDF/HTML collections, include:
+
+Use /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/showcases/space-datacenters-thesis-analysis/generate_collection.mjs as the latest validated pattern.
+
+Critical fixes to preserve:
+- Output RDF/JSON-LD/HTML to /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/{rdf,webpages}/.
+- Use kg-generator plus rdf-infographic-skill contract.
+- SPARQL Graph IRI must be https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl, not the source article URL.
+- Run validate-harness-contract.py and RDF parse checks before delivery.
+- Run JSON-LD parse, no-blank-node, HTML parser, JavaScript syntax, resolver-link, and stale-source-graph checks before delivery.
+- RDF/HTML only unless Markdown is explicitly requested.
+
+Then provide the new URL and any special critique or omission angle."""@en .
+
+:stepReloadMemoryInNewSession a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Do not skip memory reload in the new session"@en ;
+    schema:text "The token-optimized handoff does not replace the Agent RDF Memory Protocol. In the new session, still list the memory root and subfolders, read core.ttl, preferences.ttl, index.ttl, follow relevant project/session/howto references, and reason over the loaded Turtle before editing or answering."@en .
+
+:stepValidateAndRecordCorrections a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Validate outputs and record reusable corrections"@en ;
+    schema:text "After generating or repairing artifacts, parse Turtle and JSON-LD, enforce no blank nodes, validate HTML and JavaScript, run the rdf-infographic harness, and update project/session memory. If a new reusable contract correction is discovered, codify it in preferences.ttl and a companion howto rather than leaving it only in the conversation transcript."@en .

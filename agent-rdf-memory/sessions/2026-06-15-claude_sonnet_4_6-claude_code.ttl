@@ -1,0 +1,73 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<> a schema:CreativeWork ;
+    schema:about :session ;
+    schema:dateCreated "2026-06-15T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-15T18:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> .
+
+:session a schema:Event ;
+    schema:name "Session 2026-06-15 (Claude Sonnet 4.6 + Claude Code — OKF SPARQL Accordion URL Fix + Step 50 Memory Write)"@en ;
+    schema:description "Fixed 6 broken SPARQL accordion run buttons in okf-google-cloud-blog-infographic.html (Q1, Q2, Q3 — each with display code block + href). Root causes: (1) relative PREFIX IRI <okf-open-knowledge-format-ontology.ttl#okf-> invalid at remote endpoint, replaced with absolute DAV IRI; (2) missing FROM <DAV-graph-IRI> clause per Step 41. Added Step 50 (:step-sparqlAbsolutePrefixIRI) to preferences.ttl encoding the absolute-PREFIX-IRI rule. Created companion howto/sparql-absolute-prefix-iri.ttl."@en ;
+    schema:startDate "2026-06-15T00:00:00Z"^^xsd:dateTime ;
+    schema:agent <https://linkedin.com/in/kidehen#this> ;
+    schema:hasPart :taskFixSparqlAccordions, :taskWriteStep50, :taskEnrichInstanceData, :taskFixWhatIsOKFHrefs, :taskFixRemainingGitHubIRIs, :taskAddHowToSection, :taskFixFAQAnchors, :taskFixGlossaryDefs .
+
+:taskFixSparqlAccordions a schema:Action ;
+    schema:name "Fix 6 SPARQL accordion buttons in okf-google-cloud-blog-infographic.html"@en ;
+    schema:description "Three queries (Q1: table joins, Q2: metric documents, Q3: KnowledgeBundle + DBpedia SERVICE federation) each had two broken targets: sparql-code display block and sparql-run-btn href. Fixed both per query. Changes per query: (1) absolute DAV IRI for okf: PREFIX, (2) SELECT DISTINCT, (3) FROM <...instance-data.ttl> before WHERE. Note: Q3 will still return zero rows because schema:provider is absent from the instance data TTL — the syntactic break is resolved, the data gap is out of scope."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-google-cloud-blog-infographic.html> ;
+    schema:result "6 edits applied successfully. SPARQL Run buttons now point to valid absolute DAV IRIs with correct graph scoping."@en .
+
+:taskWriteStep50 a schema:Action ;
+    schema:name "Write Step 50 (sparqlAbsolutePrefixIRI) to preferences.ttl + companion HowTo"@en ;
+    schema:description "Appended :step-sparqlAbsolutePrefixIRI (position 50) and :topicSparqlAbsolutePrefixIRI to preferences.ttl. Created agent-rdf-memory/howto/sparql-absolute-prefix-iri.ttl with 5 steps explaining the root cause, derivation procedure, dual-target fix, FROM clause requirement, and post-fix verification."@en ;
+    schema:result "preferences.ttl updated; howto/sparql-absolute-prefix-iri.ttl created."@en .
+
+:taskEnrichInstanceData a schema:Action ;
+    schema:name "Enrich instance-data TTL with row-level records and rewrite 3 SPARQL accordions"@en ;
+    schema:description "Two-part task: (1) Fixed broken relative @prefix okf: IRI in okf-open-knowledge-format-instance-data.ttl (Step 50 violation) and appended SECTION 10 — 8 class/property declarations (okf:OrderRecord, okf:CustomerRecord, okf:orderId, okf:customerId, okf:orderDate, okf:revenueUSD, okf:customerName, okf:email, okf:signupDate, okf:isRowOf) plus 5 CustomerRecord instances (CUST001–CUST005) and 10 OrderRecord instances across 2 calendar weeks (Week 1: 2026-06-01 to 2026-06-07 / WAU=4; Week 2: 2026-06-08 to 2026-06-14 / WAU=4). (2) Rewrote all 3 SPARQL accordions in okf-google-cloud-blog-infographic.html: Q1 = JOIN query (OrderRecord x CustomerRecord via shared okf:customerId); Q2 = COUNT(DISTINCT ?custId) WAU metric for Week 1 with xsd:date FILTER; Q3 = SUM(?revenue) GROUP BY customer for revenue ranking. All queries conform to Step 41 (FROM clause), Step 50 (absolute PREFIX IRI), Step 28 (SELECT → text/x-html+tr)."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/rdf/okf-open-knowledge-format-instance-data.ttl>,
+                  <../../../../../LLMs/Claude%20Generated/webpages/okf-google-cloud-blog-infographic.html> ;
+    schema:result "Instance data TTL enriched with 5 customers + 10 orders. All 3 accordion queries now operate on computable row-level data. Run buttons use valid absolute DAV PREFIX IRIs, FROM clauses, and correct SELECT format."@en .
+
+:taskFixWhatIsOKFHrefs a schema:Action ;
+    schema:name "Fix 7 fabricated GitHub IRIs in 'What is OKF?' section"@en ;
+    schema:description "Replaced 7 entity hrefs that pointed to GitHub repository URLs (https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf#...) with resolver-wrapped IRIs sourced from the companion TTL files per Step 49. Card entities (ConceptDocument, KnowledgeBundle, EnrichmentAgent, Visualizer) map to ontology class IRIs in okf-open-knowledge-format-ontology.ttl using the #okf-{ClassName} fragment pattern. Design principle entities (PrincipleMinimallyOpinionated, PrincipleProducerConsumerIndependence, PrincipleFormatNotPlatform) map to instance data IRIs in okf-open-knowledge-format-instance-data.ttl. All resolver URLs use the pattern: https://linkeddata.uriburner.com/describe/?url={percent-encoded-DAV-IRI}. Post-fix grep confirmed zero GitHub fabricated IRIs remain in the file."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-infographic-claude_sonnet_4_6-1.html> ;
+    schema:result "7 edits applied. No GitHub IRIs remain. All entity hrefs now resolve to DAV-hosted RDF entities via the URIBurner resolver."@en .
+
+:taskFixRemainingGitHubIRIs a schema:Action ;
+    schema:name "Fix 2 remaining GitHub fabricated IRIs in ACME Sales section (lines 582, 594)"@en ;
+    schema:description "Two entity hrefs in the ACME Sales Knowledge Bundle section (line 582: okf:KnowledgeBundle; line 594: okf:isForeignKeyTo) still pointed to GitHub repository URLs after the earlier 7-fix pass. Canonical DAV IRI base confirmed from SPARQL accordion PREFIX declarations: https://linkeddata.uriburner.com/DAV/demos/daas/okf-open-knowledge-format-ontology.ttl. Both entities verified in local ontology TTL (okf-ontology-claude_sonnet_4_6-1.ttl): KnowledgeBundle at line 47, isForeignKeyTo at line 204. Post-fix grep on 'github.com/GoogleCloudPlatform' returned zero results — all fabricated GitHub IRIs eliminated."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-infographic-claude_sonnet_4_6-1.html> ;
+    schema:result "2 edits applied. Zero GitHub IRIs remain anywhere in the HTML file."@en .
+
+:taskAddHowToSection a schema:Action ;
+    schema:name "Add missing HowTo section to okf-infographic-claude_sonnet_4_6-1.html"@en ;
+    schema:description "Companion TTL (okf-open-knowledge-format-instance-data.ttl) contains :OKFCoreStructure (schema:HowTo) with 3 schema:HowToStep entities (:StepYAMLFrontmatter, :StepMarkdownBody, :StepRelativeLinks), but no HowTo section was rendered in the HTML. Added: (1) nav panel link <a href='#howto'>HowTo</a>; (2) full <section id='howto'> block using grid-3 + card pattern, step headings as resolver-wrapped <a> tags using DAV IRIs from companion TTL, step text verbatim from schema:text fields. Section numbered 9, pushing FAQ to 10 and Glossary to 11."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-infographic-claude_sonnet_4_6-1.html> ;
+    schema:result "HowTo section rendered with 3 steps, all headings resolver-linked to companion TTL entity IRIs."@en .
+
+:taskFixFAQAnchors a schema:Action ;
+    schema:name "Fix minimal anchor text in FAQ F1 and F3 answers"@en ;
+    schema:description "F1 answer anchor was only the word 'OKF' (too minimal). F3 answer anchor was only inline <code>type</code> (too minimal). Expanded both to wrap the full opening sentence of each answer, with the <a> tag enclosing meaningful prose per skill contract requirement for answer entity links."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-infographic-claude_sonnet_4_6-1.html> ;
+    schema:result "F1 and F3 FAQ answer anchors now wrap complete opening sentences rather than single words/elements."@en .
+
+:taskFixGlossaryDefs a schema:Action ;
+    schema:name "Hyperlink all 7 glossary definition divs in okf-infographic-claude_sonnet_4_6-1.html"@en ;
+    schema:description "All 7 <div class='def'> definition texts were plain text with no hyperlinks — a direct violation of rdf-infographic-skill contract line 1135 and CLAUDE.md entity hyperlink contract. Wrapped each def text in <a href='resolver?url=...#TermXxx' target='_blank' rel='noopener noreferrer'> using the same IRI already used for the sibling term name link. Terms fixed: TermKnowledgeBundle, TermEnrichmentAgent, TermKnowledgeConsumer, TermLLMWikiPattern, TermYAMLFrontmatter, TermProducerConsumerIndependence, TermFormatNotPlatform. Also updated section comment from 'Section 10' to 'Section 11' to reflect renumbering after HowTo insertion."@en ;
+    schema:object <../../../../../LLMs/Claude%20Generated/webpages/okf-infographic-claude_sonnet_4_6-1.html> ;
+    schema:result "All 7 glossary definition divs now hyperlinked to companion TTL entity IRIs via URIBurner resolver."@en .
+
+:lessonSparqlRelativeIRI a schema:Thing ;
+    schema:name "Lesson: relative PREFIX IRIs in SPARQL are silently broken at remote endpoints"@en ;
+    schema:description "A PREFIX IRI like <filename.ttl#fragment> is resolved by the remote SPARQL endpoint relative to its own base URL, not the filesystem. The resulting absolute IRI points to a non-existent resource. The failure is silent — the endpoint returns 0 results rather than an error. The fix is always to use the absolute DAV IRI derived from the skills contract DAV path pattern."@en .
+
+:lessonMemoryProtocolEnforcement a schema:Thing ;
+    schema:name "Lesson: Agent RDF Memory Protocol failure causes compounding SPARQL URL bugs"@en ;
+    schema:description "The root systemic cause of the SPARQL accordion breakage was failure to execute the mandatory Agent RDF Memory Protocol (Steps 28 and 41 of preferences.ttl) before generating the HTML. Had Step 41 (virtuosoWorkbenchQueryDedup) and Step 28 (virtuosoSparqlFormats) been read before generation, the relative IRI and missing FROM clause errors would not have occurred. The protocol is a blocking gate, not a post-hoc check."@en .

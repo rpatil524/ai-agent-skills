@@ -1,0 +1,66 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:HowTo ;
+    schema:name "KG Explorer Construction — Reuse-First Protocol"@en ;
+    schema:description "Protocol for constructing KG Explorer visualizations that optimizes for token economy by reusing proven, validated implementations from prior tasks. Building from scratch is error-prone and reintroduces fixed bugs. Reuse-first means: find the most recent working KG Explorer, validate it, adapt its control shell to new kgData — only build afresh if all recent candidates fail validation."@en ;
+    schema:dateCreated "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-04T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-reuseSearch, :step-reuseValidate,
+        :step-reuseAdapt, :step-reuseFallback ;
+    schema:step :step-reuseSearch, :step-reuseValidate,
+        :step-reuseAdapt, :step-reuseFallback ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Search for recent candidates ───────────────────────────────────
+
+:step-reuseSearch a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Search prior task outputs for the 3 most recent KG Explorer implementations"@en ;
+    schema:text """Scan the LLM output directories for HTML files containing a working KG Explorer pattern. Search order: most recent first.
+Primary scan paths:
+  /Users/kidehen/Documents/LLMs/Claude Generated/webpages/
+  /Users/kidehen/Documents/LLMs/DeepSeek/webpages/
+  /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated/webpages/
+  /Users/kidehen/Documents/LLMs/MiniMax Generated/webpages/
+Candidate identification: grep for 'function initGraph' AND 'd3.forceSimulation' AND 'function updateGraph' in each HTML file. Sort by file modification time (newest first). Take the first 3 that match all three patterns. Proceed to step-reuseValidate with this ordered candidate list."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 2: Validate candidates ───────────────────────────────────────────
+
+:step-reuseValidate a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Validate each candidate against the harness contract — keep the first that passes"@en ;
+    schema:text """Run validate-harness-contract.py against each candidate in order (most recent first). Required: the candidate must pass ALL contract checks — no exceptions. Semantic fidelity gates from howto/semantic-fidelity-gates.ttl must also pass (base URI, title, foreign entities). If the first candidate passes, use it. If it fails, try the next. If all three fail, proceed to step-reuseFallback (build afresh). Do NOT attempt to fix a failing candidate — the point is to reuse a PROVEN working implementation, not to debug a broken one. A candidate that fails validation is not proven."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 3: Adapt the validated shell ──────────────────────────────────────
+
+:step-reuseAdapt a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Adapt the validated KG Explorer shell to the new kgData and topic"@en ;
+    schema:text """Once a validated candidate is selected, adapt it surgically:
+(a) Replace the embedded kgData payload (const _kgDataFull / const kgCore) with data derived from the current task's companion TTL via rdflib.
+(b) Update the SPARQL graph IRI, Q_ENTITY, and Q_SAMPLE to match the current task's TTL graph.
+(c) Update the KG Explorer title (kg-title span) and node count badge to reflect the new topic.
+(d) Update nodeColors if the new data introduces groups not in the candidate's color map.
+(e) Do NOT modify the D3 simulation setup (initGraph), the updateGraph function with its merge pattern, the zoom isolation pattern, the drag/click guard, the slider wiring, or the predicate/type chip builders — these are the proven parts. Only swap data and topic labels. The control shell stays intact.
+If any structural change is needed (e.g. a new control), prefer adding it as a minimal delta, not a rewrite."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation .
+
+# ── Step 4: Fallback — build afresh ───────────────────────────────────────
+
+:step-reuseFallback a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Build afresh with strict contract adherence only when all candidates fail"@en ;
+    schema:text """Only when all three recent candidates fail validation, build the KG Explorer from scratch. When building afresh:
+(a) Follow the canonical template from rdf-infographic-skill/assets/templates/competitive-analysis-head-to-head-claude_sonnet_4_6.html.
+(b) Apply ALL known patterns from preferences: merge pattern in updateGraph, tick handler removal before re-adding, normalised link source/target, resolver-backed anchors, zoom isolation, click-distance guard, orphan prevention in getFilteredData.
+(c) Run validate-harness-contract.py before declaring the build complete.
+(d) After delivery, this new implementation becomes the most recent candidate for the next task. The cycle is self-reinforcing — each successful afresh build improves the candidate pool.
+Building afresh is expensive in token economy and error-prone. It should be the exception, not the norm."""@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified .

@@ -1,0 +1,124 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Session 2026-06-15 (GPT-5 Chat Codex — Market Intelligence Dashboard Generation + Memory Protocol Correction)"@en ;
+    schema:description "Session memory for GPT-5 Chat Codex work in the market-intelligence workspace on 2026-06-15. The session generated and refined an HTML market-intelligence dashboard from accumulated CSV snapshots, clarified that the current dashboard logic is cumulative rather than strict-delta, identified that automation memory.md had been used as the only write target despite the RDF memory contract, and corrected behavior by writing canonical RDF session/project memory into agent-rdf-memory/."@en ;
+    schema:dateCreated "2026-06-15T13:21:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-15T13:21:00Z"^^xsd:dateTime ;
+    schema:author <https://www.linkedin.com/in/kidehen#this> ;
+    schema:about :session .
+
+:session a schema:Event ;
+    schema:name "Market Intelligence dashboard and memory protocol correction"@en ;
+    schema:startDate "2026-06-15T13:21:00Z"^^xsd:dateTime ;
+    schema:description "Loaded AGENT.md plus core.ttl, preferences.ttl, index.ttl, and relevant howto files. Updated the generator to improve facet navigation, topic jumps, and CSV lineage links; regenerated the market-intelligence JSON, RDF, and HTML artifacts; confirmed that current aggregation logic deduplicates repeated records but intentionally carries forward historical unique records; then corrected memory handling by treating automation memory.md as a sidecar and writing canonical RDF memory into agent-rdf-memory/ as the source of truth."@en ;
+    schema:agent :agent ;
+    schema:participant <https://www.linkedin.com/in/kidehen#this> ;
+    schema:hasPart :taskDashboardGeneration, :taskNoveltyClarification, :taskMemoryProtocolCorrection ;
+    opal:hasMessage :msg1, :msg2, :msg3, :msg4, :assistant1, :assistant2, :assistant3 .
+
+:agent a schema:SoftwareApplication ;
+    schema:name "Codex Desktop"@en ;
+    schema:version "GPT-5 Chat" ;
+    schema:applicationCategory "AI Agent"@en .
+
+:taskDashboardGeneration a schema:CreativeWork ;
+    schema:name "Generate HTML-based interactive market-intelligence dashboard"@en ;
+    schema:description "Patched the workspace generator script to emit a dated dashboard filename, route canonical HTML output to GPT5-Chat-Generated/webpages when writable, use generated-market-intelligence/webpages as the workspace fallback, add topic jump navigation, and add CSV lineage links. Regenerated the dashboard from all dated CSV snapshots currently in the workspace."@en ;
+    schema:isBasedOn <../../../../../CSV%20Files/market-intelligence/generate_market_intelligence_dashboard.py> ;
+    schema:hasPart <../../../../../CSV%20Files/market-intelligence/generated-market-intelligence/json/market-intelligence-2026-06-15-3.json>,
+        <../../../../../CSV%20Files/market-intelligence/generated-market-intelligence/rdf/market-intelligence-2026-06-15-3.ttl>,
+        <../../../../../CSV%20Files/market-intelligence/generated-market-intelligence/webpages/market-intelligence-dashboard-2026-06-15.html> ;
+    prov:wasGeneratedBy :session .
+
+:taskNoveltyClarification a schema:CreativeWork ;
+    schema:name "Clarify current novelty behavior of the dashboard"@en ;
+    schema:description "Inspected the generator and confirmed that load_rows() reads all CSV files in the workspace on every run, while load_aggregated_market_data() merges prior JSON snapshots and deduplicates records by sourceUrl or fallback composite key. Result: the dashboard is cumulative with deduplication, not strict-delta 'new since last report only'."@en ;
+    schema:about <../../../../../CSV%20Files/market-intelligence/generate_market_intelligence_dashboard.py> ;
+    prov:wasGeneratedBy :session .
+
+:taskMemoryProtocolCorrection a schema:CreativeWork ;
+    schema:name "Correct memory handling to use RDF memory as the primary store"@en ;
+    schema:description "Explained that preferences.ttl and RDF session files are the canonical memory system, while automation memory.md is only a sidecar required by the outer automation wrapper. This correction writes a canonical session TTL and project TTL to agent-rdf-memory/ so future retrieval follows the RDF protocol instead of relying on markdown memory alone."@en ;
+    schema:hasPart <../projects/market-intelligence.ttl>, <../index.ttl> ;
+    prov:wasGeneratedBy :session .
+
+:msg1 a opal:ChatMessage ;
+    opal:messageRole "user" ;
+    opal:messageContent :prompt1 ;
+    opal:messageOf :session ;
+    opal:usesTools true ;
+    opal:timestamp "2026-06-15T13:15:44Z"^^xsd:dateTime .
+
+:prompt1 a opal:PromptText ;
+    rdf:value "Automation: Market Intelligence Report (HTML Page)\nAutomation ID: market-intelligence-report-html-page\nAutomation memory: $CODEX_HOME/automations/market-intelligence-report-html-page/memory.md\nLast run: 2026-06-14T13:15:44.801Z (1781442944801)\n\nGenerate and HTML-based interactive dashboard from the CSV docs in /Users/kidehen/Documents/CSV Files/market-intelligence. \n\n# Page Guidelines\n1. Navigable using local and external hyperlinking\n2. Faceted Search and browsing to handle content growth from the accumulating CSV docs\n\nSave the doc to /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated using an appended -{date} for distinct file naming."@en .
+
+:msg2 a opal:ChatMessage ;
+    opal:messageRole "user" ;
+    opal:messageContent :prompt2 ;
+    opal:messageOf :session ;
+    opal:usesTools false ;
+    opal:timestamp "2026-06-15T13:19:00Z"^^xsd:dateTime .
+
+:prompt2 a opal:PromptText ;
+    rdf:value "Are you ensuring these reports only include new information i.e., no carryovers from previous reports?"@en .
+
+:msg3 a opal:ChatMessage ;
+    opal:messageRole "user" ;
+    opal:messageContent :prompt3 ;
+    opal:messageOf :session ;
+    opal:usesTools false ;
+    opal:timestamp "2026-06-15T13:20:00Z"^^xsd:dateTime .
+
+:prompt3 a opal:PromptText ;
+    rdf:value "Yes, but why are you using memory.md instead of what's outlined in preferences.ttl?"@en .
+
+:msg4 a opal:ChatMessage ;
+    opal:messageRole "user" ;
+    opal:messageContent :prompt4 ;
+    opal:messageOf :session ;
+    opal:usesTools false ;
+    opal:timestamp "2026-06-15T13:21:00Z"^^xsd:dateTime .
+
+:prompt4 a opal:PromptText ;
+    rdf:value "I want the right behavior"@en .
+
+:assistant1 a opal:ChatMessage ;
+    opal:messageRole "assistant" ;
+    opal:messageContent :assistantSummary1 ;
+    opal:messageOf :session ;
+    opal:usesTools true ;
+    opal:timestamp "2026-06-15T13:18:00Z"^^xsd:dateTime .
+
+:assistantSummary1 a opal:PromptText ;
+    rdf:value "Generated the market-intelligence dashboard in the workspace fallback because the managed session could not write to /Users/kidehen/Documents/LLMs/GPT5-Chat-Generated. Also updated the generator to strengthen navigation, facets, and lineage links."@en .
+
+:assistant2 a opal:ChatMessage ;
+    opal:messageRole "assistant" ;
+    opal:messageContent :assistantSummary2 ;
+    opal:messageOf :session ;
+    opal:usesTools true ;
+    opal:timestamp "2026-06-15T13:20:30Z"^^xsd:dateTime .
+
+:assistantSummary2 a opal:PromptText ;
+    rdf:value "Confirmed from the generator code that the dashboard is cumulative with deduplication, not strict-delta. Historical unique items are carried forward unless an explicit novelty filter is added."@en .
+
+:assistant3 a opal:ChatMessage ;
+    opal:messageRole "assistant" ;
+    opal:messageContent :assistantSummary3 ;
+    opal:messageOf :session ;
+    opal:usesTools true ;
+    opal:timestamp "2026-06-15T13:21:30Z"^^xsd:dateTime .
+
+:assistantSummary3 a opal:PromptText ;
+    rdf:value "Explained that preferences.ttl and RDF session files are the source of truth, while automation memory.md is only a sidecar required by the wrapper. Corrected behavior by staging canonical RDF memory updates for the market-intelligence session and project."@en .
+
+:validation a schema:Review ;
+    schema:name "Validation outcome"@en ;
+    schema:itemReviewed :taskDashboardGeneration ;
+    schema:reviewBody "Generator script compiled with python3 -m py_compile. Static HTML parsing passed. Generated outputs reported 184 current posts and 184 aggregated posts. Canonical GPT5-Chat-Generated output directories were not writable from the managed session, so artifacts were written to the workspace fallback tree under generated-market-intelligence/."@en .

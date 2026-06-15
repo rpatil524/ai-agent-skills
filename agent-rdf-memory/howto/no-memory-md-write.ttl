@@ -1,0 +1,46 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+: a schema:CreativeWork ;
+    schema:about :noMemoryMdWrite .
+
+:noMemoryMdWrite a schema:HowTo ;
+    schema:name "MEMORY.md Is a Fallback, Not a Write Target"@en ;
+    schema:description "The flat markdown index at .claude/projects/…/memory/MEMORY.md is a secondary fallback index loaded at session start as a safety net. The agent must never write to it unless agent-rdf-memory/preferences.ttl is genuinely inaccessible or corrupted. The canonical write target is always preferences.ttl."@en ;
+    schema:dateCreated "2026-06-15T13:10:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-15T13:10:00Z"^^xsd:dateTime ;
+    schema:step :step1, :step2, :step3 .
+
+:step1 a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Preferences.ttl is the sole canonical write target"@en ;
+    schema:text """All behavioral rules, preferences, and reference pointers must be written to:
+  - agent-rdf-memory/preferences.ttl (new schema:HowToStep + schema:Thing)
+  - agent-rdf-memory/howto/<topic>.ttl (detailed substeps when warranted)
+
+Stop after writing these. Do NOT also update MEMORY.md. Do NOT create new .md files under
+.claude/projects/…/memory/. The markdown layer is a read-only safety net, not a parallel
+channel for the agent to maintain."""@en .
+
+:step2 a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "What MEMORY.md actually is"@en ;
+    schema:text """MEMORY.md is:
+  - A flat index loaded into the agent's context at session start
+  - A safety net so the agent knows what rules exist even if it can't read every .ttl file
+  - System-generated or user-maintained — NOT agent-maintained
+  - Read-only from the agent's perspective under normal operation
+
+The .ttl files in agent-rdf-memory/ are the source of truth. MEMORY.md is a derived convenience,
+not a co-authoritative record."""@en .
+
+:step3 a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "When MEMORY.md CAN be touched"@en ;
+    schema:text """The only valid reason for the agent to write to MEMORY.md is a catastrophic fallback:
+  preferences.ttl is missing, unreadable, or corrupt, and the agent needs to record a rule
+  before preferences.ttl can be repaired.
+
+Even then, the write should be minimal — one line pointing to the issue — and the agent should
+migrate the content to preferences.ttl as soon as it becomes accessible again."""@en .

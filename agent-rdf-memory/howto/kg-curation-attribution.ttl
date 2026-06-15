@@ -1,0 +1,124 @@
+@prefix :       <#> .
+@prefix schema: <http://schema.org/> .
+@prefix rdfs:   <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:    <http://www.w3.org/2001/XMLSchema#> .
+@prefix onto:   <https://www.openlinksw.com/ontology/> .
+
+# ── Self-describing document entity ──────────────────────────────────────────
+
+<> a schema:CreativeWork ;
+    schema:name "HowTo: KG Curation Attribution Pattern"@en ;
+    schema:description "Companion howto for preferences.ttl Step 47. Specifies the pattern for crediting knowledge graph curation in hero-meta lines and infographic headers: skills + AI agent acting on behalf of the human principal."@en ;
+    schema:dateCreated "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-14T12:00:00Z"^^xsd:dateTime ;
+    schema:about :HowToKgCurationAttribution .
+
+# ── HowTo ─────────────────────────────────────────────────────────────────────
+
+:HowToKgCurationAttribution a schema:HowTo ;
+    schema:name "KG Curation Attribution — Skills, AI Agent, and Human Principal"@en ;
+    schema:description "When displaying a curation credit in a knowledge graph infographic, expose the full provenance chain: which skills were used, which AI agent executed them, and on whose behalf. Never collapse this to a bare human name."@en ;
+    schema:step :stepPattern,
+                :stepHtmlMarkup,
+                :stepSubstitutionRules,
+                :stepAntiPatterns,
+                :stepRdfDelegation .
+
+# ── Steps ─────────────────────────────────────────────────────────────────────
+
+:stepPattern a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Core pattern"@en ;
+    schema:text """KG curated by {relevant-skills} and {relevant-ai-agent} on behalf of [Kingsley Idehen]({resolver-IRI})
+
+Where:
+  {relevant-skills}    = the skill(s) that produced the KG (e.g., kg-generator, rdf-infographic-skill)
+  {relevant-ai-agent}  = the LLM/model that executed the skills (e.g., Claude Sonnet 4.6)
+  {resolver-IRI}       = the URIBurner resolver URL for Kingsley's LinkedIn IRI (see stepSubstitutionRules)
+
+This makes the provenance chain machine-readable and human-readable:
+  Skills → AI agent → Human principal"""@en .
+
+:stepHtmlMarkup a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "HTML markup template"@en ;
+    schema:text """Place in the .hero-meta <p> element, delimited by &nbsp;·&nbsp;:
+
+  &nbsp;·&nbsp; KG curated by
+  <a href="https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/kg-generator"
+     target="_blank" rel="noopener noreferrer">kg-generator</a>,
+  <a href="https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/rdf-infographic-skill"
+     target="_blank" rel="noopener noreferrer">rdf-infographic-skill</a>,
+  and <a href="{llm-canonical-url}"
+     target="_blank" rel="noopener noreferrer">{llm-name}</a>
+  on behalf of
+  <a href="https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fkidehen%23this"
+     target="_blank" rel="noopener noreferrer">Kingsley Idehen</a>
+
+All links inherit color from .hero-meta a { color: var(--accent); text-decoration: none; }.
+All links use target="_blank" rel="noopener noreferrer"."""@en .
+
+:stepSubstitutionRules a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Substitution rules for template variables"@en ;
+    schema:text """Skill URLs:
+  Always use the canonical GitHub repo URL:
+  https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/{skill-name}
+  Never use the #this IRI suffix in the href — that is for JSON-LD prov:wasGeneratedBy only.
+
+LLM URL:
+  Use the model's canonical product page (verbatim from existing footer, never fabricated).
+  Claude Sonnet 4.6 → https://www.anthropic.com/claude
+
+Kingsley Idehen resolver IRI:
+  https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fkidehen%23this
+  This is the URIBurner resolver pattern applied to the canonical LinkedIn IRI
+  (https://www.linkedin.com/in/kidehen#this). Do not shorten or alter the percent-encoding.
+
+Skill list grammar:
+  - One skill:  "KG curated by {skill} and {llm} on behalf of …"
+  - Two skills: "KG curated by {skill1}, {skill2}, and {llm} on behalf of …"
+  - N skills:   Oxford-comma list ending with "and {llm}"
+  The LLM is always the final item before "on behalf of" — it is not a skill."""@en .
+
+:stepRdfDelegation a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Encode delegation in embedded JSON-LD using PROV-O and schema.org"@en ;
+    schema:text """When the HTML infographic contains a <script type="application/ld+json"> block, encode the delegation relationship using three complementary vocabulary layers:
+
+1. On the WebPage/CreativeWork entity (document level):
+   "accountablePerson": { "@id": "https://www.linkedin.com/in/kidehen#this" }
+   These express: (schema.org) who is accountable for the content; complements
+   the existing "author" field which already points to the same WebID.
+   Use schema:author (already required) — do NOT add foaf:maker.
+
+2. On each generating agent in prov:wasGeneratedBy:
+   - Add "@type": ["SoftwareApplication", "prov:SoftwareAgent"]
+   - Add "prov:actedOnBehalfOf": { "@id": "https://www.linkedin.com/in/kidehen#this" }
+   This expresses: this software agent executed under delegation from Kingsley's WebID.
+
+The two layers are semantically complementary:
+  schema:author                              = document authorship (WebID of principal)
+  schema:accountablePerson                   = schema.org accountability term (same WebID)
+  prov:wasGeneratedBy + prov:actedOnBehalfOf = provenance chain (tool → principal)
+
+Kingsley's WebID IRI: https://www.linkedin.com/in/kidehen#this
+(Do not use the resolver URL here — the @id must be the canonical WebID IRI, not the describe/?url= form.)"""@en .
+
+:stepAntiPatterns a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Anti-patterns — what NOT to do"@en ;
+    schema:text """❌ "KG curated by Kingsley Idehen"
+   → Missing: skill provenance, AI agent; human name is bare text, not resolver-linked.
+
+❌ "KG curated by Claude on behalf of Kingsley Idehen"
+   → Missing: skill attribution; LLM name is bare text, not hyperlinked.
+
+❌ "Created by kg-generator and rdf-infographic-skill"
+   → Missing: AI agent and human principal; phrase "created by" loses the delegation semantics.
+
+❌ "KG curated by Kingsley Idehen using kg-generator"
+   → Wrong order — human principal is the delegator, not the doer; skills and LLM are the agents.
+
+✅ "KG curated by [kg-generator], [rdf-infographic-skill], and [Claude Sonnet 4.6] on behalf of [Kingsley Idehen]"
+   where [] = hyperlinked to canonical URLs and resolver IRI respectively."""@en .

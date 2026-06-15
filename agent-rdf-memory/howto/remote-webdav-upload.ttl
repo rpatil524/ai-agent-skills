@@ -1,0 +1,133 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "Remote WebDAV Upload — URIBurner Default, User-Designated Alternative"@en ;
+    schema:description "Workflow for uploading locally generated artifacts (HTML, RDF, MD) to a remote WebDAV server. URIBurner is the default endpoint; the user may designate an alternative. Uses curl with PKCS#12 client certificate for WebID-TLS authentication and optional On-Behalf-Of header for delegated identity."@en ;
+    schema:dateCreated "2026-06-10T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-10T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-offerUpload, :step-elicitEndpoint, :step-elicitCredentials,
+        :step-constructCurl, :step-executeConfirm ;
+    schema:step :step-offerUpload, :step-elicitEndpoint, :step-elicitCredentials,
+        :step-constructCurl, :step-executeConfirm ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Offer Upload ──────────────────────────────────────────────────────
+
+:step-offerUpload a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Offer to upload after artifact generation"@en ;
+    schema:text """After completing any artifact (HTML, RDF Turtle, or Markdown), ask the user whether they want to upload to a remote WebDAV server. Present the option with the default endpoint. Do not upload without confirmation.
+
+Example prompt:
+"Artifact generated at {local-path}. Upload to remote WebDAV? [y/N] (default endpoint: https://linkeddata.uriburner.com/DAV/demos/daas_paid/)" """@en .
+
+# ── Step 2: Elicit Endpoint ───────────────────────────────────────────────────
+
+:step-elicitEndpoint a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Elicit or confirm the remote endpoint"@en ;
+    schema:text """Two endpoint templates are provided as defaults; the user may specify any alternative.
+
+**Default endpoints (URIBurner DAV):**
+1. **Paid/demo access:** `https://linkeddata.uriburner.com/DAV/demos/daas_paid/{filename}`
+2. **General/template access:** `https://linkeddata.uriburner.com/DAV/demos/daas/{filename}`
+
+Where `{filename}` is the basename of the local file (e.g., `world-cup-2026-meshup-kg-1.html`).
+
+**Procedure:**
+1. Present the two default options to the user.
+2. Ask: "Upload to daas_paid/ (1) or daas/ (2), or specify a different URL?"
+3. If the user specifies a different URL, use that verbatim as the upload target.
+4. Document the chosen endpoint in session memory for future reference.
+
+**On-Behalf-Of (OBO) identity delegation:**
+When uploading to URIBurner DAV endpoints, the user may also specify an On-Behalf-Of WebID to assert a delegated identity. If the user has a preference for using OBO, add it as an HTTP header:
+```
+-H "On-Behalf-Of: {webid-uri}"
+```
+Ask: "Use On-Behalf-Of identity delegation? If so, provide the WebID URI." """@en .
+
+# ── Step 3: Elicit Credentials ────────────────────────────────────────────────
+
+:step-elicitCredentials a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Elicit PKCS#12 client certificate credentials"@en ;
+    schema:text """The curl upload uses mTLS (Mutual TLS) with a PKCS#12 client certificate bundle for WebID-TLS authentication.
+
+**Procedure:**
+1. Ask the user for the path to their PKCS#12 file (`.p12` or `.pfx`).
+2. Ask for the PKCS#12 access password (input will be hidden/sensitive).
+3. Ask for the CA certificate bundle path (optional; defaults to system CA store if omitted).
+4. If the user has an `mtls-curl` skill configured, reuse those stored credentials.
+
+**Security:** Never log or store the password in session memory. Mask it as `[REDACTED]` if it appears in any trace output."""@en .
+
+# ── Step 4: Construct Curl Command ────────────────────────────────────────────
+
+:step-constructCurl a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Construct the curl PUT command"@en ;
+    schema:text """Build the curl command using the elicited values.
+
+**Base template:**
+```bash
+curl -k \\
+  --cert-type P12 \\
+  --cert {pkcs12-path}:{password} \\
+  {--cacert {ca-path} /* optional */} \\
+  {-H "On-Behalf-Of: {webid-uri}" /* optional */} \\
+  -X PUT \\
+  --upload-file {local-file-path} \\
+  {remote-url}
+```
+
+**Example (URIBurner daas_paid, with OBO):**
+```bash
+curl -k \\
+  --cert-type P12 \\
+  --cert /path/to/cert.p12:secret \\
+  --cacert /path/to/ca-bundle.crt \\
+  -H "On-Behalf-Of: https://my.webid.org/#this" \\
+  -X PUT \\
+  --upload-file ./world-cup-2026-meshup-kg-1.html \\
+  https://linkeddata.uriburner.com/DAV/demos/daas_paid/world-cup-2026-meshup-kg-1.html
+```
+
+**Example (alternative endpoint, no OBO):**
+```bash
+curl -k \\
+  --cert-type P12 \\
+  --cert /path/to/cert.p12:secret \\
+  -X PUT \\
+  --upload-file ./my-file.ttl \\
+  https://custom-webdav.example.com/dav/my-file.ttl
+```
+
+**Show the user the full command before executing** so they can review it. Ask for confirmation."""@en .
+
+# ── Step 5: Execute with Confirmation ─────────────────────────────────────────
+
+:step-executeConfirm a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Execute the upload after user confirmation"@en ;
+    schema:text """**Before executing:**
+1. Display the constructed curl command to the user.
+2. Ask: "Execute this upload? [y/N]"
+3. Wait for explicit affirmative response.
+
+**On success (HTTP 200/201/204):**
+- Confirm to the user: "Uploaded successfully to {remote-url}"
+- Record the upload in session memory with the local path, remote URL, and timestamp.
+
+**On failure:**
+- Show the HTTP status code and error body.
+- Offer to retry with different credentials, a different endpoint, or to debug the connection.
+
+**Error handling:**
+- If the connection fails due to TLS/certificate issues, suggest checking the PKCS#12 password and CA bundle.
+- If the server returns 401/403, the certificate may not be authorized for the target DAV path.
+- If the server returns 404, the DAV path may not exist — suggest verifying the endpoint URL."""@en .

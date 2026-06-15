@@ -1,0 +1,82 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+: a schema:CreativeWork ;
+    schema:about :entityHrefCompanionTTL .
+
+:entityHrefCompanionTTL a schema:HowTo ;
+    schema:name "Entity Href Sourcing from Companion TTL"@en ;
+    schema:description "All entity hyperlinks in generated HTML infographics must be resolver-wrapped IRIs sourced from the companion TTL published at its DAV path — never external Wikipedia, W3C, schema.org, or GitHub IRIs for entities defined in the companion TTL."@en ;
+    schema:dateCreated "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-14T00:00:00Z"^^xsd:dateTime ;
+    schema:step :step1, :step2, :step3, :step4, :step5 .
+
+:step1 a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Derive the DAV base IRI from the skills contract"@en ;
+    schema:text """Read the DAV path pattern from rdf-infographic-skill/SKILL.md or kg-generator/SKILL.md:
+  https://linkeddata.uriburner.com/DAV/demos/daas/{filename}.ttl
+
+Substitute the companion TTL filename (no path, no leading slash).
+NEVER ask the user for this path — it is derivable from the skills contract."""@en .
+
+:step2 a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Pre-build gate: grep companion TTL for entity hash IRIs"@en ;
+    schema:text """Before writing any entity href, grep the companion .ttl file for the entity name.
+
+Pattern to look for:
+  :{EntityHashID} a schema:{Type} ;
+
+Examples:
+  :DimIdentity, :DimQueryability, :AdvSPARQL, :StepExtractYAML
+
+If the entity exists → proceed to Step 3.
+If the entity does NOT exist → add it to the companion TTL first, then link."""@en .
+
+:step3 a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Build the resolver-wrapped href"@en ;
+    schema:text """Resolver pattern:
+  https://linkeddata.uriburner.com/describe/?url={url-encoded-entity-IRI}
+
+Entity IRI = DAV base IRI + '#' + hash fragment
+Example:
+  base:    https://linkeddata.uriburner.com/DAV/demos/daas/okf-vs-rdf-linked-data-comparison.ttl
+  entity:  #DimIdentity
+  full:    https://linkeddata.uriburner.com/DAV/demos/daas/okf-vs-rdf-linked-data-comparison.ttl#DimIdentity
+  encoded: https%3A%2F%2Flinkeddata.uriburner.com%2FDAV%2Fdemos%2Fdaas%2Fokf-vs-rdf-linked-data-comparison.ttl%23DimIdentity
+  href:    https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Flinkeddata.uriburner.com%2FDAV%2Fdemos%2Fdaas%2Fokf-vs-rdf-linked-data-comparison.ttl%23DimIdentity
+
+NEVER fabricate resolver URLs. Compute the percent-encoding manually or with a tool."""@en .
+
+:step4 a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Scope: what gets companion TTL hrefs vs. intentional external IRIs"@en ;
+    schema:text """MUST use companion TTL resolver hrefs:
+  - Comparison table dimension cells (e.g., Entity Identity → #DimIdentity)
+  - Advantages/features section headings (e.g., Global Identity → #AdvGlobalIdentity)
+  - HowTo step headings and titles (e.g., #StepExtractYAML)
+  - Any entity whose hash IRI exists or should exist in the companion TTL
+
+INTENTIONAL external IRIs (leave unchanged):
+  - External vocabulary terms (e.g., GitHub OKF ontology IRIs like #ConceptDocument) — defined in a third-party spec
+  - FAQ/glossary entities from a dedicated FAQ TTL — reference their own TTL
+  - W3C namespace predicates used as inline code examples (e.g., owl:sameAs) — these are predicates, not entity subjects
+  - Product/tool attribution links in the footer — use canonical homepages, not the resolver"""@en .
+
+:step5 a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Post-edit verification"@en ;
+    schema:text """After updating all hrefs, verify with grep:
+
+Count companion TTL resolver hrefs:
+  grep -c 'linkeddata.uriburner.com/describe/?url=https%3A%2F%2Flinkeddata.uriburner.com%2FDAV' file.html
+
+Confirm zero stale external entity hrefs remain where companion TTL IRIs should be:
+  grep -c 'href="https://en.wikipedia.org' file.html   # expect 0 for entities in companion TTL
+  grep -c 'href="https://schema.org/' file.html         # expect 0 for entities in companion TTL
+  grep -c 'href="https://www.w3.org/' file.html         # expect 0 for entities in companion TTL
+
+If counts are wrong, re-read the companion TTL and repeat Steps 2–3."""@en .

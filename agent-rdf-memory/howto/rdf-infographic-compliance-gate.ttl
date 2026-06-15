@@ -1,0 +1,108 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/rdf-infographic-skill#> .
+
+<> a schema:CreativeWork ;
+    schema:name "rdf-infographic-skill Harness Contract Compliance Gate"@en ;
+    schema:description "Mandatory pre-delivery gate procedure for all rdf-infographic-skill HTML artifacts. Enforces 0-failure harness contract validation before any artifact is reported complete."@en ;
+    schema:dateCreated "2026-06-10T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-12T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :harnessGate ;
+    schema:step :step-locateArtifacts, :step-runValidator, :step-interpretOutput,
+                :step-fixAndRerun, :step-updateMemory ;
+    rdfs:seeAlso <../preferences.ttl>, <harness-contract-compliance.ttl>, <faq-entity-iri-gate.ttl> .
+
+# ── Primary entity ────────────────────────────────────────────────────────────
+
+:harnessGate a schema:HowTo ;
+    schema:name "rdf-infographic Compliance Gate — Pre-Delivery Validation"@en ;
+    schema:description "Five-step gate procedure: locate artifacts, run validator, interpret output, fix failures, update memory. GATE: 0 failures required before delivery."@en ;
+    schema:step :step-locateArtifacts, :step-runValidator, :step-interpretOutput,
+                :step-fixAndRerun, :step-updateMemory ;
+    schema:tool <https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/rdf-infographic-skill#this> .
+
+# ── Step 1: Locate all three artifacts ───────────────────────────────────────
+
+:step-locateArtifacts a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Locate the three companion artifacts before running the gate"@en ;
+    schema:text """Before running the validator, confirm you have paths to all three required artifacts:
+1. HTML file — the primary infographic output
+2. TTL file — the companion RDF-Turtle knowledge graph
+3. JSON-LD file — the companion JSON-LD knowledge graph
+
+If any of the three is missing, generate or locate it first. The validator requires all three to run fully. A missing --ttl or --jsonld causes incomplete validation."""@en .
+
+# ── Step 2: Run validate-harness-contract.py ─────────────────────────────────
+
+:step-runValidator a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Run validate-harness-contract.py with all three artifact paths"@en ;
+    schema:text """Run the validator from the repository root:
+
+```
+python3 rdf-infographic-skill/scripts/validate-harness-contract.py /path/to/{stem}.html --ttl /path/to/{stem}.ttl --jsonld /path/to/{stem}.jsonld
+```
+
+The script exits 0 (PASS) or 1 (FAIL). On PASS it prints one line: 'PASS: RDF infographic harness contract checks passed'. On FAIL it prints 'FAIL' followed by a bulleted list of failing checks.
+
+**Do not proceed to delivery if the exit code is 1.** Return to the HTML source and fix all listed failures."""@en .
+
+# ── Step 3: Interpret output ─────────────────────────────────────────────────
+
+:step-interpretOutput a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Map each FAIL line to the SKILL.md contract item it violates"@en ;
+    schema:text """Each FAIL line names a specific contract requirement. Cross-reference with rdf-infographic-skill/SKILL.md to find the source contract item:
+
+| FAIL message fragment | SKILL.md contract item |
+|---|---|
+| pred-anchor SVG anchors missing | Item 91 — edge predicate labels resolver-backed |
+| Edge labels not resolver-backed | Item 91 — edge predicate labels resolver-backed |
+| SPARQL explore button id="sparqlBtn" missing | Item 8 — KG SPARQL explore |
+| Node click handler missing resolver call | Item 7 — node entity hyperlinks |
+| Resolver anchor missing (node) | Item 7 — node entity hyperlinks |
+| POSH class attribute | Item 1 — semantic markup |
+| Attribution footer label | Item 10 — attribution cards |
+
+Do not skip any FAIL line. Each one is a contract violation that must be fixed before delivery."""@en .
+
+# ── Step 4: Fix and re-run until PASS ────────────────────────────────────────
+
+:step-fixAndRerun a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Fix each failure in the HTML source, then re-run until PASS"@en ;
+    schema:text """For each FAIL:
+1. Re-read the specific SKILL.md section that governs the failing check (anti-drift: re-read before fix, not just before start).
+2. Edit the HTML source to satisfy the requirement.
+3. Re-run the validator after ALL fixes are applied.
+4. Repeat until the validator outputs PASS with exit code 0.
+
+**Common fixes:**
+- Missing edge label SVG <a>: Replace bare predAnchor.append('text') with predAnchor.append('a').attr('href', resolverUrl).attr('data-resolver-href', resolverUrl).attr('target', '_blank').attr('rel', 'noopener noreferrer').attr('data-iri', iri).append('text').
+- Missing sparqlBtn: Add id="sparqlBtn" to the SPARQL explorer anchor in the attribution footer.
+- Node click handler: Ensure .on('click', d => window.open(resolveIRI(d.id), '_blank')) is present on the nodes selection.
+
+Never deliver with known failures and a plan to fix later."""@en .
+
+# ── Step 5: Update session memory ────────────────────────────────────────────
+
+:step-updateMemory a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Record gate execution result in session memory"@en ;
+    schema:text """After the gate passes, update the session TTL to record:
+1. That the validator was run and passed (schema:actionStatus schema:CompletedActionStatus on a gate-run Action).
+2. The exact validator command used.
+3. Any failures that were fixed and how.
+
+This creates an audit trail that proves the gate was executed — important for post-delivery review and for building trust that the anti-drift protocol is being followed."""@en .
+
+# ── Root cause note ───────────────────────────────────────────────────────────
+
+:rootCauseNote a schema:Thing ;
+    schema:name "Root cause of 2026-06-10 gate failures"@en ;
+    schema:description "Two independent causes: (1) validate-harness-contract.py was never run before delivery; (2) the validator's edge-label checks tested for implementation-specific function names (openInResolver, resolvePredicateIRI, linkGs.append) that did not match the actual codebase patterns. Both defects — missing SPARQL button and missing edge label hyperlinking — would have been caught by the corrected validator if it had been run. This file and the companion step-rdfInfographicGateEnforcement in preferences.ttl prevent recurrence."@en ;
+    schema:dateCreated "2026-06-10T00:00:00Z"^^xsd:dateTime .

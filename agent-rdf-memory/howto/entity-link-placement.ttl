@@ -1,0 +1,127 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Entity Hyperlink Placement — Mode Selection and Verification"@en ;
+    schema:description "Two-mode entity-link placement system for HTML infographics: first-reference-only (Mode A) and all-references (Mode B). Mode is elicited from the user before linking. Companion to preferences.ttl step 31."@en ;
+    schema:dateCreated "2026-06-08T16:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-08T16:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-elicitMode, :step-modeA, :step-modeB, :step-verify,
+        :step-exceptions ;
+    schema:step :step-elicitMode, :step-modeA, :step-modeB, :step-verify,
+        :step-exceptions ;
+    rdfs:seeAlso <../preferences.ttl>, <canonical-entity-iri-denotation.ttl>,
+        <entity-type-gate.ttl> .
+
+# ── Primary entity ────────────────────────────────────────────────────────────
+
+:entityLinkPlacement a schema:HowTo ;
+    schema:name "Entity Hyperlink Placement — Mode Selection and Verification"@en ;
+    schema:description "Five-step procedure: elicit hyperlink mode from user, apply first-reference-only (Mode A) or all-references (Mode B) linking, verify completeness and correctness, and handle special sections and exceptions."@en ;
+    schema:step :step-elicitMode, :step-modeA, :step-modeB, :step-verify,
+        :step-exceptions .
+
+# ── Step 1: Elicit Mode ──────────────────────────────────────────────────────
+
+:step-elicitMode a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Elicit hyperlink mode from user before applying links"@en ;
+    onto:hasTrigger onto:triggerPreferencesUpdate ;
+    schema:text """Before adding, fixing, or verifying entity-link hyperlinks in an HTML infographic, ask the user which mode to use:
+
+**Mode A — First-reference-only:** Each entity is linked at most once, on its first DOM occurrence. Default. Use this when the document is long and repeated links create visual noise.
+
+**Mode B — All references:** Every occurrence of every entity in body prose is linked. Use this when the document is a reference work or comprehensive infographic where every mention should resolve.
+
+Present both options to the user with a brief description. Record the choice in session memory with an onto:entityLinkMode annotation.
+
+If the user does not specify a preference, default to Mode A."""@en .
+
+# ── Step 2: Mode A — First-Reference-Only ─────────────────────────────────────
+
+:step-modeA a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Apply first-reference-only linking (Mode A)"@en ;
+    schema:text """When Mode A is selected:
+
+1. Parse the HTML DOM in document order (line number order in the source).
+2. For each entity in the RDF, identify its first occurrence in HTML body prose.
+3. Wrap only that first occurrence in `<a class="entity-link">` with the resolver URL.
+4. All subsequent occurrences of the same entity name remain as plain text (no entity-link).
+5. Entity names in meta tags, JSON-LD blocks, and the TOC nav are NOT considered for first-reference counting — only visible body prose counts.
+6. Section headings (h2, h3) count as body prose for first-reference purposes.
+
+**Determining first reference across sections:**
+- The hero tagline and body paragraphs come before the players section, so a mention in the hero is the first reference even if the players section "feels" like the proper introduction.
+- If a section heading mentions an entity before a body paragraph, the heading is the first reference.
+
+**Determining entity display text:**
+- Use the entity's `schema:name` as the display text.
+- Case-insensitive match is sufficient (e.g., "snowflake" matches the entity "Snowflake").
+- Substring match is acceptable for compound phrases (e.g., "OpenAI" in "OpenAI Codex" matches the `:openai` entity)."""@en .
+
+# ── Step 3: Mode B — All References ───────────────────────────────────────────
+
+:step-modeB a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Apply all-references linking (Mode B)"@en ;
+    schema:text """When Mode B is selected:
+
+1. Identify every occurrence of every entity name in the HTML body prose.
+2. Wrap ALL occurrences in `<a class="entity-link">` with the resolver URL.
+3. Every mention is linked — no deduplication.
+4. Entity names in meta tags, JSON-LD, and the TOC nav are excluded — only visible body prose.
+
+No other differences from Mode A for the linking mechanics. The same resolver URL pattern, entity display text matching, and section handling apply."""@en .
+
+# ── Step 4: Verification ──────────────────────────────────────────────────────
+
+:step-verify a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Verify completeness and correctness of entity links"@en ;
+    schema:text """After applying links in either mode, verify:
+
+1. **Coverage (Mode A):** Every entity in the RDF that has a corresponding text mention in the HTML body must be linked at least once. Entities never mentioned in HTML prose need no link.
+
+2. **Coverage (Mode B):** Every entity in the RDF that appears in HTML body prose must be linked at every occurrence.
+
+3. **Resolver correctness:** The href must use the pattern `https://linkeddata.uriburner.com/describe/?url={url-encoded-entity-iri}`. The encoded IRI must match the entity's IRI in the RDF exactly (including #this fragments for canonical platform IRIs).
+
+4. **Display text match:** The visible text of the `<a>` element must match the entity's `schema:name` (case-insensitive, substring-acceptable).
+
+5. **No orphan links:** Every entity-link href must correspond to an entity that exists in the companion RDF file. If an entity was removed from the RDF but the link remains in the HTML, remove the link or update it.
+
+6. **No type mismatch:** The HTML context (HowTo step, FAQ question, glossary term, player card, body paragraph) must be compatible with the entity's rdf:type. A homepage URL is not a person entity link.
+
+7. **Canonical IRI:** The entity IRI in the resolver URL must use the canonical platform IRI (per canonical-entity-iri-denotation.ttl), not a document-local hash IRI.
+
+**To run verification:**
+- Grep for `<a class="entity-link"` to get all link occurrences.
+- Grep for plain entity names in body prose to find unlinked occurrences.
+- Compare with RDF entities: every entity with a `schema:name` that appears in both the RDF and the HTML should be linked per the chosen mode."""@en .
+
+# ── Step 5: Known Exceptions ─────────────────────────────────────────────────
+
+:step-exceptions a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Handle special sections and exceptions"@en ;
+    schema:text """These sections/patterns have special linking rules:
+
+**TOC/Nav menu:** Entity names in the table of contents nav (the sticky sidebar) are NOT linked — they are navigation anchors, not prose. Exception: if the TOC list is the first DOM occurrence of an entity name and every subsequent body occurrence falls after it, the TOC entry still does NOT count as first reference. First reference is the first body occurrence.
+
+**JSON-LD blocks:** Entity names inside `<script type="application/ld+json">` are NOT linked — they are structured data, not visible prose.
+
+**Meta tags:** Entity names in `<meta>`, `<title>`, or `<link>` tags are NOT linked — they are metadata, not visible prose.
+
+**HowTo accordion:** In Mode A, the accordion TOGGLE heading is the first reference for a HowTo step entity. The repeated step text inside the expanded body (under `.step-content`) does NOT count as a separate occurrence and should not be relinked.
+
+**FAQ accordion:** The question text is the first reference. The answer text, even if it repeats the entity name, does NOT get a second link in Mode A.
+
+**Players section cards:** The card heading (h3) within the players section counts as body prose. If the entity name appears earlier (hero tagline, overview body), the players card heading is NOT linked in Mode A. In Mode B, all card headings are linked.
+
+**Entity names in compound phrases:** When an entity name appears as part of a larger compound phrase (e.g., "OpenAI Codex", "Microsoft Copilot", "Databricks Genie"), link the entire compound phrase using the entity IRI of the company (not the product). The product may have its own entity in the RDF — in that case, link the product name to the product entity and the company name to the company entity, if both appear as separate text spans."""@en .

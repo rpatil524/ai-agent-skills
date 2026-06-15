@@ -1,0 +1,77 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Concept/Term Entity Hyperlinking Gate"@en ;
+    schema:description "Rules for hyperlinking concept and term entities (schema:DefinedTerm, custom ontology classes, schema:Thing) in HTML infographics, analogous to person and organization entity-linking rules."@en ;
+    schema:dateCreated "2026-06-08T18:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-08T20:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :conceptEntityHyperlinking .
+
+:conceptEntityHyperlinking a schema:HowTo ;
+    schema:name "Concept/Term Entity Hyperlinking Procedure"@en ;
+    schema:description "Step-by-step procedure for identifying and hyperlinking concept/term entities in HTML infographics."@en ;
+    schema:step :stepIdentifyConcepts, :stepSelectIri, :stepLinkFirstRef, :stepVerify .
+
+# ── Step 1: Identify Concept Entities ──────────────────────────────────────────
+
+:stepIdentifyConcepts a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Identify concept entities in RDF"@en ;
+    schema:text """Scan the RDF Turtle file for entities matching these types — these are concept entities that must be hyperlinked:
+- schema:DefinedTerm (glossary terms)
+- skos:Concept (SKOS concepts)
+- Custom ontology classes (e.g., :SystemOfIntelligence, :AgenticClient)
+- schema:Thing entities that describe abstract concepts (e.g., :semanticWeb)
+- Any entity whose name describes an idea, framework, approach, or methodology rather than a real-world person/organization/product
+
+Look at the HTML to find where each concept first appears in visible body text (hero badges, section headings, taglines, cards, comparisons, FAQ questions, glossary entries, HowTo steps)."""@en .
+
+# ── Step 2: Select IRI for Each Concept ────────────────────────────────────────
+
+:stepSelectIri a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Select the correct entity IRI for each concept"@en ;
+    schema:text """For each concept, determine the correct entity IRI:
+1. If the concept has a well-known standards-body or platform IRI (e.g., Semantic Web → W3C, RDF → W3C), use that as the canonical IRI.
+2. Otherwise, use the document-local hash IRI derived from @prefix :.
+3. If the concept appears in the glossary as a schema:DefinedTerm, the glossary entity's IRI is the link target (could be the main entity or the :termXxx variant depending on the document's pattern).
+4. If NO entity exists for the concept in the RDF, create one before linking — never link to a non-existent entity.
+
+Priority ladder for concept IRIs (when a choice exists):
+  a) Standards-body/platform IRI (e.g., W3C, schema.org, IANA)
+  b) DBpedia resource IRI (for well-known abstract concepts)
+  c) Wikidata entity IRI
+  d) Document-local hash IRI (@prefix : namespace)"""@en .
+
+# ── Step 3: Add First-Reference Hyperlinks ─────────────────────────────────────
+
+:stepLinkFirstRef a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Add entity-link hyperlinks at first visible DOM occurrence"@en ;
+    schema:text """For each concept entity, add one entity-link hyperlink at the first visible occurrence in the HTML body:
+1. Check DOM order: hero badges → tagline → section headings → body paragraphs → FAQ → glossary → HowTo.
+2. The first occurrence of the concept text in this order gets the link.
+3. Use <a class="entity-link" href="https://linkeddata.uriburner.com/describe/?url={url-encoded-iri}" target="_blank" rel="noopener noreferrer">{concept name}</a>.
+4. For hero badges, wrap the entire <span> content: <span class="hero-badge"><a class="entity-link" href="...">&#9670; Concept Name</a></span>.
+5. Do NOT add a second entity-link to the same entity later in the document (Mode A default — elicit from user if Mode B is preferred).
+6. Ensure the resolver URL is correctly percent-encoded: # → %23, / → %2F."""@en .
+
+# ── Step 4: Verification ──────────────────────────────────────────────────────
+
+:stepVerify a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Verify concept entity-link coverage and correctness"@en ;
+    schema:text """After adding concept entity-link hyperlinks, verify:
+1. Every concept entity in the RDF that has a corresponding visible text mention in the HTML body has at least one entity-link.
+2. The href uses the correct resolver URL with properly encoded entity IRI.
+3. The display text matches (or is a reasonable presentation of) the entity's schema:name.
+4. No entity-link points to a non-existent entity IRI — every #hash target must have a corresponding entity definition in the RDF.
+5. Turtle syntax still validates after any RDF edits (new entities added).
+6. The link opens in a new tab (target="_blank" with rel="noopener noreferrer").
+7. If any concept entity lacks an RDF definition, create one before linking."""@en .

@@ -1,0 +1,28 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "RDF Document Authoring — Document Entity Declaration and schema:about Usage"@en ;
+    schema:description "Two foundational rules for self-describing RDF Turtle documents: using <> (not :) as the document entity IRI, and using schema:about (not schema:mainEntity) for the document's primary topic link."@en ;
+    schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-documentEntity, :step-documentAbout ;
+    schema:step :step-documentEntity, :step-documentAbout ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: Document Entity Declaration ──────────────────────────────────────
+
+:step-documentEntity a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Declare the document entity in every TTL file using <>"@en ;
+    schema:text "Every Turtle document MUST declare its own container entity using the empty IRI reference <>, which denotes the document itself (its retrieval URL). Do NOT use : (which is shorthand for <#>, a hash fragment within the document — a local named entity, not the document). The correct pattern is: '<> a schema:CreativeWork ; schema:name {title} ; schema:description {summary} ; schema:dateModified {now()} ; schema:author {authorIRI} ; schema:about {primaryTopic} .' This applies universally to all system-related Turtle documents: preferences.ttl, core.ttl, index.ttl, ontology.ttl, all session files, project files, and entity files. Using <> makes the document a self-describing, dereferenceable resource whose identity is its retrieval address, enabling schema:about to correctly express what the document is about. Timestamps MUST use the current time (now()) in ISO 8601 UTC format (e.g., \"2026-05-29T21:22:00Z\"^^xsd:dateTime). For new files, set both schema:dateCreated and schema:dateModified to now(). For updates to existing files, update only schema:dateModified."@en .
+
+# ── Step 2: Document Entity schema:about ────────────────────────────────────
+
+:step-documentAbout a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Use schema:about for the document entity"@en ;
+    schema:text "The document-level CreativeWork MUST use schema:about to link to its primary topic, NOT schema:mainEntity. schema:about is the correct predicate for describing what a CreativeWork is about. schema:mainEntity is reserved for specific use cases such as schema:FAQPage mainEntity linking. When in doubt, use schema:about for the document container entity."@en .

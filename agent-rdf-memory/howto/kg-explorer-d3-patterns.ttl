@@ -1,0 +1,35 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<> a schema:HowTo ;
+    schema:name "KG Explorer D3 Patterns — Simulation Lifecycle, Click Guard, and kgData Regex"@en ;
+    schema:description "Three D3-specific implementation rules for KG Explorer: single simulation creation with reuse across renders, click-distance guard for drag-vs-click disambiguation, and kgData placement adjacent to IIFE opening."@en ;
+    schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-simulationLifecycle, :step-clickGuard, :step-kgDataRegex ;
+    schema:step :step-simulationLifecycle, :step-clickGuard, :step-kgDataRegex ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+# ── Step 1: D3 Simulation Lifecycle ─────────────────────────────────────────
+
+:step-simulationLifecycle a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Create D3 forceSimulation once and reuse it across renders"@en ;
+    schema:text "CRITICAL: Create d3.forceSimulation() ONCE outside the render function, without initial node/link data. In render(): filter nodes/links, then call simulation.nodes(filteredNodes) and simulation.force('link').links(filteredLinks). NEVER recreate the simulation in render() — this destroys all node positions and breaks the graph. Handle D3 source/target object mutation by checking typeof === 'object' when filtering links."@en .
+
+# ── Step 2: Click-Distance Guard ────────────────────────────────────────────
+
+:step-clickGuard a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Use a click-distance guard to distinguish drag from click"@en ;
+    schema:text "In D3 drag.on('start'), store dragStartX and dragStartY. In drag.on('end'), compute Math.hypot(event.x - dragStartX, event.y - dragStartY). If distance < 6px, treat as click and open the resolver link via window.open(). If distance >= 6px, treat as drag and keep the node pinned (d.fx/fy remain set). A 6px threshold balances precision and usability."@en .
+
+# ── Step 3: kgData to IIFE Regex Constraint ──────────────────────────────────
+
+:step-kgDataRegex a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Place kgData immediately adjacent to the IIFE opening"@en ;
+    schema:text "The harness validator expects the JavaScript kgData declaration to be immediately followed by the IIFE opening. The IIFE (()=>{ must start immediately after the semicolon with only whitespace between. No comment lines, no blank lines with content, no section dividers. Any text between the kgData semicolon and the IIFE breaks validation."@en .

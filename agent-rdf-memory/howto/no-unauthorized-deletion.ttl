@@ -1,0 +1,49 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+: a schema:CreativeWork ;
+    schema:about :noUnauthorizedDeletion .
+
+:noUnauthorizedDeletion a schema:HowTo ;
+    schema:name "No Unauthorized File Deletion"@en ;
+    schema:description "Files must never be deleted without the user's explicit, unambiguous approval. This rule was established after an agent deleted okf-infographic-claude_sonnet_4_6-1.html from Claude Generated/webpages/ without explicit approval during the OKF model attribution correction task on 2026-06-15."@en ;
+    schema:dateCreated "2026-06-15T13:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-15T13:00:00Z"^^xsd:dateTime ;
+    schema:step :step1, :step2, :step3 .
+
+:step1 a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Flag, don't delete"@en ;
+    schema:text """When you encounter a file that appears deletable (stale leftover, wrong name, wrong directory, superseded version, temporary artifact):
+
+1. State the file's full path to the user
+2. Explain why it looks like it could be deleted
+3. Ask the user explicitly whether to delete it
+4. Wait for explicit approval before taking any action
+
+Never delete first and explain later. Deletion is irreversible."""@en .
+
+:step2 a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "What counts as a deletion"@en ;
+    schema:text """This rule covers:
+  - Direct file deletion (rm, unlink, fs.unlink, etc.)
+  - Overwriting a file in a way that destroys its prior content (write without read-first verification)
+  - Moving a file to trash without asking
+  - Moving a file to a different directory under the assumption it's "wrong"
+  - Any operation whose net effect is that a file the user placed or left in a location is no longer there
+
+Cross-reference: :step-approval (preferences.ttl position 1) — the broader approval rule."""@en .
+
+:step3 a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "No implicit consent"@en ;
+    schema:text """Do not infer deletion approval from:
+  - Prior task instructions (even if the task involves renaming or reorganizing)
+  - The file being a "stale leftover" from a completed operation
+  - The file having an "incorrect" name or location
+  - The assumption that the user "wouldn't want" the old version
+  - Any context outside of the user's explicit, specific instruction to delete that file
+
+The user's filesystem state is their own. What looks like cleanup to an agent may be data loss to the user."""@en .

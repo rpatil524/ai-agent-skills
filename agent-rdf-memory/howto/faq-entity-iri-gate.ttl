@@ -1,0 +1,145 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <https://github.com/OpenLinkSoftware/ai-agent-skills/tree/main/rdf-infographic-skill#> .
+
+<> a schema:CreativeWork ;
+    schema:name "FAQ Entity IRI Pre-Build Gate"@en ;
+    schema:description "Mandatory gate: before writing any FAQ HTML, verify that schema:Question entities with hash IRIs exist in the companion TTL. If missing, create them first. Never substitute external concept IRIs (DBpedia, Wikidata, W3C) for FAQ question entity IRIs."@en ;
+    schema:dateCreated "2026-06-12T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-12T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :faqEntityIriGate ;
+    schema:step :step-checkTtlForQuestions, :step-createIfMissing,
+                :step-deriveEntityIri, :step-writeHtmlHref, :step-verify ;
+    rdfs:seeAlso <../preferences.ttl>, <rdf-infographic-compliance-gate.ttl> .
+
+:faqEntityIriGate a schema:HowTo ;
+    schema:name "FAQ Entity IRI Gate — Pre-Build Verification"@en ;
+    schema:description "Five-step gate that blocks FAQ HTML generation until schema:Question entities exist in the companion TTL. Prevents substitution of external concept IRIs (DBpedia/Wikidata/W3C) as FAQ question hyperlinks."@en ;
+    schema:step :step-checkTtlForQuestions, :step-createIfMissing,
+                :step-deriveEntityIri, :step-writeHtmlHref, :step-verify .
+
+# ── Step 1: Check companion TTL for schema:Question entities ─────────────────
+
+:step-checkTtlForQuestions a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Before writing any FAQ HTML, grep the companion TTL for schema:Question entities"@en ;
+    schema:text """Run before writing any FAQ HTML:
+
+```bash
+grep -n "schema:Question\\|a schema:FAQPage" /path/to/{stem}.ttl
+```
+
+If the result is empty — no `schema:Question` entities exist — do NOT proceed to HTML. Go to step 2.
+
+If entities exist, collect their hash IRIs (e.g., `:faq-context-interoperability`) and the base TTL IRI, then go to step 3.
+
+**RULE:** An empty result is a blocking condition, not a reason to use a substitute IRI. There is no acceptable substitute for a missing `schema:Question` entity IRI."""@en .
+
+# ── Step 2: Create schema:Question entities in the companion TTL ──────────────
+
+:step-createIfMissing a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "If schema:Question entities are missing, add them to the companion TTL before writing HTML"@en ;
+    schema:text """For each FAQ item:
+
+1. Derive a slug from the question text (lowercase, hyphen-separated, descriptive): e.g., "What is context portability?" → `:faq-context-portability`.
+2. Add a `schema:FAQPage` entity linked from the main article/post entity via `schema:hasPart`.
+3. Add each `schema:Question` with:
+   - `a schema:Question`
+   - `schema:name "Question text"@en`
+   - `schema:acceptedAnswer [ a schema:Answer ; schema:text "Answer text"@en ]`
+   - `schema:parentItem :faqSection`
+4. Link the `schema:FAQPage` to each question via `schema:mainEntity`.
+5. Save and verify the TTL is syntactically valid before proceeding.
+
+**RULE:** Create the RDF entities first. The HTML is derived from the RDF — never the reverse.
+
+**Pattern:**
+```turtle
+:faqSection a schema:FAQPage ;
+    schema:name "FAQ: {Topic}"@en ;
+    schema:mainEntity :faq-{slug-1}, :faq-{slug-2} .
+
+:faq-{slug-1} a schema:Question ;
+    schema:name "Question text"@en ;
+    schema:acceptedAnswer [ a schema:Answer ;
+        schema:text "Answer text"@en ] ;
+    schema:parentItem :faqSection .
+```"""@en .
+
+# ── Step 3: Derive the full entity IRI ───────────────────────────────────────
+
+:step-deriveEntityIri a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Derive the full absolute entity IRI for each schema:Question"@en ;
+    schema:text """The companion TTL's base IRI is the DAV path IRI, e.g.:
+`https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl`
+
+The hash IRI `:faq-{slug}` (from `@prefix : <#>`) resolves to:
+`https://linkeddata.uriburner.com/DAV/demos/daas/{stem}.ttl#faq-{slug}`
+
+Percent-encode this full IRI for use in the resolver pattern:
+`https://linkeddata.uriburner.com/describe/?url=https%3A%2F%2Flinkeddata.uriburner.com%2FDAV%2Fdemos%2Fdaas%2F{stem}.ttl%23faq-{slug}`
+
+**RULE:** Derive the resolver URL by percent-encoding the absolute entity IRI. Never substitute a DBpedia, Wikidata, or W3C IRI — even if the FAQ question is about a concept those sources define. The FAQ question is a `schema:Question` entity in the companion RDF, not the concept the question is about."""@en .
+
+# ── Step 4: Write the HTML href ───────────────────────────────────────────────
+
+:step-writeHtmlHref a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Write the FAQ question <a> href using the schema:Question entity IRI via the resolver"@en ;
+    schema:text """The FAQ question HTML structure MUST be:
+
+```html
+<div class="faq-q" role="button" tabindex="0">
+  <a href="https://linkeddata.uriburner.com/describe/?url={percent-encoded-question-entity-iri}"
+     target="_blank" rel="noopener noreferrer"
+     onclick="event.stopPropagation()">
+    Question text here
+  </a>
+  <span class="faq-indicator">▼</span>
+</div>
+```
+
+**RULES:**
+1. The `href` MUST be the `schema:Question` entity IRI from the companion TTL, wrapped in the resolver pattern.
+2. MUST NOT be: a DBpedia concept IRI, a Wikidata IRI, a W3C IRI, a LinkedIn post URL, or any other external URL.
+3. The `<a>` MUST sit inside `<div role="button">` — NOT inside `<button>`. Nested `<a>` inside `<button>` is invalid HTML.
+4. `onclick="event.stopPropagation()"` is required to prevent the accordion toggle from firing when the link is clicked.
+5. The entity button label for resolver links in this context MUST read "Lookup" (not "Resolve")."""@en .
+
+# ── Step 5: Verify all FAQ hrefs before delivery ──────────────────────────────
+
+:step-verify a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Verify every FAQ question href resolves to a schema:Question entity IRI in the companion TTL"@en ;
+    schema:text """Before reporting the FAQ section complete, run:
+
+```bash
+grep "faq-q.*href" /path/to/{stem}.html
+```
+
+For each href found:
+1. Confirm it contains the DAV TTL base IRI (not dbpedia.org, wikidata.org, w3.org, or linkedin.com).
+2. Confirm the fragment slug (`#faq-{slug}`) matches a `schema:Question` entity in the companion TTL.
+3. Confirm the resolver URL is correctly percent-encoded.
+
+If any href fails check 1 — it contains an external concept IRI — that is a contract violation. Fix before delivery."""@en .
+
+# ── Root cause note ───────────────────────────────────────────────────────────
+
+:rootCauseNote a schema:Thing ;
+    schema:name "Root cause of 2026-06-12 FAQ IRI violations"@en ;
+    schema:description """Three distinct violations in session 2026-06-12:
+
+1. FAQ question hrefs used DBpedia concept IRIs (e.g., dbpedia.org/resource/Knowledge_graph, dbpedia.org/resource/Semantic_Web) instead of schema:Question entity IRIs from the companion TTL. Root cause: schema:Question entities did not exist in the companion TTL at HTML generation time. Rather than creating those entities first (per the RDF-source-of-truth contract, SKILL.md item 1), the agent substituted topically adjacent external concept IRIs. These are semantically related but are not the correct entity type or source for FAQ question hyperlinks.
+
+2. <a> inside <button> invalid HTML. Root cause: generated in batch without re-reading the PRE-BUILD CHECK in SKILL.md before writing the FAQ HTML section.
+
+3. 'Resolve' label used instead of 'Lookup' for resolver link buttons. Root cause: a standing preference already in session memory was not retrieved and applied.
+
+Common thread: the anti-drift protocol (re-read before each section, gate-first, section-by-section) was bypassed in favour of batch generation. This gate (step 42) enforces the FAQ-specific blocking check that should have been executed before any FAQ HTML was written."""@en ;
+    schema:dateCreated "2026-06-12T00:00:00Z"^^xsd:dateTime .

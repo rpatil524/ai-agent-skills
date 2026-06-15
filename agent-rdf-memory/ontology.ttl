@@ -1,0 +1,184 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix event: <http://purl.org/NET/c4dm/event.owl#> .
+@prefix opal: <https://www.openlinksw.com/ontology/opal/> .
+
+<> a schema:CreativeWork ;
+    schema:name "Agent Memory Ontology"@en ;
+    schema:description "Custom vocabulary for the agent RDF memory system, defining classes for generated artifacts, source articles, memory write triggers, and their relationships."@en ;
+    schema:dateModified "2026-06-03T15:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :memoryOntology .
+
+:memoryOntology a owl:Ontology ;
+    schema:name "Agent Memory Ontology"@en ;
+    schema:description "OWL ontology defining vocabulary terms for agent-generated knowledge graph artifacts, source articles, and session memory write triggers."@en ;
+    rdfs:seeAlso <preferences.ttl>, <core.ttl> .
+
+:GeneratedArtifact a rdfs:Class ;
+    rdfs:label "Generated Artifact"@en ;
+    rdfs:comment "An RDF, HTML, or MD file generated from a source URL using kg-generator and rdf-infographic-skill."@en .
+
+:SourceArticle a rdfs:Class ;
+    rdfs:label "Source Article"@en ;
+    rdfs:comment "A web article used as the source for knowledge graph generation."@en .
+
+:hasSource a rdf:Property ;
+    rdfs:label "has source"@en ;
+    rdfs:domain :GeneratedArtifact ;
+    rdfs:range :SourceArticle .
+
+:hasArtifactPath a rdf:Property ;
+    rdfs:label "has artifact path"@en ;
+    rdfs:domain :GeneratedArtifact ;
+    rdfs:range xsd:string .
+
+# ── Memory Write Trigger Vocabulary ──────────────────────────────────────────
+
+# ── Prompt Vocabulary (reuses opal-analytics-ontology-2) ──────────────────
+
+# We reuse opal:ChatSession, opal:ChatMessage, opal:PromptText, and associated
+# properties from https://www.openlinksw.com/ontology/opal/ for modeling
+# prompt-to-outcome chains. The ontology provides:
+#
+#   opal:ChatSession   → session container
+#   opal:ChatMessage   → individual message (user or assistant)
+#   opal:PromptText    → the verbatim text content
+#   opal:messageContent → ChatMessage → PromptText
+#   opal:messageOf     → ChatMessage → ChatSession
+#   opal:hasMessage    → ChatSession → ChatMessage (inverse)
+#   opal:messageRole   → "user" | "assistant" | "system"
+#   opal:timestamp     → xsd:dateTime of message creation
+#   opal:usesTools     → whether tools/skills were invoked
+#   opal:chatModel     → session → ChatModel
+#   opal:user          → session → foaf:Person
+#   opal:provider      → ChatModel → LLMProvider (organization)
+#
+# Session files should use opal:ChatMessage instances rather than ad-hoc
+# prompt entities. The opal vocabulary provides the full interaction model:
+# user message → assistant response → tool invocations → artifacts.
+#
+# Canonical ontology URI for imports:
+# <https://www.openlinksw.com/ontology/opal/>
+# Local copy for offline resolution:
+# <file:///Users/kidehen/Documents/RDF_Ontologies/OpenLink/opal-analytics-ontology-2.ttl>
+
+# ── TBox Cross-References to opal-analytics-ontology-2 ─────────────────────
+
+# The opal ontology (https://www.openlinksw.com/ontology/opal/) provides
+# opal:ChatSession, opal:ChatMessage, opal:PromptText for modeling LLM
+# interactions. Existing session files (pre-2026-06-03) use schema:CreativeWork
+# with aggregated schema:description summaries — structurally different from
+# the opal message-level model. These TBox axioms enable a reasoner to classify
+# local session entities under opal vocabulary and link the two vocabularies,
+# without destructive retrofit of existing files.
+
+# Class: local Session ≡ opal ChatSession
+:Session a rdfs:Class ;
+    rdfs:label "Session"@en ;
+    rdfs:comment "A single agent interaction session. Equivalent to opal:ChatSession — the local class exists so reasoners can classify both new opal-modeled sessions and legacy schema:CreativeWork sessions under a common type."@en ;
+    rdfs:subClassOf schema:CreativeWork ;
+    owl:equivalentClass opal:ChatSession ;
+    rdfs:isDefinedBy : .
+
+# Cross-reference: local schema:description → opal aggregate
+# A session's schema:description is an aggregated textual summary of the
+# conversation. It is NOT structurally equivalent to opal:ChatMessage +
+# opal:PromptText (which capture individual messages). We declare it as
+# rdfs:seeAlso so tools can navigate from the opal vocabulary to the local
+# session model, but a reasoner cannot materialize ChatMessages from it.
+#
+# For post-2026-06-03 sessions using the full opal model, the description
+# serves as a human-readable tl;dr while opal:ChatMessage instances carry
+# the verbatim interaction trace.
+
+:Session rdfs:seeAlso opal:ChatSession, opal:ChatMessage, opal:PromptText .
+
+# Property: session authorship maps to opal:user
+# schema:author on a :Session (pointing to a foaf:Person or schema:Person)
+# is semantically equivalent to opal:user on an opal:ChatSession.
+schema:author rdfs:subPropertyOf opal:user ;
+    rdfs:isDefinedBy : .
+
+# Property: schema:hasPart on sessions maps to opal:hasMessage (partial)
+# schema:hasPart links a session to its generated artifacts; opal:hasMessage
+# links a session to its messages. These are not equivalent — one links to
+# files, the other to messages — but a reasoner can infer that both describe
+# session-contained resources. We use rdfs:seeAlso rather than subPropertyOf
+# to avoid incorrect entailments.
+schema:hasPart rdfs:seeAlso opal:hasMessage ;
+    rdfs:isDefinedBy : .
+
+# Property: prov:wasGeneratedBy on sessions maps to opal:usesTools
+# When a session artifact lists prov:wasGeneratedBy pointing to a skill
+# (schema:SoftwareApplication), this corresponds to a chat message whose
+# opal:usesTools is true. Not structurally equivalent (prov links to
+# artifact output, opal links to message), but semantically related.
+prov:wasGeneratedBy rdfs:seeAlso opal:usesTools ;
+    rdfs:isDefinedBy : .
+
+# What a reasoner CAN infer from these axioms:
+#   - Old sessions typed as :Session or schema:CreativeWork can be classified
+#     as opal:ChatSession (via owl:equivalentClass on :Session)
+#   - schema:author on a session entails opal:user
+#   - The opal vocabulary is navigable from local session entities via rdfs:seeAlso
+#
+# What a reasoner CANNOT infer:
+#   - Individual opal:ChatMessage instances from schema:description strings
+#   - opal:PromptText entities from aggregated summary text
+#   - opal:messageRole, opal:timestamp, or opal:usesTools from legacy sessions
+#
+# For full message-level traceability, new sessions MUST use the opal model
+# directly (opal:ChatSession → opal:hasMessage → opal:ChatMessage →
+# opal:messageContent → opal:PromptText) as demonstrated in
+# sessions/2026-06-03-deepseek_v4pro-claude_code.ttl.
+
+# ── Memory Write Trigger Vocabulary ──────────────────────────────────────────
+
+:MemoryWriteTrigger a rdfs:Class ;
+    rdfs:subClassOf prov:Activity ;
+    rdfs:subClassOf event:Event ;
+    rdfs:label "Memory Write Trigger"@en ;
+    rdfs:comment "A workflow activity that mandates an immediate write to the agent session memory file."@en ;
+    schema:name "Memory Write Trigger"@en ;
+    schema:description "Subclass of prov:Activity (equivalent to event:Event) representing a discrete workflow event that triggers a mandatory write to sessions/YYYY-MM-DD-{llm-id}-{agent-env}.ttl."@en ;
+    rdfs:isDefinedBy : .
+
+:hasTrigger a rdf:Property ;
+    rdfs:label "has trigger"@en ;
+    rdfs:comment "Links a schema:HowToStep to the MemoryWriteTrigger instances that mandate a session memory write."@en ;
+    schema:name "has trigger"@en ;
+    rdfs:domain schema:HowToStep ;
+    rdfs:range :MemoryWriteTrigger ;
+    rdfs:isDefinedBy : .
+
+# ── Trigger Instances ─────────────────────────────────────────────────────────
+
+:triggerPreferencesUpdate a :MemoryWriteTrigger ;
+    schema:name "Preferences File Updated"@en ;
+    schema:description "Fired when any file in agent-rdf-memory/ (preferences.ttl, core.ttl, ontology.ttl, index.ttl, or any session/project/entity file) is written or modified."@en .
+
+:triggerSkillInvocation a :MemoryWriteTrigger ;
+    schema:name "Skill Invocation Completed"@en ;
+    schema:description "Fired when any registered skill (kg-generator, data-twingler, rdf-infographic-skill, wikidata-query-skill, document-to-kg-skill, etc.) produces a result."@en .
+
+:triggerNamedWorkflow a :MemoryWriteTrigger ;
+    schema:name "Named Workflow Completed"@en ;
+    schema:description "Fired on completion of any named-mode workflow: kg-only, kg-hybrid, KG generation, infographic generation, or SPARQL query session."@en .
+
+:triggerBehaviorGapIdentified a :MemoryWriteTrigger ;
+    schema:name "Behavior Gap Identified"@en ;
+    schema:description "Fired when any correction or gap is identified in the agent's behavior, memory contract, or preferences encoding."@en .
+
+:triggerTopicChange a :MemoryWriteTrigger ;
+    schema:name "Topic Change"@en ;
+    schema:description "Fired when the user changes topic or signals a natural conversational break between distinct tasks."@en .
+
+:triggerSessionEnd a :MemoryWriteTrigger ;
+    schema:name "Session End"@en ;
+    schema:description "Fired at the explicit or inferred end of a session. Final write captures all remaining unrecorded events."@en .

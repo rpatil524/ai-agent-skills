@@ -1,0 +1,357 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Agent Session Index"@en ;
+    schema:description "Index of all agent sessions with references to session files."@en ;
+    schema:dateModified "2026-06-15T12:50:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :sessionIndex .
+
+:sessionIndex a schema:ItemList ;
+    schema:name "Agent Session Index"@en ;
+    schema:dateCreated "2026-05-27T00:00:00"^^xsd:dateTime ;
+    schema:dateModified "2026-06-15T12:50:00Z"^^xsd:dateTime .
+
+:session20260527 a schema:ListItem ;
+    schema:position 1 ;
+    schema:item <sessions/2026-05-27.ttl> ;
+    schema:name "Session 2026-05-27 (Copy and Guru + initial setup)"@en .
+
+:session20260527b a schema:ListItem ;
+    schema:position 2 ;
+    schema:item <sessions/2026-05-27-qwen3_6_plus-opencode.ttl> ;
+    schema:name "Session 2026-05-27 (After the Feed + Contract Fixes + How we contain Claude)"@en ;
+    schema:description "KG Explorer generated from scratch violated harness contract — drag didn't stick, filters broke graph, sliders obliterated visualization. Fixed by studying working implementations in the same output folder. Lesson: always verify harness contract gates before delivery, and reuse prior working documents as reference rather than generating from scratch."@en .
+
+:session20260528gpt5ChatCodex a schema:ListItem ;
+    schema:position 3 ;
+    schema:item <sessions/2026-05-28-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-05-28 (GPT-5 Chat Codex Anthropic KG Collection UI Refinement)"@en .
+
+:session20260528minimaxOpenCode a schema:ListItem ;
+    schema:position 4 ;
+    schema:item <sessions/2026-05-28-minimax_m2_5free-opencode.ttl> ;
+    schema:name "Session 2026-05-28 (MiniMax M2.5free + OpenCode — ESM Protein World Model KG Generation)"@en .
+
+:session20260528deepseekClaudeCode a schema:ListItem ;
+    schema:position 5 ;
+    schema:item <sessions/2026-05-28-deepseek_v4pro-claude_code.ttl> ;
+    schema:name "Session 2026-05-28 (DeepSeek V4 Pro + Claude Code — ESM KG Fixes, JSON-LD, Attribution Correction)"@en .
+
+:session20260528kimiOpenCode a schema:ListItem ;
+    schema:position 6 ;
+    schema:item <sessions/2026-05-28-kimi-k2_6-opencode.ttl> ;
+    schema:name "Session 2026-05-28 (kimi-k2.6 + OpenCode — ESM Protein World Model Repair & Migration)"@en .
+
+:session20260529kimiOpenCode a schema:ListItem ;
+    schema:position 7 ;
+    schema:item <sessions/2026-05-29-kimi-k2_6-opencode.ttl> ;
+    schema:name "Session 2026-05-29 (kimi-k2.6 + OpenCode — Security AI Agents KG Explorer Rebuild)"@en .
+
+:session20260529claudeCode a schema:ListItem ;
+    schema:position 8 ;
+    schema:item <sessions/2026-05-29-claude-sonnet-claude-code.ttl> ;
+    schema:name "Session 2026-05-29 (Claude Sonnet 4.6 + Claude Code — SSI/Agent Governance Mashup, memory protocol failure corrected)"@en .
+
+:session20260529gpt5ChatCodex a schema:ListItem ;
+    schema:position 9 ;
+    schema:item <sessions/2026-05-29-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-05-29 (GPT-5 Chat Codex — meshup corrections and preference contract repair)"@en ;
+    schema:description "Recorded correction after the user pointed out that GPT-5 Chat Codex had not followed the ai-agent-skills AGENT.md route to preferences.ttl. Added the missing GPT-5 Chat Codex output route and repaired preferences.ttl Turtle syntax."@en .
+
+:session20260529deepseekClaudeCode a schema:ListItem ;
+    schema:position 10 ;
+    schema:item <sessions/2026-05-29-deepseek_v4pro-claude_code.ttl> ;
+    schema:name "Session 2026-05-29 (DeepSeek V4 Pro + Claude Code — Session Report Generation)"@en ;
+    schema:description "Generated HTML+RDF session report synthesizing Kimi K2.6 and Claude Sonnet sessions. Initial output misrouted to Claude Generated/ with wrong llm-id — corrected to DeepSeek directories. Encoded lesson on LLM self-identification: the system prompt is authoritative for model identity, not session file context."@en .
+
+:session20260530grok43 a schema:ListItem ;
+    schema:position 11 ;
+    schema:item <sessions/2026-05-30-grok_4_3-grok-cli.ttl> ;
+    schema:name "Session 2026-05-30 (Grok 4.3 + Grok CLI — Full Contract Mode activation)"@en ;
+    schema:description "User explicitly selected Full Contract Mode (option 1). Instructed agent to add Grok 4.3 output path to core.ttl and create the initial session memory file for this Grok session. Agent now operating under full AGENT.md + preferences.ttl contract for the ai-agent-skills repository."@en .
+
+:session20260531claudeCode a schema:ListItem ;
+    schema:position 12 ;
+    schema:item <sessions/2026-05-31-claude-sonnet-claude-code.ttl> ;
+    schema:name "Session 2026-05-31 (Claude Sonnet 4.6 + Claude Code — Token Economy & AI Governance Mashup)"@en ;
+    schema:description "Generated token-economy-ai-governance-claude-sonnet-1.{html,ttl} to Claude Generated/ output directories. HTML initially had 21 harness contract failures; all fixed systematically without full regeneration. Key fixes: kgData JSON payload with IIFE adjacency, full SPARQL workbench with textarea+recipe selector+format strings, 8-label attribution footer, nav aria-label, btn-basic/btn-advanced classes, settings-panel alias, alternate link. Validator passed: 0 failures."@en .
+
+:session20260530grok43Meshup a schema:ListItem ;
+    schema:position 13 ;
+    schema:item <sessions/2026-05-30-grok_4_3-grok-cli.ttl> ;
+    schema:name "Session 2026-05-30 (Grok 4.3 + Grok CLI — Token Budget Wars + ROTS Mashup)"@en ;
+    schema:description "User instructed: if LinkedIn article has X replica, use that instead. Located full Jaya Gupta text on X (post 2059784669382791653). No replica for Kevin White. Generated compliant RDF (Business template) + HTML infographic (harness mode) to Grok output paths. Session memory written."@en .
+
+:session20260601gpt5ChatCodex a schema:ListItem ;
+    schema:position 14 ;
+    schema:item <sessions/2026-06-01-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-01 (GPT-5 Chat Codex — Enterprise AI Performance Pricing collection contract miss)"@en ;
+    schema:description "User pointed out that the agent did not follow the skills contract and had not read AGENT.md before generating the document collection. Memory loaded and correction recorded. Future KG/HTML/MD collections must run AGENT.md memory retrieval first, present required skill gate plan for approval, route final artifacts to GPT5-Chat-Generated, and validate the rdf-infographic harness."@en .
+:session20260601glm51OpenCode a schema:ListItem ;
+    schema:position 15 ;
+    schema:item <sessions/2026-06-01-glm_5_1-opencode.ttl> ;
+    schema:name "Session 2026-06-01 (GLM-5.1 + OpenCode — ACP purchase walkthrough, resource access verification)"@en ;
+    schema:description "Completed ACP agentic purchase with env-var-driven flow. Discovered delayed ACL provisioning — resource returns 403 immediately after purchase, 200 after async provisioning. Updated walkthrough with Step 8 (resource access verification), env-var cURL patterns, and Section 5.9 on delayed provisioning."@en .
+
+:session20260602grok43 a schema:ListItem ;
+    schema:position 16 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-2.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 Support Meshup Refined)"@en ;
+    schema:description "Redo of Virtuoso RDF 1.2 Support meshup using full post content. Enriched RDF with explicit GraphNode for historical approaches, features, claims in 'Why it Matters', examples. HTML with full D3 KG Explorer (matching previous DGX style: legend, tooltips, controls, kgData with winner/claim nodes), SPARQL workbench with exact harness IDs, correct attribution footer, dark mode blocks. MD updated with graph structure. Session memory written per protocol. Followed all contracts (meshup, routing, entity IRIs, harness, memory triggers)."@en .
+
+:session20260602grok43 a schema:ListItem ;
+    schema:position 16 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-1.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 Support Meshup)"@en ;
+    schema:description "Full contract-compliant generation of fine-grained RDF + MD + HTML meshup from the OpenLink Community post 'Introducing RDF 1.2 Support in Virtuoso'. Used full post content. Expanded graph with nodes for concepts, historical approaches, examples, products, people. HTML includes D3 KG Explorer with legend/tooltips, SPARQL workbench (correct IDs), proper attribution footer, harness elements. Memory written per trigger. Output to Grok dirs."@en .
+
+:session20260602grok43Aesthetics a schema:ListItem ;
+    schema:position 17 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-3.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 Support Meshup UI/UX Expert++ Aesthetics Redesign)"@en ;
+    schema:description "Expert++ visual and interaction redesign of the Virtuoso RDF 1.2 meshup HTML (while preserving every contract element: exact harness IDs, two separate dark CSS blocks, exact prose attribution footer with canonical links only, kgData immediately adjacent to IIFE, D3 simulation lifecycle + click guard + sid/tid/cloneLink + kgActiveGroups + renderFiltered + SVG <a> resolver wrappers, expanded claim nodes, verbatim post fidelity, all URIBurner resolver hyperlinks, 'meshup' only). Modern design system, premium D3 (side panel, interactive legend, better nodes/links, demo workbench), approach/why cards, top nav, copy buttons, responsive. Written per triggerSkillInvocation + triggerNamedWorkflow."@en .
+
+:session20260602grok43AnteUp a schema:ListItem ;
+    schema:position 18 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-4.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 Support Meshup Major UI/UX Expert++ Ante-Up)"@en ;
+    schema:description "Major ante-up: evolutionary timeline for historical, premium glass + depth + dot-grid + inline SVG icon system + floating TOC + theme toggle. D3 massively advanced (curved paths + arrows, neighbor highlighting on hover, click-to-focus with smooth d3.zoom pan/scale to node+neighborhood, live physics sliders for charge/linkDist/collide, SVG export button, richer node visuals with rings + halos, velocityDecay tuning). SPARQL workbench IDE-grade (beautify, richer results). All contracts strictly preserved (exact IDs, two dark blocks, exact footer prose, kgData+IIFE adjacency, simulation lifecycle, click guard, expanded claims, verbatim fidelity, full resolvers, meshup only). Written per triggerSkillInvocation + triggerNamedWorkflow."@en .
+
+:session20260602grok43KgFix a schema:ListItem ;
+    schema:position 19 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-5.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 Support Meshup (KG Explorer Fixed per Validated Prior Outputs + Memory Notes))"@en ;
+    schema:description "KG Explorer was broken despite aesthetics pass (drag pinning unreliable, filters/Advanced not isolating predicates/groups correctly, simulation object mutation issues, missing edge-label <a> resolvers, no predicate checkboxes sourced from allLinks, no proper getFilteredData + nid + clone + updateGraph, missing zoom-isolation click-activate + outside release, missing #kg-settings[hidden] harness alias). Re-read memory (step-kgExplorerReuse, simulationLifecycle, clickGuard, kgDataRegex) and studied working output from token-budget-wars-rots-meshup-grok_4_3-1.html (proven port from earlier fixed claude/grok sessions that hit 0 validator failures). Ported the exact engine: simulation created ONCE, getFilteredData returning clones, nid helper, updateGraph with layer data-joins, SVG <a> for node labels + edge labels with resolver hrefs, per-group + predicate filtering (checkboxes from allLinks), zoom isolation, dblclick unpin + drag pin guard, settings panel + hidden alias, Basic/Adv + Core/Full. Adapted to Virtuoso kgFull + kept all verbatim content, harness IDs, two dark blocks, exact footer, kgData+IIFE adjacency. Written on triggerBehaviorGapIdentified + triggerSkillInvocation."@en .
+
+:session20260602grok43KgFix2 a schema:ListItem ;
+    schema:position 20 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-6.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — Virtuoso RDF 1.2 (KG Explorer Fixed — Re-ingested Token Proven + Prefs))"@en ;
+    schema:description "Explicit re-ingest of prefs graph steps + the validated token HTML; final port of the engine to guarantee all listed patterns (getKGData-style, sid/tid/clone, predicate from allLinks, etc)."@en .
+
+:session20260602gpt5ChatCodex a schema:ListItem ;
+    schema:position 21 ;
+    schema:item <sessions/2026-06-02-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-02 (GPT-5 Chat Codex — KG-ONLY default mode preference update)"@en ;
+    schema:description "User clarified that KG-ONLY mode should be the default KG-related question-answering mode when no mode is specified. Updated preferences.ttl step-kgQueryMode accordingly and recorded this session memory."@en .
+
+:session20260602glm51OpenCode a schema:ListItem ;
+    schema:position 22 ;
+    schema:item <sessions/2026-06-02-glm_5_1-opencode.ttl> ;
+    schema:name "Session 2026-06-02 (GLM-5.1 + OpenCode — ACP subscription payment flow, Stripe invoice completion)"@en ;
+    schema:description "End-to-end ACP subscription payment: XYZFileAccess purchase → SPT → /complete → subscription_payment link → Stripe invoice page → sandbox card fill → payment confirmed. Added Stripe sandbox card step to preferences.ttl. Verified TestFile.txt accessible (200), XYZ resource not found in DAV listing."@en .
+
+:session20260602grok43Whoami a schema:ListItem ;
+    schema:position 22 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-7.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — whoami equivalent redo after preferences reload)"@en ;
+    schema:description "Reloaded full agent-rdf-memory/ (dir list, core.ttl, preferences.ttl [now with new KG Explorer UI steps :step-kgNavPlacement etc and :step-curlAuth], index.ttl, ontology.ttl, latest sessions). Redid whoami report. New prefs rules now in force: float nav top-left + collapsed, controls as master reset for panels, no orphan nodes in filters, tb-group + tb-label for toolbar, slider cards + grid for settings panel, authenticated curl with cert + On-Behalf-Of. Wrote new session memory."@en .
+
+:session20260602grok43WhoamiReload a schema:ListItem ;
+    schema:position 23 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-8.ttl> ;
+    schema:name "Session 2026-06-02 (Grok 4.3 + Grok CLI — whoami after preferences reload (22 steps incl. stripe step))"@en ;
+    schema:description "Executed full reload per AGENT.md + :step-memoryProtocol (list_dir on agent-rdf-memory/ incl. sessions/, read core.ttl, preferences.ttl [2026-06-02T20:30:00Z declaring 22 HowToSteps with :step-curlAuth (21) + :step-stripeSandboxCard (22) added during GLM ACP work], index.ttl, ontology.ttl, latest sessions). Answered whoami in the exact compact bullet format from the user-supplied Claude Code example. Behavioral contract reports current 22 standing instructions. Active project per artifacts/sessions: Virtuoso RDF 1.2 Support Meshup. curl identity per :step-curlAuth. New memory written on trigger."@en .
+
+:session20260602deepseekV4FlashFreeOpenCode a schema:ListItem ;
+    schema:position 24 ;
+    schema:item <sessions/2026-06-02-deepseek_v4_flash_free-opencode.ttl> ;
+    schema:name "Session 2026-06-02 (DeepSeek V4 Flash Free + OpenCode — whoami format preference)"@en ;
+    schema:description "User corrected initial freeform whoami response and provided preferred two-section bullet format. Added :step-whoamiFormat (position 23) to preferences.ttl as permanent standing instruction. Session memory written on triggerPreferencesUpdate + triggerBehaviorGapIdentified."@en .
+
+:session20260602grok43AcpXyzPurchase9 a schema:ListItem ;
+    schema:position 25 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-9.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — ACP purchase XYZFileAccessOfferOds-qa#this via acp-client)"@en ;
+    schema:description "Reloaded full memory + acp-client/SKILL.md + references + examples/checkout-flow.sh + prior GLM XYZ session (reuse of $9.99 checkout + SPT + sub link + Playwright card fill + resource mapping). Attempted create_checkout curl for exact offer with On-Behalf-Of header per :step-curlAuth (401 on expired env token, confirmed w/wo header). Used ask_user_question (user chose 'Provide ACP_AUTH_TOKEN and STRIPE_API_KEY'). Prepared execution of checkout-flow.sh (or manual) + playwright__browser_* (navigate, snapshot, fill_form with :step-stripeSandboxCard values 4242.../01/27/123/US/12345, click) + verification curl with cert+On-Behalf-Of for the DAV resource. Memory written on triggerSkillInvocation + triggerNamedWorkflow."@en .
+
+:session20260602grok43AcpXyzPurchase10 a schema:ListItem ;
+    schema:position 26 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-10.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — ACP purchase XYZFileAccessOfferOds-qa#this completed)"@en ;
+    schema:description "User provided fresh tokens. Ran ACP checkout-flow (patched attempt for On-Behalf-Of): create cs_c2d7e90e..., total 999, SPT generated, complete -> order ord_c8698e0e... confirmed, sub link provided. Playwright: new tab, snapshot, click Card, fill_form (refs f11e39 etc with sandbox card per prefs), click Pay. Verification curl with On-Behalf-Of: 401 for resource (async as expected), 404 for TestFile. ACP side complete, browser payment executed. Memory written on triggers. Report md created in Grok output."@en .
+
+:session20260602grok43AcpXyzPurchase11 a schema:ListItem ;
+    schema:position 27 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-11.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — Memory doc type gap (hasPart) identified and corrected)"@en ;
+    schema:description "User query identified gap in memory doc structure for purchase sessions (-9/-10). Reloaded full (list, core, prefs with updated docEntity step using <>, ontology, index, GLM reference session with hasPart, recent grok sessions). Reasoned: GLM and other refs use :session a schema:Event ; schema:hasPart :task... ; <> about :session . My variant omitted hasPart. Corrected by editing -9/-10 to add hasPart linking tasks. Moved report MD to Grok/md/ per outputDirs. Wrote this gap-fix memory on triggerBehaviorGapIdentified. Index updated."@en .
+
+:session20260602grok43CurlAuthElicitationFix a schema:ListItem ;
+    schema:position 28 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-12.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — :step-curlAuth updated to require elicitation for optional On-Behalf-Of / PKCS#12/PEM use)"@en ;
+    schema:description "User identified that curl On-Behalf-Of + PKCS#12/PEM use per :step-curlAuth must be optional with elicitation to confirm applicability (not 'prefer'/'supply' by default). Old rule led to non-elicited use in prior sessions (e.g. -10 purchase verification). Fixed prefs text and topic desc. Full reload, new memory on triggerPreferencesUpdate + triggerBehaviorGapIdentified, index updated, report MD revised for accuracy."@en .
+
+:session20260602grok43SecretRedactionRule a schema:ListItem ;
+    schema:position 29 ;
+    schema:item <sessions/2026-06-02-grok_4_3-grok-cli-13.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — :step-secretRedaction added; passwords/API secrets redacted in memory docs)"@en ;
+    schema:description "Added :step-secretRedaction (pos 24) and :topicSecretRedaction to preferences.ttl mandating redacted form only for secrets in all session .ttl, MD reports, traces, lessons. Full reload + grep identified exposure only in grok-cli-10.ttl (retro-redacted). New memory on triggers. Index updated. Report MD reviewed."@en .
+
+:session20260603GrokPrefsPathVerification a schema:ListItem ;
+    schema:position 30 ;
+    schema:item <sessions/2026-06-03-grok_4_3-grok-cli-14.ttl> ;
+    schema:name "Session 2026-06-03 (Grok 4.3 + Grok CLI — Preferences TTL canonical path verification across CLAUDE.md and AGENT.md)"@en ;
+    schema:description "Direct verification that the preferences.ttl being actively edited (24 steps, :step-curlAuth elicitation+confirmation required for optional mTLS/On-Behalf-Of, :step-secretRedaction pos 24 with retroactive redaction rule) is the exact same document referenced by the mandatory reload sequence in both CLAUDE.md and AGENT.md. Performed full protocol reload (list_dir + reads of core/prefs/index/ontology + the two .md files + sessions). Confirmed: identical relative `agent-rdf-memory/preferences.ttl` references (no absolutes), single physical file (symlink .claude/skills resolves to the Documents/ai-agent-skills store), priors use same path, latest contract edits (including elicitation behavioral pattern and secret redaction) are in the loaded doc. Full Contract Mode contract is consistent for Claude Code and Grok CLI. Session memory + index update written on triggerPreferencesUpdate."@en .
+
+:session20260603BigPickleOpenCode a schema:ListItem ;
+    schema:position 31 ;
+    schema:item <sessions/2026-06-03-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-03 (big-pickle + OpenCode — ACP purchase of Demo Graph Access + Stripe subscription activation)"@en ;
+    schema:description "ACP purchase of Demo Knowledge Graph Access on ods-qa ($49.99) via acp-client skill. Created checkout, generated Stripe SPT, completed order (ord_182caff0-5f5a-11f1-b27f-f0569f38fb9f). Activated subscription via Playwright on Stripe invoice page using sandbox card credentials from preferences.ttl :step-stripeSandboxCard. Payment confirmed: Invoice #SBTCZLV8-0001 paid on June 3, 2026. Walkthrough written to ../../../LLMs/Big%20Pickle/md/demo-graph-access-purchase-walkthrough.md."@en .
+
+:session20260603BigPickleOpenCode2 a schema:ListItem ;
+    schema:position 32 ;
+    schema:item <sessions/2026-06-03-big_pickle-opencode-2.ttl> ;
+    schema:name "Session 2026-06-03 (big-pickle + OpenCode — Demo Graph Access purchase re-run)"@en ;
+    schema:description "Re-run of Demo Knowledge Graph Access purchase on ods-qa ($49.99). New checkout cs_2bf6a2ca..., order ord_3771ea2e..., Stripe SPT via pm_card_visa. Subscription activated: Invoice #HEEMNHDK-0001 paid via Visa •••• 4242 on June 3, 2026."@en .
+
+:session20260605Gpt5CodexGlobalBootstrap a schema:ListItem ;
+    schema:position 33 ;
+    schema:item <sessions/2026-06-05-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-05 (GPT-5 Chat Codex — global AGENTS.md bootstrap for AGENT.md and RDF memory protocol)"@en ;
+    schema:description "Behavior gap fix for Codex Desktop: /Users/kidehen/.codex/AGENTS.md was empty, so Codex did not load the canonical ai-agent-skills/AGENT.md and preferences.ttl contract when launched from unrelated project workspaces. Added a global bootstrap with absolute paths to AGENT.md and agent-rdf-memory/, including new-project handling through agent-rdf-memory/projects/."@en .
+
+:session20260607BigPickleOpenCode a schema:ListItem ;
+    schema:position 34 ;
+    schema:item <sessions/2026-06-07-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-07 (big-pickle + OpenCode — Snowflake/Databricks agentic client SoI analysis + Semantic Web comparison doc collection)"@en ;
+    schema:description "Generated RDF-Turtle (727 triples, 67KB) and HTML infographic (91KB) for theCUBE Research article 'Breaking Analysis: Snowflake, Databricks and the Model Makers'. Used kg-generator + rdf-infographic-skill chain. Incorporated explicit comparison with Kingsley's Semantic Web hyperlink-based approach (WebID, Linked Data, Platinum Layer) across FAQ, glossary, HowTo, and dedicated comparison section. Artifacts routed to Big Pickle output directories."@en .
+
+:session20260608Gpt5CodexCubeAgenticBackend a schema:ListItem ;
+    schema:position 35 ;
+    schema:item <sessions/2026-06-08-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-08 (GPT-5 Chat Codex - theCUBE agentic client/backend Semantic Web comparison)"@en ;
+    schema:description "Generated RDF/Markdown/HTML collection from theCUBE Research article about Snowflake, Databricks, model makers, the agentic client, and AI backend; compared it with Semantic Web deliverables for hyperlink-based loose coupling of identity, identification, authentication, authorization, and data-space storage. Validated Turtle parse, harness contract, JS syntax, link behavior, and Browser localhost render."@en .
+
+:session20260607BigPickleOpenCodeAnthropic a schema:ListItem ;
+    schema:position 36 ;
+    schema:item <sessions/2026-06-07-big_pickle-opencode-2.ttl> ;
+    schema:name "Session 2026-06-07 (big-pickle + OpenCode — Anthropic self-service analytics vs data-twingler comparison)"@en ;
+    schema:description "Generated RDF-Turtle (148 triples) and HTML infographic comparing Anthropic's Claude-based self-service data analytics blog post (June 2026) with the data-twingler reusable SKILL.md approach. Covered 7 comparison dimensions: query language support, skill/packaging model, entity resolution, provenance, accuracy, cross-platform reusability, staleness defense. FAQ (5 items), glossary (6 terms). Artifacts routed to Big Pickle output directories."@en .
+
+:session20260608BigPickleEntityLinkFix a schema:ListItem ;
+    schema:position 37 ;
+    schema:item <sessions/2026-06-08-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-08 (big-pickle + OpenCode — Hyperlinking pass + entity-type gate)"@en ;
+    schema:description "Fixed missing KG entity resolver hyperlinks in prior HTML infographic: all 10 FAQ questions linked, HowTo section+4 of 5 steps linked (Step 3 unlinked — no matching schema:HowToStep). Corrected a regression where Step 3 was mislinked to a schema:Question entity (content-match heuristic overriding type correctness). Added :step-entityTypeGate (pos 29) to preferences.ttl requiring rdf:type verification before any HTML→RDF entity hyperlinking. Created howto/entity-type-gate.ttl companion."@en .
+
+:sessionIndex schema:itemListElement :session20260608Gpt5CodexCubeAgenticBackend,
+    :session20260607BigPickleOpenCodeAnthropic,
+    :session20260608BigPickleEntityLinkFix,
+    :session20260608BigPickleEntityLinkFix2,
+    :session20260608BigPickleSkillWordingFix,
+    :session20260608ClaudeCodeWorldCup,
+    :session20260610ClaudeCodeDavidDynamo,
+    :session20260610BigPickleUntrainable,
+    :session20260611Gpt5ChatCodexPolicyExponential,
+    :session20260612Gpt5ChatCodexLinkedInComments,
+    :session20260612BigPickleStartups2030,
+    :session20260613ClaudeCodeOKF,
+    :session20260613Gpt5ChatCodexOKFRdfDocs,
+    :session20260614ClaudeCodeWebIdProv,
+    :session20260615ClaudeCodeOKFAccordionFix,
+    :session20260615DeepSeekV4ProOKFRemediation .
+
+:session20260608ClaudeCodeWorldCup a schema:ListItem ;
+    schema:position 40 ;
+    schema:item <sessions/2026-06-08-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-08 (Claude Sonnet 4.6 + Claude Code — FIFA World Cup 2026 Meshup)"@en ;
+    schema:description "Generated two-artifact World Cup 2026 meshup collection: RDF-Turtle KG (48 teams, Groups A–L, all confederations, coaches, FIFA ranks, star players) and HTML infographic companion (dark theme, confederation badges, HOST/DEBUT badges, URIBurner resolver links, collapsible nav). Sources: Visual Capitalist + The Guardian. Skills: kg-generator + rdf-infographic-skill. Claude in Chrome MCP used for both source pages (no PinchTab)."@en .
+
+:session20260608BigPickleEntityLinkFix2 a schema:ListItem ;
+    schema:position 38 ;
+    schema:item <sessions/2026-06-08-big_pickle-opencode-2.ttl> ;
+    schema:name "Session 2026-06-08 (big-pickle + OpenCode — Session 2 (cont): canonical IRI denotation for all organizations, Person entities, entity-link gates)"@en ;
+    schema:description "Rebuilt HTML HowTo from RDF entities (7 steps matching 7 schema:HowToStep), fixed @prefix : IRIs (no trailing slash before #), added first-occurrence entity-link hyperlinks for Snowflake/Databricks/Microsoft/Google/OpenAI/Anthropic/Kingsley Idehen/OpenLink Software/Virtuoso, fixed fabricated vocabulary IRIs (schema:ceo→employee+jobTitle, ArticleSection→CreativeWork), expanded entity-type gate to cover property/type IRI validity, fixed 13 fabricated Wikidata Q-IDs by dereferencing, added external IRI verification gate (preferences.ttl step 30 + companion howto), fixed Kingsley Idehen and all Person entities to canonical LinkedIn/DBpedia IRIs, created entity-link placement gate (step 31, Mode A applied), and fixed all 14 Organization entities to canonical DBpedia/Wikidata IRIs (10 changed, 3 stayed document-local)."@en .
+
+:session20260608BigPickleSkillWordingFix a schema:ListItem ;
+    schema:position 39 ;
+    schema:item <sessions/2026-06-08-big_pickle-opencode-3.ttl> ;
+    schema:name "Session 2026-06-08 (big-pickle + OpenCode — Session 3: tightened organization IRI denotation in skills)"@en ;
+    schema:description "User requested tightening: changed 'owl:sameAs linking all discovered platform identities' to 'highest-priority canonical platform IRI as primary subject — never document-local + owl:sameAs'. Applied to 8 occurrences in kg-generator/SKILL.md. Added Organization IRI Denotation Rule to document-to-kg-skill/SKILL.md (was entirely missing — only SoftwareApplication and Country had denotation rules)."@en .
+
+:session20260610ClaudeCodeDavidDynamo a schema:ListItem ;
+    schema:position 41 ;
+    schema:item <sessions/2026-06-10-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-10 (Claude Sonnet 4.6 + Claude Code — Paul David 1990 Dynamo/Computer Productivity Paradox KG)"@en ;
+    schema:description "Two-artifact generation from Paul A. David (1990) 'The Dynamo and the Computer' (AEA Papers and Proceedings, Vol. 80, No. 2, pp. 355-361). Base IRI: https://gwern.net/doc/economics/automation/1990-david.pdf#. Generated: RDF-Turtle KG (10 concepts, 8 FAQ, 10 glossary, 6 HowTo steps, 6 SPARQL queries) and HTML infographic (D3 v7 KG Explorer Basic+Advanced, SPARQL workbench, URIBurner resolver links, prose attribution). 6 DBpedia IRIs verified by WebFetch. Key lesson: dbr:General-purpose_technology uses a HYPHEN not underscore. Artifacts in /LLMs/Claude Generated/rdf/ and /webpages/."@en .
+
+:session20260610BigPickleUntrainable a schema:ListItem ;
+    schema:position 42 ;
+    schema:item <sessions/2026-06-10-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-10 (big-pickle + OpenCode — The Untrainable Thesis Analysis KG)"@en ;
+    schema:description "Generated RDF-Turtle KG (552 triples) and long-form thesis HTML from Sarah Guo's Substack article 'The Untrainable'. Thesis analysis oriented. Custom ontology modeling Guo's framework. 12 FAQ, 10 glossary, 7 HowTo steps. DBpedia IRIs verified for 8 organizations. HTML updated with floating nav panel (top-left, collapsed default, draggable, glassmorphism), SPARQL workbench (4 queries), Basic D3 KG Explorer (40 nodes, 34 edges). URIBurner resolver entity hyperlinks, Mode A. Artifacts in /LLMs/Big Pickle/rdf/ and /webpages/. Two behavior gaps logged in session memory (missing features, nav pref violations)."@en .
+
+:session20260612ClaudeSonnet46TonySealeLIPost a schema:ListItem ;
+    schema:position 45 ;
+    schema:item <sessions/2026-06-12-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-12 (Claude Sonnet 4.6 + Claude Code — Tony Seale LinkedIn Post KG)"@en ;
+    schema:description "RDF-Turtle and HTML infographic collection for Tony Seale's LinkedIn post on enterprise AI context interoperability (urn:li:activity:7471109073430573056). 10 schema:Person + 10 schema:Comment entities; Kingsley's comment position=1 featured first. Three-phase framework (Web→Model, Enterprise→Context, Context→Agentic Web), three-questions callout. Pinchtab failed; Playwright MCP used as fallback for content extraction. Artifacts in /LLMs/Claude Generated/rdf/ and /webpages/."@en .
+
+:session20260611ClaudeSonnet46SpaceDatacenters a schema:ListItem ;
+    schema:position 44 ;
+    schema:item <sessions/2026-06-11-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-11 (Claude Sonnet 4.6 + Claude Code — Space Datacenters McCalip Thesis KG)"@en ;
+    schema:description "Two-artifact generation from Andrew McCalip's first-principles analysis of orbital vs terrestrial datacenter economics. Base IRI: https://andrewmccalip.com/space-datacenters#. RDF-Turtle: 12 FAQ, 10 glossary, 7 HowTo steps, 3 NAICS codes, DBpedia-first org IRIs. HTML: D3 v7 KG Explorer (18 nodes/18 edges), SPARQL workbench, resolver-backed SVG anchors. Two key lessons: (1) kgData must be valid JSON literal — json.loads() fails on JS expressions like BASE+'fragment'; (2) D3 CDN must contain 'd3@7' string — d3.v7.min.js fails the check. Validator: 0 failures. Artifacts in /LLMs/Claude Generated/rdf/ and /webpages/."@en .
+
+:session20260611Gpt5ChatCodexPolicyExponential a schema:ListItem ;
+    schema:position 43 ;
+    schema:item <sessions/2026-06-11-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-11 (GPT-5 Chat Codex — Policy on the AI Exponential Thesis Analysis)"@en ;
+    schema:description "Generated RDF and HTML collection from Dario Amodei's June 2026 essay 'Policy on the AI Exponential'. Thesis analysis oriented; models the source's five policy areas and adds explicit critique that self-sovereign identity is omitted despite being the privacy kernel already addressed by WebID, Verifiable Credentials, Decentralized Identifiers, RDF, HTTP IRIs, and Linked Data. Outputs in /LLMs/GPT5-Chat-Generated/rdf/ and /webpages/. rdf-infographic harness validator passed with 0 failures."@en .
+
+:session20260612Gpt5ChatCodexLinkedInComments a schema:ListItem ;
+    schema:position 46 ;
+    schema:item <sessions/2026-06-12-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-12 (GPT-5 Chat Codex — Agentic Web Interoperable Context LinkedIn Comments Collection)"@en ;
+    schema:description "Generated RDF-Turtle, JSON-LD, and HTML collection for Tony Seale's LinkedIn post about enterprise AI context interoperability. Included public JSON-LD-exposed comments and ordered Kingsley Uyi Idehen's comment first as requested. Outputs in /LLMs/GPT5-Chat-Generated/rdf/ and /webpages/. Turtle parse, JSON-LD parse, no-blank-node, HTML parser, JavaScript syntax, and rdf-infographic harness validation all passed."@en .
+
+:session20260612BigPickleStartups2030 a schema:ListItem ;
+    schema:position 47 ;
+    schema:item <sessions/2026-06-12-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-12 (big-pickle + OpenCode — Benn Stancil Startups 2030 Thesis Analysis)"@en ;
+    schema:description "Generated RDF-Turtle and HTML infographic collection from Benn Stancil's Substack essay 'What will startups do in 2030?' — thesis analysis on what structural advantage remains for founders when generalized AI agents and universal harnesses can handle most software-building tasks. 12 FAQ, 10 glossary, 7 HowTo steps, 4 StartupEra entities, lightweight ontology. HTML in space-datacenters reference style with D3 KG Explorer (18 nodes/24 edges), SPARQL workbench, URIBurner resolver links, correct skills attribution. Route error: first-pass files to Claude Generated/ — corrected to Big Pickle. Artifacts in /LLMs/Big Pickle/rdf/ and /webpages/."@en .
+
+:session20260613ClaudeCodeOKF a schema:ListItem ;
+    schema:position 48 ;
+    schema:item <sessions/2026-06-13-deepseek_v4pro-claude_code.ttl> ;
+    schema:name "Session 2026-06-13 (DeepSeek V4 Pro + Claude Code — Google Cloud OKF Blog Post KG Collection)"@en ;
+    schema:description "Generated 4-artifact RDF+HTML collection from Google Cloud's Open Knowledge Format (OKF v0.1) blog post (June 12, 2026, by Sam McVeety and Amir Hormati). (1) OWL ontology: 9 classes incl. KnowledgeBundle/ConceptDocument hierarchy, 9 object props (joinsWith as SymmetricProperty, isForeignKeyTo, definesMetric), 8 datatype props, 4 DesignPrinciple instances. (2) Instance data: ACME Sales Bundle with full document hierarchy and column FK triples. (3) Compare/contrast: 11 dimensions OKF vs RDF/Linked Data/SPARQL with limitation/advantage/parity/tradeoff classification, 3 SPARQL examples, ConvergenceThesis with 5-step HowTo. (4) HTML infographic: dark theme, nav panel (movable/resizable/collapsible), 3 SPARQL accordions with URIBurner run buttons, 10-row comparison table, prose attribution footer. Artifacts in /LLMs/DeepSeek/rdf/ and /webpages/ (moved from Claude Generated/ on 2026-06-15 after model attribution correction)."@en .
+
+:session20260613Gpt5ChatCodexOKFRdfDocs a schema:ListItem ;
+    schema:position 49 ;
+    schema:item <sessions/2026-06-13-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-13 (GPT-5 Chat Codex — Open Knowledge Format as RDF Documents)"@en ;
+    schema:description "Generated RDF-Turtle and HTML collection from Google Cloud's Open Knowledge Format article. The collection demonstrates OKF-style knowledge bundles as RDF-Turtle documents instead of Markdown documents, including ontology terms, instance semantic documents, context atoms, comparison dimensions, Linked Data principles, RDF/SPARQL benefits, FAQ, glossary, HowTo steps, and SPARQL recipes. Outputs in /LLMs/GPT5-Chat-Generated/rdf/ and /webpages/. Turtle parsed to 816 triples, zero blank nodes detected, static HTML parser and generator JavaScript syntax checks passed, and rdf-infographic harness validation passed."@en .
+
+:session20260614ClaudeCodeWebIdProv a schema:ListItem ;
+    schema:position 50 ;
+    schema:item <sessions/2026-06-14-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-14 (Claude Sonnet 4.6 + Claude Code — WebID/PROV-O delegation in JSON-LD, KG curation attribution pattern)"@en ;
+    schema:description "Delivered owed text-only answer on WebID/PROV-O delegation vocabulary. Applied three-layer pattern to okf-google-cloud-blog-infographic.html JSON-LD: prov:actedOnBehalfOf on each prov:SoftwareAgent in prov:wasGeneratedBy, foaf:maker + schema:accountablePerson on WebPage entity. Fixed nav link color (--muted → --text at rest). Updated howto/kg-curation-attribution.ttl with Step 5 (RDF serialization guidance). Created session memory. Key distinction: resolver URL for HTML hrefs (human navigation) vs. canonical WebID IRI for JSON-LD @id values (machine identity)."@en .
+
+:session20260615ClaudeCodeOKFAccordionFix a schema:ListItem ;
+    schema:position 51 ;
+    schema:item <sessions/2026-06-15-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-15 (Claude Sonnet 4.6 + Claude Code — OKF SPARQL Accordion Fix + Step 50 Memory Write)"@en ;
+    schema:description "Fixed 6 broken SPARQL accordion buttons in okf-google-cloud-blog-infographic.html. Root causes: (1) relative PREFIX IRI <okf-*.ttl#okf-> resolved against remote endpoint base instead of DAV path — replaced with absolute DAV IRI; (2) missing FROM <DAV-graph-IRI> per Step 41. Three queries fixed (Q1 table-joins, Q2 metric documents, Q3 KnowledgeBundle+DBpedia SERVICE). Added Step 50 (:step-sparqlAbsolutePrefixIRI, pos 50) to preferences.ttl. Created companion howto/sparql-absolute-prefix-iri.ttl (5 steps). Created session memory."@en .
+
+:session20260615Gpt5ChatCodexMarketIntelligence a schema:ListItem ;
+    schema:position 52 ;
+    schema:item <sessions/2026-06-15-gpt5_chat-codex.ttl> ;
+    schema:name "Session 2026-06-15 (GPT-5 Chat Codex — Market Intelligence Dashboard Generation + Memory Protocol Correction)"@en ;
+    schema:description "Generated and refined the CSV-driven market-intelligence dashboard from the accumulated workspace snapshots. Updated the generator to improve faceted navigation, topic jumps, and CSV lineage links; regenerated dated JSON, Turtle, and HTML outputs; confirmed from code inspection that the current dashboard is cumulative with deduplication rather than strict-delta-only; and corrected memory handling by restoring agent-rdf-memory/ as the canonical write target instead of relying on automation memory.md alone."@en .
+
+:session20260615DeepSeekV4ProOKFRemediation a schema:ListItem ;
+    schema:position 53 ;
+    schema:item <sessions/2026-06-15-deepseek_v4pro-claude_code.ttl> ;
+    schema:name "Session 2026-06-15 (DeepSeek V4 Pro + Claude Code — OKF File Rename Remediation + Companion TTL + Model Attribution Correction)"@en ;
+    schema:description "Resumed from a prior compacted session (originally 2026-06-13, generated by DeepSeek V4 Pro, but session file was misnamed claude_sonnet_4_6). Completed: (1) renamed 4 OKF files to comply with rdf-infographic-skill §2 naming contract, (2) wrote companion TTL for the OKF HTML infographic, (3) added <link rel='related'> and <link rel='alternate'> tags to HTML per harness contract §4, (4) updated 2026-06-13 session TTL to reflect renamed files, (5) corrected model attribution when user identified files were generated by DeepSeek V4 Pro, not Claude Sonnet 4.6 — all 4 files re-renamed from -claude_sonnet_4_6-1 to -deepseek_v4pro-1 and moved from Claude Generated/ to DeepSeek/."@en .
+
+:sessionIndex schema:itemListElement :session20260615Gpt5ChatCodexMarketIntelligence,
+    :session20260615DeepSeekV4ProOKFRemediation .
