@@ -1,0 +1,147 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix oplcert: <http://www.openlinksw.com/schemas/cert#> .
+@prefix cert: <http://www.w3.org/ns/auth/cert#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Verified Identity Gate — Whoami Certificate Verification Protocol"@en ;
+    schema:description "Protocol for cryptographically verifying both the user identity and the agent identity before responding to a whoami query. Uses local PKCS#12 / PEM certificates whose public key moduli are matched against the published cert:RSAPublicKey in each party's WebID profile document."@en ;
+    schema:dateCreated "2026-06-19T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-19T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-locateUserCert, :step-verifyUserIdentity,
+                 :step-locateAgentCert, :step-verifyAgentIdentity,
+                 :step-assembleVerifiedWhoami ;
+    schema:step :step-locateUserCert, :step-verifyUserIdentity,
+                :step-locateAgentCert, :step-verifyAgentIdentity,
+                :step-assembleVerifiedWhoami ;
+    rdfs:seeAlso <../preferences.ttl>, <agent-identity.ttl> .
+
+# ── Canonical credentials ─────────────────────────────────────────────────────
+
+:userCredentials a schema:Thing ;
+    schema:name "User credential bundle"@en ;
+    schema:description "Default local directory containing cert.pem / cert.p12 for the user's WebID."@en ;
+    schema:value "/Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-credentials-5/"@en ;
+    oplcert:SAN <https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/profile.ttl#identity> ;
+    schema:url <https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/profile.ttl> .
+
+:agentCredentials a schema:Thing ;
+    schema:name "Agent credential bundle"@en ;
+    schema:description "Default local directory containing cert.pem / cert.p12 for the agent's WebID (CN=Kingsley Idehen's Agent)."@en ;
+    schema:value "/Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-agent-credentials/"@en ;
+    oplcert:SAN <https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/profile.ttl#identity> ;
+    schema:url <https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/profile.ttl> .
+
+# ── Step 1: Locate user certificate ──────────────────────────────────────────
+
+:step-locateUserCert a schema:HowToStep ;
+    schema:position "1"^^xsd:integer ;
+    schema:name "Locate user credential file"@en ;
+    schema:text """Default user credentials directory:
+  /Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-credentials-5/
+
+Elicit an override from the user if they want to verify a different credential set.
+
+Look for (in order of preference):
+  1. cert.pem   — PEM-encoded certificate (no passphrase needed)
+  2. cert.p12   — PKCS#12 bundle (extract with empty passphrase)
+  3. cert.crt   — DER or PEM certificate
+
+If none found: skip verification, mark user identity as ⚠️ Unverified and continue."""@en .
+
+# ── Step 2: Verify user identity ─────────────────────────────────────────────
+
+:step-verifyUserIdentity a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Verify user identity via cert modulus ↔ profile doc"@en ;
+    schema:text """Verification procedure (run via Bash tool):
+
+1. Extract Subject Alternative Name URI from local cert:
+     openssl x509 -noout -ext subjectAltName -in <dir>/cert.pem
+   Expected SAN URI:
+     https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/profile.ttl#identity
+
+2. Strip the fragment (#identity) → profile doc base URL:
+     https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/profile.ttl
+
+3. Read published cert:modulus from the LOCAL profile.ttl in the credentials dir:
+     grep 'cert:modulus' <dir>/profile.ttl | sed 's/.*"\\(.*\\)".*/\\1/' | tr '[:upper:]' '[:lower:]'
+   (Optionally verify against the live URL with curl as a second check.)
+
+4. Extract local cert modulus:
+     openssl x509 -noout -modulus -in <dir>/cert.pem | sed 's/Modulus=//' | tr '[:upper:]' '[:lower:]'
+
+5. Compare strings. Match → SAN URI + ✅. Mismatch or file absent → memory IRI + ⚠️ Unverified.
+
+Known values (as of 2026-06-16):
+  SAN URI (from cert):   https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/index.html#netid
+  owl:sameAs (profile):  https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/profile.ttl#identity
+  Modulus prefix: c719382fd4beaea6...
+  Fingerprint (SHA-1): DE:9B:0F:1E:83:DB:2F:0E:A1:70:E5:35:05:29:CB:95:D4:E6:81:07"""@en .
+
+# ── Step 3: Locate agent certificate ─────────────────────────────────────────
+
+:step-locateAgentCert a schema:HowToStep ;
+    schema:position "3"^^xsd:integer ;
+    schema:name "Locate agent credential file"@en ;
+    schema:text """Default agent credentials directory:
+  /Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-agent-credentials/
+
+The agent certificate subject is:
+  CN=Kingsley Idehen's Agent / emailAddress=kidehen@openlinksw.com / O=Personal Data Space
+
+Same file-search order as Step 1: cert.pem → cert.p12 → cert.crt.
+If none found: mark agent identity as ⚠️ Unverified."""@en .
+
+# ── Step 4: Verify agent identity ────────────────────────────────────────────
+
+:step-verifyAgentIdentity a schema:HowToStep ;
+    schema:position "4"^^xsd:integer ;
+    schema:name "Verify agent identity via cert modulus ↔ profile doc"@en ;
+    schema:text """Identical procedure to Step 2, applied to the agent credentials dir.
+
+Expected SAN URI:
+  https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/profile.ttl#identity
+
+Profile doc base URL:
+  https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/profile.ttl
+
+Known values (as of 2026-06-18):
+  SAN URI (from cert):   https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/index.html#netid
+  owl:sameAs (profile):  https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/profile.ttl#identity
+  Modulus prefix: da2b893263967cfc...
+  Fingerprint (SHA-1): B9:58:40:EF:17:45:B7:5E:FE:B9:1F:8B:CD:11:47:DE:98:6A:19:CD
+  Valid: 2026-06-18 → 2027-06-18"""@en .
+
+# ── Step 5: Assemble verified whoami response ─────────────────────────────────
+
+:step-assembleVerifiedWhoami a schema:HowToStep ;
+    schema:position "5"^^xsd:integer ;
+    schema:name "Assemble the verified whoami response"@en ;
+    schema:text """After completing Steps 1–4, emit this response format.
+Substitute ✅ or ⚠️ Unverified per verification outcome.
+Fill runtime values (model, env, path, project) from current session context.
+
+**User (principal)**
+• Name: Kingsley Uyi Idehen
+• Email: kidehen@openlinksw.com
+• Role: Founder & CEO, OpenLink Software
+• WebID: https://www.linkedin.com/in/kidehen#this
+• Verified Identity: {user SAN URI} {✅ | ⚠️ Unverified}
+• Aliases: https://x.com/kidehen#this, https://substack.com/@kidehen#this
+
+**Agent (me)**
+• Model: {model name} ({llm-id used in session filenames})
+• Environment: {agent environment name}
+• Artifact output root: {canonical LLM output path from step-outputDirs} (rdf/, md/, webpages/)
+• Active project: {current task/project or 'none yet this session'}
+• Memory store: {absolute path to agent-rdf-memory/}
+• Behavioral contract: preferences.ttl ({count} standing instructions, incl. {notable recent additions})
+• On-Behalf-Of WebID: https://www.linkedin.com/in/kidehen#this
+• Agent WebID: {agent SAN URI} {✅ | ⚠️ Unverified}
+
+If verification is skipped (cert files absent, openssl unavailable) emit both lines
+with ⚠️ Unverified rather than omitting them — absence of the badge is informative."""@en .

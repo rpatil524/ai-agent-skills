@@ -247,15 +247,34 @@ Verification SPARQL queries are in `references/verification-queries.md`.
 
 **Apply delegation to local files**:
 
-6. **Add `oplcert:hasIdentityDelegate` to the delegator's local profile files:**
-   - **`profile.ttl`** — add to the `#netid` entity: `oplcert:hasIdentityDelegate <delegate-webid> .`
-   - **`profile.jsonld`** — add to the `#netid` graph entry: `"oplcert:hasIdentityDelegate": { "@id": "<delegate-webid>" }`
-   - **`profile_rdfa.html`** — add RDFa: `<div rel="oplcert:hasIdentityDelegate" resource="<delegate-webid>"></div>` AND add to embedded JSON-LD graph
-   - **`index.html`** — add to embedded JSON-LD block AND add hidden RDFa annotation
-   - The exact insertion point depends on the file's existing structure; use `edit_file` to add the triple after the existing profile triples
+> **Key rule**: In local file deployment, each identity's documents only declare their side of the relation.
+> - **Delegator's documents** — `oplcert:hasIdentityDelegate` only (grants authority)
+> - **Delegate's documents** — `oplcert:onBehalfOf` only (acknowledges authority)
+> This differs from SPARQL UPDATE deployment where both triples may reside in a single graph (see `references/delegation.md`).
 
-7. **If delegate directory provided**, add `oplcert:onBehalfOf` to the delegate's local profile files using the same pattern:
-   `oplcert:onBehalfOf <delegator-webid>`
+6. **Add `oplcert:hasIdentityDelegate` to the delegator's local profile files** — every RDF representation MUST contain the triple:
+
+   | File | Representation | What to add |
+   |------|---------------|-------------|
+   | `profile.ttl` | Turtle | `oplcert:hasIdentityDelegate <delegate-webid> .` on the `#netid` entity |
+   | `profile.jsonld` | JSON-LD | `"oplcert:hasIdentityDelegate": { "@id": "<delegate-webid>" }` in the `#netid` graph entry |
+   | `profile_rdfa.html` | RDFa + JSON-LD | `<div rel="oplcert:hasIdentityDelegate" resource="<delegate-webid>"></div>` AND add to embedded JSON-LD graph |
+   | `index.html` | POSH (hero `<header>`) | `<link property="oplcert:hasIdentityDelegate" href="<delegate-webid>" />` after the existing `<link property="cert:key">` |
+   | `index.html` | Embedded JSON-LD | Graph entry with `"oplcert:hasIdentityDelegate": { "@id": "<delegate-webid>" }` — also add `@type: "foaf:Agent"` and `schema:additionalType: "Delegator"` |
+   | `index.html` | Embedded Turtle | `oplcert:hasIdentityDelegate <delegate-webid> .` on the `#netid` entity |
+   | `index.html` | Hidden RDFa | `<div typeof="foaf:Agent" about="<delegator-webid>"><div property="schema:additionalType" content="Delegator"></div><div rel="oplcert:hasIdentityDelegate" resource="<delegate-webid>"></div></div>` |
+
+7. **If delegate directory provided**, add `oplcert:onBehalfOf` to the delegate's local profile files using the same index.html coverage:
+
+   | File | Representation | What to add |
+   |------|---------------|-------------|
+   | `profile.ttl` | Turtle | `oplcert:onBehalfOf <delegator-webid> .` on the `#netid` entity |
+   | `profile.jsonld` | JSON-LD | `"oplcert:onBehalfOf": { "@id": "<delegator-webid>" }` in the `#netid` graph entry |
+   | `profile_rdfa.html` | RDFa + JSON-LD | `<div rel="oplcert:onBehalfOf" resource="<delegator-webid>"></div>` AND add to embedded JSON-LD graph |
+   | `index.html` | POSH (hero `<header>`) | `<link property="oplcert:onBehalfOf" href="<delegator-webid>" />` after the existing `<link property="cert:key">` |
+   | `index.html` | Embedded JSON-LD | `"oplcert:onBehalfOf": { "@id": "<delegator-webid>" }` on the `#netid` entry — add in both the `foaf:Agent` and `schema:Person` graph entries if both exist |
+   | `index.html` | Embedded Turtle | `oplcert:onBehalfOf <delegator-webid> .` on the `#netid` entity |
+   | `index.html` | Hidden RDFa | `<div typeof="foaf:Agent" about="<delegate-webid>"><div property="schema:additionalType" content="Delegate"></div><div rel="oplcert:onBehalfOf" resource="<delegator-webid>"></div></div>` |
 
 8. **Generate `declarativeNetRequest` rule** — produce `delegation-rule.json` for the delegate's browser (injects `On-Behalf-Of` header):
    ```json

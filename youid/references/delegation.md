@@ -7,7 +7,26 @@ WebID delegation allows one agent (the **Delegate**) to act on behalf of another
 - `oplcert:hasIdentityDelegate` — Declared on the **Delegator**, pointing to the **Delegate**
 - `oplcert:onBehalfOf` — Declared on the **Delegate**, pointing back to the **Delegator**
 
-Both triples are inserted into the **Delegator's** WebID profile document via SPARQL UPDATE.
+## Deployment Strategies
+
+### A. SPARQL UPDATE (distinct graphs)
+
+The delegator's graph receives only `oplcert:hasIdentityDelegate`. The delegate's graph receives only `oplcert:onBehalfOf`. Inverse relations are not stored — a SPARQL endpoint resolves the delegation by querying the appropriate graph.
+
+### B. Local file deployment (split per entity)
+
+Each identity's local documents declare only their side of the relation:
+
+- **Delegator's files** — `oplcert:hasIdentityDelegate` only (grants authority)
+- **Delegate's files** — `oplcert:onBehalfOf` only (acknowledges authority)
+
+Both sets of files must carry the triple in EVERY RDF representation they contain:
+- `profile.ttl` — Turtle triples
+- `profile.jsonld` — JSON-LD graph entry
+- `profile_rdfa.html` — RDFa inline + embedded JSON-LD
+- `index.html` — POSH hero header, embedded JSON-LD, embedded Turtle, hidden RDFa annotations
+
+See T6 in `SKILL.md` for the full step-by-step.
 
 ## Delegation Roles
 
@@ -20,20 +39,34 @@ Both triples are inserted into the **Delegator's** WebID profile document via SP
 
 ## SPARQL UPDATE Pattern
 
+Delegator and delegate graphs are distinct. Each graph contains only its side of the relation — never the inverse.
+
 ### Insert Delegation (grant)
+
+Insert into the **delegator's** WebID graph:
 
 ```sparql
 PREFIX foaf:     <http://xmlns.com/foaf/0.1/>
 PREFIX oplcert:  <http://www.openlinksw.com/schemas/cert#>
 PREFIX schema:   <http://schema.org/>
 
-INSERT DATA {
+INSERT INTO <delegator-graph-iri> {
   <delegator-webid>
       a foaf:Agent ;
       schema:additionalType "Delegator" ;
       schema:description "Delegates {ROLE} authority to <delegate-webid>" ;
       oplcert:hasIdentityDelegate <delegate-webid> .
+}
+```
 
+Insert into the **delegate's** WebID graph:
+
+```sparql
+PREFIX foaf:     <http://xmlns.com/foaf/0.1/>
+PREFIX oplcert:  <http://www.openlinksw.com/schemas/cert#>
+PREFIX schema:   <http://schema.org/>
+
+INSERT INTO <delegate-graph-iri> {
   <delegate-webid>
       a foaf:Agent ;
       schema:additionalType "Delegate" ;
@@ -47,10 +80,13 @@ INSERT DATA {
 ```sparql
 PREFIX oplcert: <http://www.openlinksw.com/schemas/cert#>
 
-DELETE DATA {
+DELETE FROM <delegator-graph-iri> {
   <delegator-webid> oplcert:hasIdentityDelegate <delegate-webid> .
+};
+
+DELETE FROM <delegate-graph-iri> {
   <delegate-webid> oplcert:onBehalfOf <delegator-webid> .
-}
+};
 ```
 
 ## HTTP Header Injection

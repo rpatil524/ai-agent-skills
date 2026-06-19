@@ -4,28 +4,29 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <> a schema:HowTo ;
-    schema:name "Agent Identity — Whoami Format and Stripe Sandbox Card"@en ;
-    schema:description "Two rules for agent identity presentation: the canonical two-section bullet response to whoami queries, and the Stripe sandbox card credentials for ACP test payments."@en ;
+    schema:name "Agent Identity — Whoami Format, Verified Identity Gate, and Stripe Sandbox Card"@en ;
+    schema:description "Rules for agent identity presentation: the canonical two-section bullet response to whoami (with verified identity lines for both user and agent), the certificate verification gate that runs before composing the response, and the Stripe sandbox card credentials for ACP test payments."@en ;
     schema:dateCreated "2026-06-05T00:00:00Z"^^xsd:dateTime ;
-    schema:dateModified "2026-06-05T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-19T00:00:00Z"^^xsd:dateTime ;
     schema:author <https://linkedin.com/in/kidehen#this> ;
-    schema:about :step-whoamiFormat, :step-stripeSandboxCard ;
-    schema:step :step-whoamiFormat, :step-stripeSandboxCard ;
-    rdfs:seeAlso <../preferences.ttl> .
+    schema:about :step-whoamiFormat, :step-verifiedIdentityGate, :step-stripeSandboxCard ;
+    schema:step :step-whoamiFormat, :step-verifiedIdentityGate, :step-stripeSandboxCard ;
+    rdfs:seeAlso <../preferences.ttl>, <verified-identity.ttl> .
 
 # ── Step 1: Whoami Format ─────────────────────────────────────────────────────
 
 :step-whoamiFormat a schema:HowToStep ;
     schema:position "1"^^xsd:integer ;
     schema:name "Present whoami responses in the canonical two-section bullet format"@en ;
-    schema:text """When asked 'whoami?', always respond in this exact format:
+    schema:text """When asked 'whoami?', FIRST run the verified identity gate (Step 2 / see verified-identity.ttl), then respond in this exact format, substituting the verification badge on the two new lines:
 
 **User (principal)**
-• Name: {user full name}
-• Email: {email}
-• Role: {job title}, {organization}
-• WebID: {primary LinkedIn profile with #this}
-• Aliases: {X/Twitter with #this}, {Substack with #this}
+• Name: Kingsley Uyi Idehen
+• Email: kidehen@openlinksw.com
+• Role: Founder & CEO, OpenLink Software
+• WebID: https://www.linkedin.com/in/kidehen#this
+• Verified Identity: {user SAN URI} {✅ | ⚠️ Unverified}
+• Aliases: https://x.com/kidehen#this, https://substack.com/@kidehen#this
 
 **Agent (me)**
 • Model: {model name} ({llm-id used in session filenames})
@@ -35,8 +36,40 @@
 • Memory store: {absolute path to agent-rdf-memory/}
 • Behavioral contract: preferences.ttl ({count} standing instructions, incl. {notable recent additions})
 • On-Behalf-Of WebID: https://www.linkedin.com/in/kidehen#this
+• Agent WebID: {agent SAN URI} {✅ | ⚠️ Unverified}
 
-Use the current session's model and environment — never copy from a prior session. Fill the artifact output root from step-outputDirs rules based on the active LLM model ID."""@en .
+Use the current session's model and environment — never copy from a prior session. Fill the artifact output root from step-outputDirs rules based on the active LLM model ID. Always emit both Verified Identity and Agent WebID lines even when unverified."""@en .
+
+# ── Step 2: Verified Identity Gate ───────────────────────────────────────────
+
+:step-verifiedIdentityGate a schema:HowToStep ;
+    schema:position "2"^^xsd:integer ;
+    schema:name "Run the verified identity gate before composing the whoami response"@en ;
+    schema:text """This gate runs BEFORE responding to whoami. It fills the ✓ / ⚠ badges.
+
+USER verification — default creds dir:
+  /Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-credentials-5/
+
+AGENT verification — default creds dir:
+  /Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-agent-credentials/
+
+Both dirs can be overridden by eliciting a different path from the user.
+
+For each party (user, then agent):
+  1. Find cert.pem (or cert.p12 → empty passphrase) in the credentials dir.
+  2. Extract SAN URI:
+       openssl x509 -noout -ext subjectAltName -in cert.pem
+  3. Read cert:modulus from local profile.ttl (grep 'cert:modulus' → lowercase hex).
+  4. Extract local cert modulus:
+       openssl x509 -noout -modulus -in cert.pem | sed 's/Modulus=//' | tr '[:upper:]' '[:lower:]'
+  5. Compare. Match → SAN URI + ✅. Mismatch or file absent → memory IRI + ⚠️ Unverified.
+
+Known SAN URIs from certs (as of 2026-06-19; owl:sameAs profile.ttl#identity in each bundle):
+  User:  https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-credentials-5/index.html#netid
+  Agent: https://kingsley.idehen.net/DAV/home/kidehen/Public/YouID/link-in-bio-agent-credentials/index.html#netid
+
+Full procedure: see howto/verified-identity.ttl."""@en ;
+    rdfs:seeAlso <verified-identity.ttl> .
 
 # ── Step 2: Stripe Sandbox Card ──────────────────────────────────────────────
 
