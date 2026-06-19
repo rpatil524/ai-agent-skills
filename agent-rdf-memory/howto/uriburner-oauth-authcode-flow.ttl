@@ -1,0 +1,117 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:CreativeWork ;
+    schema:name "URIBurner OAuth Authorization Code Flow with Local Server"@en ;
+    schema:description "Detailed workflow for authenticating to linkeddata.uriburner.com DAV resources via the Authorization Code grant type with dynamic client registration and a local redirect listener."@en ;
+    schema:dateCreated "2026-06-19"^^xsd:date ;
+    schema:dateModified "2026-06-19"^^xsd:date ;
+    schema:about :oauthAuthCodeGuide .
+
+:oauthAuthCodeGuide a schema:HowTo ;
+    schema:name "How to authenticate to URIBurner DAV using OAuth Authorization Code flow"@en ;
+    schema:description "Three-stage process: (1) dynamic client registration at the resource's OIDC issuer, (2) Authorization Code flow with local redirect server, (3) Bearer token access to the target resource."@en ;
+    schema:step :stepCriticalInsight, :stepDiscoverOidc, :stepDynamicRegister,
+        :stepStartLocalServer, :stepBrowserAuth, :stepExchangeCode,
+        :stepAccessResource, :stepReuseToken .
+
+:stepCriticalInsight a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Critical insight: token issuer MUST match resource server"@en ;
+    schema:text """URIBurner (linkeddata.uriburner.com) and my.openlinksw.com are separate OIDC issuers.
+A token issued by my.openlinksw.com has `iss: https://my.openlinksw.com` and is rejected by URIBurner with 401.
+Always register and authenticate against the resource server's OWN OIDC provider.
+- URIBurner OIDC discovery: https://linkeddata.uriburner.com/.well-known/openid-configuration
+- my.openlinksw.com OIDC discovery: https://my.openlinksw.com/.well-known/openid-configuration
+The resource server only accepts tokens it issued itself."@en .
+
+:stepDiscoverOidc a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Discover OIDC configuration of the target resource"@en ;
+    schema:text """The target resource is typically linkeddata.uriburner.com. Fetch its OIDC discovery document:
+  curl -s https://linkeddata.uriburner.com/.well-known/openid-configuration
+Extract key endpoints:
+- authorization_endpoint: https://linkeddata.uriburner.com/OAuth2/authorize
+- token_endpoint: https://linkeddata.uriburner.com/OAuth2/token
+- registration_endpoint: https://linkeddata.uriburner.com/OAuth2/register
+Scopes include: openid, profile, email, webid, offline_access, claudeai, mcp:tools"@en .
+
+:stepDynamicRegister a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Dynamically register an OAuth client with localhost redirect URI"@en ;
+    schema:text """Register a public client with a localhost redirect URI for the Authorization Code flow:
+  curl -X POST https://linkeddata.uriburner.com/OAuth2/register \\
+    -H "Content-Type: application/json" \\
+    -d '{
+      "client_name": "Local CLI OAuth Flow",
+      "redirect_uris": ["http://localhost:12345/callback"],
+      "grant_types": ["authorization_code"],
+      "response_types": ["code"],
+      "token_endpoint_auth_method": "none"
+    }'
+Returns client_id, client_secret, and registration metadata.
+IMPORTANT: If the token endpoint requires auth_method "none" but still requires client_secret, include it in the token exchange POST body."@en .
+
+:stepStartLocalServer a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Start a local HTTP server to capture the authorization callback"@en ;
+    schema:text """Start an HTTP server on localhost (port 12345) that listens for the OAuth redirect.
+The server parses the ?code= parameter from the query string.
+Implementation in Python:
+  class CallbackHandler(http.server.BaseHTTPRequestHandler):
+      def do_GET(self):
+          params = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+          if "code" in params:
+              auth_code = params["code"][0]
+              # respond with success HTML page
+          # then proceed to token exchange
+Key: The redirect_uri registered in step 3 must exactly match the local server URL."@en .
+
+:stepBrowserAuth a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Open browser to authorization URL — user logs in"@en ;
+    schema:text """Construct and open the authorization URL in the browser:
+  auth_url = (
+      f"{AUTH_ENDPOINT}?response_type=code"
+      f"&client_id={CLIENT_ID}"
+      f"&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
+      f"&scope=openid%20webid"
+  )
+  webbrowser.open(auth_url)
+The user authenticates (social login, WebID-TLS, SQL credentials).
+The browser redirects to http://localhost:12345/callback?code={auth_code}.
+The local server captures the authorization code."@en .
+
+:stepExchangeCode a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Exchange authorization code for tokens"@en ;
+    schema:text """POST the authorization code to the token endpoint:
+  curl -X POST https://linkeddata.uriburner.com/OAuth2/token \\
+    -d "grant_type=authorization_code" \\
+    -d "code={auth_code}" \\
+    -d "redirect_uri=http://localhost:12345/callback" \\
+    -d "client_id={client_id}" \\
+    -d "client_secret={client_secret}"
+Response includes:
+- access_token (Bearer token, 3600s expiry)
+- refresh_token (for token renewal)
+- id_token (JWT with claims: sub=WebID, iss=issuer, aud=client_id)
+The id_token's "webid" claim contains the user's WebID, e.g.:
+  https://my.openlinksw.com/dataspace/person/kidehen@openlinksw.com#this"@en .
+
+:stepAccessResource a schema:HowToStep ;
+    schema:position 7 ;
+    schema:name "Access the target resource with Bearer token"@en ;
+    schema:text """Use the access_token in an Authorization header:
+  curl -s -H "Authorization: Bearer {access_token}" \\
+    "https://linkeddata.uriburner.com/DAV/demos/daas_paid/world-cup-2026-country-player-guide-meshup-gpt5-chat-1.html"
+The token works against any DAV resource on linkeddata.uriburner.com.
+After expiry (3600s), use the refresh_token to obtain a new access_token:
+  curl -X POST https://linkeddata.uriburner.com/OAuth2/token \\
+    -d "grant_type=refresh_token" \\
+    -d "refresh_token={refresh_token}" \\
+    -d "client_id={client_id}" \\
+    -d "client_secret={client_secret}"

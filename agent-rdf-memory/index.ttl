@@ -408,3 +408,16 @@
     schema:name "Session 2026-06-18 (YouID v1.0.1 — delegation triples across all RDF representations)"@en ;
     schema:description "Verified link-in-bio-credentials-5 WebID via curl mTLS. Committed youid v1.0.1, pushed PR #34. Audited/regenerated link-in-bio-agent-credentials bundle. Added delegation relations (oplcert:hasIdentityDelegate / oplcert:onBehalfOf, authority role) to ALL RDF representations in both credential bundles: POSH, JSON-LD, Turtle, Hidden RDFa, and profile.ttl."@en .
 
+:session20260619ClaudeCodeYouIDSSI a schema:ListItem ;
+    schema:position 61 ;
+    schema:item <sessions/2026-06-19-claude_sonnet_4_6-claude_code.ttl> ;
+    schema:name "Session 2026-06-19 (Claude Sonnet 4.6 + Claude Code — YouID Self-Sovereign Identity KG + Infographic)"@en ;
+    schema:description "Generated 319-triple RDF-Turtle KG + interactive HTML infographic for the YouID self-sovereign identity story. Narrative arc: Browser PKI Gap → Semantic Web bridge (WebID-TLS, FOAF, cert ontology, DPKI) → Democratization via LLM-powered AI Agents + Skills. Kingsley Uyi Idehen's principal quote attributed as the refined story thesis. D3 KG Explorer (15 Core/20 Full nodes), 4 SPARQL accordion queries, 10 FAQ pairs, 10 glossary terms, 7 HowTo steps. Fixed QName syntax error (parentheses in dbr: local name). Artifacts in /LLMs/Claude Generated/rdf/ and /webpages/."@en .
+
+:session20260619BigPickleOAuthAuthCode a schema:ListItem ;
+    schema:position 62 ;
+    schema:item <sessions/2026-06-19-big_pickle-opencode.ttl> ;
+    schema:name "Session 2026-06-19 (big-pickle + OpenCode — URIBurner OAuth Authorization Code flow)"@en ;
+    schema:description "Established OAuth2 Authorization Code flow with dynamic client registration and local redirect server for linkeddata.uriburner.com DAV resources. Discovered critical rule: token issuer MUST match resource server. Registered dynamic client at linkeddata.uriburner.com/OAuth2/register, executed Auth Code flow via localhost:12345, obtained Bearer token, accessed DAV resource (200 OK). Added Step 61 to preferences.ttl + howto/uriburner-oauth-authcode-flow.ttl."@en .
+
+
