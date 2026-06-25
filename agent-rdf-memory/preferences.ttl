@@ -1903,3 +1903,114 @@ Blank nodes (`[...]` or `_:b`) have no stable IRI. Any entity that will be (a) h
 **How to apply:** Before writing the FAQ section of any companion TTL, verify every `schema:acceptedAnswer` value is a named IRI. grep for `acceptedAnswer [` — if any match exists, it is a contract violation. Fix before proceeding."""@en ;
     onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
     rdfs:seeAlso <howto/no-blank-nodes-resolver-entities.ttl> .
+
+# ── Step 68: sparqlBtn must be <a> in footer with real SPARQL href ─────────────
+
+:step-sparqlBtnFooterAnchor a schema:HowToStep ;
+    schema:position 68 ;
+    schema:name "sparqlBtn must be an <a> element in the footer with a pre-built SPARQL href — not a <button> scroll trigger at page top"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+The harness contract (SKILL.md line 1029) states: "Every HTML infographic that has a companion RDF file MUST include a SPARQL button in the **footer** that lets users query the knowledge graph via URIBurner."
+
+And line 1040 shows: `<a id="sparqlBtn" href="...">Explore Knowledge Graph using SPARQL</a>`
+
+**Two hard rules:**
+
+1. **Element type**: `id="sparqlBtn"` MUST be an `<a>` (anchor/link) — NOT a `<button>`. The href carries the live SPARQL URL; clicking navigates directly to the endpoint result. A `<button>` that scrolls to an on-page workbench section is a different UX and does not satisfy this contract item.
+
+2. **Placement**: The `<a id="sparqlBtn">` MUST be inside the footer section (or inside `id="sparql-explorer"` which is in/near the footer) — NOT in a `#controls-bar` at the top of the page.
+
+**Required implementation pattern:**
+```html
+<!-- In footer, wrapped in id="sparql-explorer" -->
+<div id="sparql-explorer">
+  <!-- Format tabs for Turtle / JSON-LD -->
+  <button class="fmt-tab active" data-fmt="ttl" onclick="setSparqlFmt('ttl',this)">RDF Turtle</button>
+  <button class="fmt-tab" data-fmt="jsonld" onclick="setSparqlFmt('jsonld',this)">JSON-LD</button>
+  <!-- The actual sparqlBtn: an <a> with a live SPARQL href -->
+  <a id="sparqlBtn" href="{pre-encoded-sparql-url}" target="_blank" rel="noopener noreferrer">
+    Explore Knowledge Graph using SPARQL
+  </a>
+</div>
+```
+
+**Initial href**: Must NOT be `href="#"` (fragment) combined with `target="_blank"` — the validator rejects this as a fragment link incorrectly opened in a new tab. Pre-compute the canonical entity-type summary query URL and embed it directly as the initial href value.
+
+**Canonical entity-type summary query (from SKILL.md line 1027):**
+```sparql
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?type (SAMPLE(?s) AS ?sampleEntity) (SAMPLE(?label) AS ?sampleLabel) (COUNT(?s) AS ?entityCount)
+FROM <{graphIri}>
+WHERE {
+  GRAPH <{graphIri}> {
+    ?s rdf:type ?type .
+    OPTIONAL { ?s rdfs:label ?label }
+  }
+}
+GROUP BY ?type
+ORDER BY DESC(?entityCount)
+```
+
+URL: `https://linkeddata.uriburner.com/sparql?query={encodeURIComponent(query)}&format=text%2Fx-html%2Btr`
+
+**setSparqlFmt / setSparqlFmt function**: Must exist and update `sparqlBtn.href` when the user switches between RDF Turtle and JSON-LD format tabs.
+
+**Verification gate (pre-delivery):**
+grep for `id="sparqlBtn"` — the match MUST be an `<a` tag, NOT a `<button` tag. Also verify the match appears after `<footer>` in the DOM, not in a `#controls-bar` near the top.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24 and 2026-06-25), `sparqlBtn` was a `<button>` in a `#controls-bar` at the top of the page that only scrolled to the on-page SPARQL workbench. The static validator only checks for `id="sparqlBtn"` presence anywhere in the HTML — it does not check element type or position. User had to request the fix manually twice."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+:topicSparqlBtnFooterAnchor a schema:Thing ;
+    schema:name "sparqlBtn Footer Anchor Gate"@en ;
+    schema:description "id=sparqlBtn must be an <a> element placed in the footer/sparql-explorer section with a pre-built canonical SPARQL href — never a <button> scroll trigger at the top of the page. Static validator checks presence only, not element type or position."@en .
+
+# ── Step 69: Theme toggle must be in nav header bar — always visible ───────────
+
+:step-themeToggleInNavHeader a schema:HowToStep ;
+    schema:position 69 ;
+    schema:name "Theme toggle must live in the nav panel header bar — not a separate controls bar, not inside the collapsible nav body"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+The harness contract (SKILL.md line 48) states: "one page-level light/dark toggle in the **navigation panel**"
+
+The validation checklist (SKILL.md line 1174) is more precise: "Light/dark theme toggle is present in the **nav panel header bar** (`#fnav-header`) — not inside the collapsible `#fnav-links` section — so it is accessible whether the nav is collapsed or expanded."
+
+**Two rules:**
+
+1. **Location**: The theme toggle button MUST be inside the nav panel header (the always-visible strip, e.g. `.nav-header` or `#fnav-header`), NOT:
+   - In a separate `#controls-bar` floating at the top-right of the page
+   - Inside the collapsible nav body (`.nav-body`, `#fnav-links`)
+   - In the KG Explorer toolbar
+
+2. **Accessibility when collapsed**: Because the header is always visible (even when the nav is collapsed to its compact header-bar state), the theme toggle is always reachable. Placing it inside the collapsible body means the user cannot reach it when the nav is collapsed.
+
+**Correct HTML pattern (theme toggle in header alongside +/- collapse toggle):**
+```html
+<div class="nav-header" id="nav-drag-handle">
+  <span>☰ Page Title</span>
+  <div style="display:flex;gap:5px;align-items:center">
+    <button id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode"
+            onclick="toggleTheme()">☀</button>
+    <button id="nav-toggle" aria-label="Expand navigation" title="Expand">+</button>
+  </div>
+</div>
+```
+
+**toggleTheme() must update the button**: On each toggle, update the button's icon (☀/☾), `aria-label`, and `title` to reflect the new theme state.
+
+**No duplicate controls**: Do not also place a theme toggle in `#controls-bar` or the KG toolbar. One toggle, in the nav header bar. SKILL.md line 584 explicitly forbids duplicate theme controls.
+
+**Verification gate (pre-delivery):**
+grep for `id="theme-toggle"` — the match MUST appear between `<div class="nav-header"` (or `id="fnav-header"`) and its closing `</div>`. A match outside the nav header is a placement violation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24 and 2026-06-25), the theme toggle was in a `#controls-bar` at the top-right of the page (outside the nav panel entirely). An earlier fix moved it to the collapsible nav body, which also violates the contract because it becomes unreachable when the nav is collapsed. The static validator only checks that `toggleTheme` or `theme-toggle` appears somewhere in the HTML — not where."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+:topicThemeToggleInNavHeader a schema:Thing ;
+    schema:name "Theme Toggle Nav Header Placement Gate"@en ;
+    schema:description "The theme toggle must be in the nav panel header bar (always-visible strip) — not in a separate controls bar, not in the collapsible nav body. Static validator checks string presence only, not DOM placement."@en .
