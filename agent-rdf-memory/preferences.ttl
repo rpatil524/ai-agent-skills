@@ -2035,3 +2035,80 @@ grep for `id="theme-toggle"` — the match MUST appear between `<div class="nav-
 :topicThemeToggleInNavHeader a schema:Thing ;
     schema:name "Theme Toggle Nav Header Placement Gate"@en ;
     schema:description "The theme toggle must be in the nav panel header bar (always-visible strip) — not in a separate controls bar, not in the collapsible nav body. Static validator checks string presence only, not DOM placement."@en .
+
+# ── Step 70: Section heading fragment identifiers + 🔗 copy-to-clipboard ───────
+
+:step-headingFragmentIds a schema:HowToStep ;
+    schema:position 70 ;
+    schema:name "Every section heading must carry a stable id + 🔗 hover anchor with copy-to-clipboard"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+SKILL.md (Section Anchors section) states:
+- "Every section/subsection heading MUST carry a stable, unique HTML `id` attribute serving as a URL-addressable fragment identifier."
+- "Fragment IDs MUST use lowercase kebab-case."
+- "Fragment IDs MUST be stable across regenerations — derive them from section heading text (slugified) or RDF entity IRI local name."
+- "Heading hover shows visible 🔗 icon that copies the full page URL with the fragment to clipboard."
+
+**Three common violations to avoid:**
+
+1. **Id on `<section>` wrapper instead of the heading element** — putting `id="ai-integration"` on a `<section>` wrapper and leaving the `<div class="section-title">` without an id satisfies navigation but violates the spec. The id MUST be on the heading element itself (`<h2 id="ai-integration">`).
+
+2. **Using `<div class="section-title">` instead of `<h2>`** — section titles must be semantic heading elements (`<h2>`) so screen readers, document outlines, and crawlers can navigate the page structure.
+
+3. **Missing 🔗 icon** — every `<h2>` section heading must contain an `<a class="heading-anchor">` child that is hidden by default and appears on `:hover`. Clicking it copies the fragment URL to clipboard via `navigator.clipboard.writeText()`.
+
+**Correct pattern:**
+```html
+<!-- Parent <section> has NO id — the h2 carries it -->
+<section class="section">
+  <h2 class="section-title" id="ai-integration">
+    <span class="dot dot-ai"></span>
+    1. Deep AI Integration with OPAL
+    <a class="heading-anchor" href="#ai-integration"
+       onclick="copyFragmentUrl(event,'ai-integration')"
+       aria-label="Link to this section" title="Copy link to section">🔗</a>
+  </h2>
+  <!-- section content -->
+</section>
+```
+
+**Required CSS:**
+```css
+.heading-anchor {
+  display: inline-flex; align-items: center; margin-left: 8px;
+  opacity: 0; transition: opacity .15s; font-size: .75em;
+  color: var(--muted); text-decoration: none; cursor: pointer;
+}
+h2:hover .heading-anchor { opacity: 1; }
+.heading-anchor:hover { color: var(--accent); }
+```
+
+**Required JS:**
+```javascript
+function copyFragmentUrl(e, slug) {
+  e.preventDefault(); e.stopPropagation();
+  const url = window.location.href.split('#')[0] + '#' + slug;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      const a = e.currentTarget, orig = a.textContent;
+      a.textContent = '✓';
+      setTimeout(function() { a.textContent = orig; }, 1200);
+    });
+  }
+}
+```
+
+**Sections that always need this treatment:**
+hero, ai-integration (or equivalent), authentication, core-engine, sparql-middleware, kg-explorer, faq, glossary, howto, sparql-workbench — and any additional content sections.
+
+**Verification gate (pre-delivery):**
+grep for `class="section-title"` — every match must be `<h2 class=` not `<div class=`.
+grep for `id="` on `<section>` elements — should return 0 matches (ids belong on heading elements, not section wrappers).
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-25), ALL section titles were `<div class="section-title">` without any `id` or fragment anchor. The parent `<section>` elements carried the ids (which satisfied nav link navigation) but the heading elements themselves were unsemantic divs with no ids and no 🔗 icon. The static validator does not check heading element type, id placement on heading vs wrapper, or presence of copy-to-clipboard anchors."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+:topicHeadingFragmentIds a schema:Thing ;
+    schema:name "Section Heading Fragment Id Gate"@en ;
+    schema:description "Every section heading must be an <h2> (not <div>) carrying its own id attribute, plus a .heading-anchor <a> child that appears on hover and copies the fragment URL to clipboard. Static validator has no check for heading element type, id-on-wrapper vs id-on-heading, or 🔗 icon presence."@en .
