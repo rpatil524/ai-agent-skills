@@ -10,7 +10,7 @@
 <> a schema:CreativeWork ;
     schema:name "preferences.ttl"@en ;
     schema:description "Configuration for agent RDF memory management and semantic memory skill usage." ;
-    schema:dateModified "2026-06-25T14:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-25T15:46:00Z"^^xsd:dateTime ;
     schema:dateCreated "2026-05-29T17:22:00Z"^^xsd:dateTime ;
     schema:author <https://linkedin.com/in/kidehen#this> ;
     schema:about :agentBehaviorGuide .
@@ -49,7 +49,8 @@
         :topicSparqlHtmlEscape,
         :topicYouidValidationGate,
         :topicOAuthAuthCodeFlow,
-        :topicD3Loading ;
+        :topicD3Loading,
+        :topicSecretEchoRedaction ;
     schema:step :step-approval, :step-outputDirs, :step-gpt5ChatCodexOutputDirs, :step-mashupVsMeshup, :step-modelIdentityPreflight, :step-skillChain,
         :step-kgQueryMode,
         :step-entityDenotation, :step-memoryProtocol,
@@ -75,7 +76,8 @@
         :step-sparqlHtmlEscape,
         :step-youidValidationGate,
         :step-uriburnerOAuthAuthCodeFlow,
-        :step-staticD3Load, :step-singleRender .
+        :step-staticD3Load, :step-singleRender,
+        :step-secretEchoRedaction .
 
 # ── Step 1: Seek Approval ────────────────────────────────────────────────────
 
@@ -331,21 +333,64 @@
     schema:name "Respond to identity queries: full two-section for 'whoami', agent-only section for 'who are you?'"@en ;
     schema:text """Identity queries have two triggers with distinct response formats:
 
-**Trigger A — "whoami?"** → Full two-section response (User principal + Agent).
-Run the verified identity gate, then emit both sections with ✅/⚠️ badges.
+**Trigger A — "whoami?"** → Full two-section response (User principal + Agent (me) and my preferences).
+Run the verified identity gate, then emit both sections. Append the verification badge (✅/⚠️) to the `schema:identifier` value in the Value column for each section, reflecting the local mTLS verification result.
+
+**Verification priority:**
+1. **Local** — Extract modulus from the .p12 certificate and compare against the local profile.ttl/public_key.ttl `cert:modulus` declaration. Confirm exponent match.
+2. **Remote** — Fall back to the ODS `webid_verify.vsp` endpoint only if local verification is inconclusive (e.g., no local profile files available).
+
+**User section** fields (use the RDF predicate/property as the first-column label):
+• `schema:name`: {full name}
+• `schema:jobTitle`: {job title}
+• `schema:email`: {mailto: IRI (e.g., `mailto:user@example.com`)}
+• `schema:identifier`: {canonical user WebID/NetID URI (the entity IRI itself)}
+• `owl:sameAs`: {all known platform identity relations — LinkedIn, X/Twitter, Substack, DBpedia, etc.}
+• `schema:worksFor`: {employer organization}
 
 **Trigger B — "who are you?"** / "who is this?" / "identify yourself" → Agent-only response.
-Skip the verified identity gate. Emit only the **Agent (me)** section with these fields:
+Skip the verified identity gate. Emit only the **Agent (me) and my preferences** section with these fields:
 • Model: {model name} ({llm-id})
 • Environment: {agent environment name}
 • Artifact output root: {path from step-outputDirs} (rdf/, md/, webpages/)
 • Active project: {current task/project or 'none yet this session'}
 • Memory store: {absolute path to agent-rdf-memory/}
 • Behavioral contract: preferences.ttl ({count} standing instructions, incl. {notable recent additions})
-• Agent WebID: {agent SAN URI} (omit ✅/⚠ badge — no cert verification on this trigger)
+• `schema:identifier`: {agent SAN URI} (omit ✅/⚠ badge — no cert verification on this trigger)
 
 Do not add User section lines or verify identity when the query is about the agent only."""@en ;
     onto:hasTrigger onto:triggerWhoamiQuery ;
+    rdfs:seeAlso <howto/agent-identity.ttl> .
+
+# ── Step 23.1: WebID-TLS Verification ─────────────────────────────────────────
+
+:step-webidTlsVerification a schema:HowToStep ;
+    schema:position 23.1 ;
+    schema:name "Verify WebID-TLS credentials — local first, remote fallback"@en ;
+    schema:text """When verifying any WebID-TLS identity (agent, principal, or third-party), use this local-first methodology:
+
+**Step 1 — Local verification (primary):**
+1. Extract the certificate's RSA modulus using `openssl x509 -in <cert> -noout -modulus`.
+2. Load the local profile document (profile.ttl, public_key.ttl, or index.html with embedded RDF).
+3. Find the `cert:modulus` and `cert:exponent` values from the `cert:RSAPublicKey` entity linked via `cert:key` from the WebID entity.
+4. Compare: modulus must match byte-for-byte (hex, case-insensitive). Exponent must match (typically 65537).
+5. If matched → ✅ Verified locally. Skip remote verification.
+6. If no local profile documents exist → Proceed to Step 2.
+
+**Step 2 — Remote verification (fallback):**
+1. Use curl with the P12 certificate against the ODS `webid_verify.vsp` endpoint:
+   ```
+   curl -sik --cert-type P12 --cert "<path>/cert.p12:<password>" "https://<ods-host>:<port>/webid/webid_verify.vsp?callback=x"
+   ```
+2. Check the response: `webid=` parameter contains the extracted WebID from the cert SAN.
+3. If `pku=` contains a URI → Public key was found and verified remotely.
+4. If `pku=No such info` → Remote server could not extract the cert:key chain (likely RDF extraction failure from HTML pages).
+
+**Step 3 — Reporting:**
+- Local match → ✅ badge on `schema:identifier`.
+- Local match + delegation (`oplcert:onBehalfOf`) → ✅ on both agent and principal identifiers.
+- Remote-only partial (TLS ok, pku failed) → ⚠️ on the identifier.
+- No cert available → No badge."""@en ;
     rdfs:seeAlso <howto/agent-identity.ttl> .
 
 # ── Step 24: Secret Redaction ────────────────────────────────────────────────
@@ -2134,3 +2179,83 @@ grep for `id="` on `<section>` elements — should return 0 matches (ids belong 
     schema:name "Use single render() that wipes/rebuilds SVG — not initGraph/updateGraph split"@en ;
     schema:text "Use a single render() function that calls svg.selectAll('*').remove() and rebuilds everything. Avoids D3 data join mutation bugs from stale source/target object references. Proven in canonical competitive-analysis-head-to-head template. See howto/kg-explorer-d3-patterns.ttl step 6 for full pattern."@en ;
     rdfs:seeAlso <howto/kg-explorer-d3-patterns.ttl> .
+
+# ── Step 73: Secret value echo protection ──────────────────────────────────────
+
+:topicSecretEchoRedaction a schema:Thing ;
+    schema:name "Secret Value Echo Protection"@en ;
+    schema:description "Never echo API keys, bearer tokens, or other credentials in command output, shell traces, or displayed text. When executing authenticated curl commands or processing responses that contain secrets, ensure the secret values are never visible in stdout, stderr, or any output shown to the user — even when piping through tee or debugging helpers. Interactions may be recorded for training or demo purposes."@en .
+
+:step-secretEchoRedaction a schema:HowToStep ;
+    schema:position 73 ;
+    schema:name "Never echo secret values in command output or displayed text"@en ;
+    schema:text """Never display API keys, bearer tokens, Stripe secret keys, or any credential value in command output, shell traces, or any text shown to the user:
+
+**Prohibited patterns:**
+1. Using `-u "${STRIPE_API_KEY}"` (no trailing colon) — curl treats the key as a username and prompts `Enter host password for user 'sk_test_...'`, echoing the key.
+2. Using `tee /dev/stderr` on responses that contain credential values visible in the agent's output.
+3. Echoing or printing authenticated curl command strings that contain inline secret values.
+4. Logging full API responses to stderr when those responses include credential material (SPT IDs, bearer tokens, etc.) — filter or redact before display.
+5. Any sed/awk/jq extraction of secret values that would show the value in the agent's output. Extract silently and use only in the next command.
+
+**Required patterns:**
+1. When using `-u` with a Stripe API key (or any token that lacks a colon), ALWAYS append a trailing colon: `-u "${STRIPE_API_KEY}:"`. This tells curl "username = key, password = empty" — no password prompt, no echo. Stripe's HTTP Basic auth expects exactly this format.
+2. Pipe API responses only to silent extraction (e.g., `python3 -c "import sys,json; print(json.load(sys.stdin)['id'])"`) if you must extract an ID — but never tee to stderr if the response contains credentials.
+3. When debugging, log metadata (HTTP status, response size, success/failure) — never the raw response body if it contains secrets.
+4. Use `set +x` / `set -x` wrappers around any authenticated command to prevent shell tracing from revealing secrets.
+
+**Why:** The user explicitly requested this rule because interactions may be recorded for training and demo purposes. A secret value visible in a session recording could be captured in training data. The existing :step-secretRedaction (position 24) covers redaction in written memory documents after the fact; this step covers preventing display during execution — an earlier point in the pipeline."""@en ;
+    onto:hasTrigger onto:triggerBehaviorGapIdentified, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/session-governance.ttl> .
+
+# ── Step 74: DBpedia IRI as canonical subject — no local-alias + owl:sameAs ────
+
+:step-dbpediaCanonicalSubject a schema:HowToStep ;
+    schema:position 74 ;
+    schema:name "When a DBpedia IRI exists for an entity, use it as the primary subject — never a document-local alias with owl:sameAs dbr:X"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every RDF document generated.**
+
+The canonical IRI compliance gate (step 32) requires using the highest-priority platform IRI as the entity subject. This step makes the specific rule for DBpedia IRIs explicit and non-negotiable:
+
+**The rule:** When a DBpedia resource IRI exists for an entity and is verified (step 30), that IRI IS the entity's subject in the generated RDF. The entity MUST be defined as:
+
+```turtle
+dbr:Semantic_Web
+    a schema:DefinedTerm ;
+    schema:name "a Semantic Web"@en ;
+    ...
+    owl:sameAs wd:Q54837 .    ← Wikidata cross-reference: stays
+```
+
+**Not as:**
+```turtle
+:semanticWeb                   ← document-local IRI: prohibited when DBpedia IRI exists
+    a schema:DefinedTerm ;
+    ...
+    owl:sameAs dbr:Semantic_Web .  ← self-referential owl:sameAs after migration; wastes a triple
+```
+
+**What this eliminates:** The pattern of creating a document-local hash IRI (`:semanticWeb`, `:term-sparql`, `:knowledgeGraph`) and then adding `owl:sameAs dbr:X` creates redundant triples and prevents the entity from being directly dereferenceable at its canonical address. The owl:sameAs triple is logically correct but architecturally wasteful — it should express cross-vocabulary alignment (DBpedia ↔ Wikidata), not an alias between a document-local IRI and its canonical counterpart.
+
+**owl:sameAs triples that SHOULD exist (cross-vocabulary):**
+- `dbr:Semantic_Web owl:sameAs wd:Q54837 .` — DBpedia ↔ Wikidata alignment ✓
+- `dbr:SPARQL owl:sameAs wd:Q54871 .` — DBpedia ↔ Wikidata alignment ✓
+
+**owl:sameAs triples that should NOT exist (self-referential or avoidable):**
+- `:semanticWeb owl:sameAs dbr:Semantic_Web .` — use DBpedia as subject directly ✗
+- `dbr:Semantic_Web owl:sameAs dbr:Semantic_Web .` — identity, no information ✗
+
+**Scope:** This rule applies to all entity types: schema:DefinedTerm (glossary), schema:Thing (concept), schema:Organization, schema:SoftwareApplication, schema:CreativeWork. For entities with NO DBpedia IRI, document-local IRIs remain correct (OPAL, MCP, MPP, Delta-Sharing, Sponger, etc.).
+
+**Verification gate (post-generation):**
+1. grep TTL for `: owl:sameAs dbr:` — every match is a document-local entity that should be migrated to use DBpedia as primary subject.
+2. grep TTL for `owl:sameAs dbr:X` where the subject is ALSO `dbr:X` — self-referential, must be removed.
+3. After migration, all owl:sameAs triples should express cross-vocabulary alignment only (DBpedia ↔ Wikidata) or person/organization platform identity equivalences.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 KG (2026-06-25), entities like `:semanticWeb`, `:term-sparql`, `:knowledgeGraph`, `:virtuosoProduct` were all defined as document-local IRIs with `owl:sameAs dbr:X` added separately, resulting in 18 owl:sameAs triples of which 10 were avoidable local-alias patterns. After migration to DBpedia canonical subjects, owl:sameAs dropped to 8 — only genuine cross-vocabulary and platform identity alignments remain."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/canonical-iri-compliance-gate.ttl> .
+
+:topicDbpediaCanonicalSubject a schema:Thing ;
+    schema:name "DBpedia Canonical Subject Gate"@en ;
+    schema:description "When a DBpedia IRI exists for an entity, it must be used as the primary subject — never as the target of owl:sameAs from a document-local IRI. owl:sameAs should only express genuine cross-vocabulary alignment (DBpedia↔Wikidata) or platform identity equivalences."@en .
