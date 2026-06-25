@@ -6,6 +6,21 @@ license: MIT
 
 # RDF-based HTML and Markdown Infographic Generation Skill
 
+## Operating Modality — Read This First
+
+**You are a modern UI/UX expert and visual designer** for the duration of any task that uses this skill. This is not a mode you switch into on request — it is your identity when this skill is active.
+
+What this means in practice:
+
+- **Design intent before implementation** — before writing a single line of HTML or CSS, decide the visual hierarchy, colour system, spacing rhythm, and interaction model. The spec constrains what must be present; your design judgment determines how it looks and feels.
+- **Colour token discipline** — use `--accent` (blue) exclusively for resolver entity links; `--accent2` (purple) only for counter badges and icon backgrounds; `--accent3` (green) for positive/success states. Never use accent colours interchangeably.
+- **Typography as information architecture** — heading sizes, weights, and spacing should communicate hierarchy, not just label sections. Section subtitles in `--muted` reduce visual noise so entity links in `--accent` stand out.
+- **Node label geometry** — KG Explorer node labels belong *below* the circle (`y = r + 11`), never inside it. Text width at any readable font size exceeds a small circle diameter. Use `paint-order: stroke` with `stroke: var(--bg)` for contrast on any background.
+- **Interaction consistency** — hover states, focus rings, active states, and transition durations must be consistent across cards, accordions, buttons, and graph elements. A component that behaves differently from its siblings is a design defect.
+- **First-pass quality** — the goal is zero aesthetic corrections from the user. Read the full harness contract and the KG Explorer Non-Negotiables below before writing any code, then build to that bar on the first attempt.
+
+---
+
 Transform raw RDF knowledge graphs into visually compelling, interactive HTML infographics and optional Markdown companion documents. This skill provides everything needed to convert semantic data into high-fidelity, modern web presentations and portable Markdown summaries.
 
 ## Overview
@@ -90,6 +105,7 @@ Future KG Explorers MUST use the same behavioral contract as the helper shell:
 - Graph payload is derived from companion RDF, includes no orphan links, and keeps node IDs and predicate IDs as RDF IRIs.
 - SVG node labels and edge labels are resolver-backed anchors with `href`, `xlink:href`, `target="_blank"`, `rel="noopener noreferrer"`, `data-iri`, and `data-resolver-href`.
 - Nodes support sticky drag with a click-distance guard; double-click unpins.
+- **Node label geometry**: labels MUST be positioned **below** the node circle (`y = r + ~11`), never inside it. `dominant-baseline: central` on a text element that sits at `y=0` inside a small circle (r ≤ 18) causes label overflow — the text width at typical font sizes exceeds the circle diameter. Correct pattern: `attr("y", r + 11)` with `text-anchor: middle`, `fill: var(--text)`, `stroke: var(--bg)`, `stroke-width: 2.5`, `paint-order: stroke` (halo for contrast on any background), and truncation at ~15 characters. The circle remains the colour-coded group indicator; the label reads in free space below it.
 
 #### Footer SPARQL Workbench Non-Negotiables
 
@@ -241,9 +257,11 @@ The generated HTML follows this narrative flow:
 
 ### Navigation Control Best Practices
 
-⛔ **PRE-BUILD CHECK**: Before writing the nav panel HTML/CSS/JS, re-read the full "Navigation Control Best Practices" section and the "Navigation Control" and "localStorage Correctness" items in the Validation Checklist. Confirm: collapse-to-header-bar pattern, always-visible header, toggle button (+/−) with aria-label, links hidden when collapsed (`max-height:0`), draggable by header bar, resizable, starts collapsed by default, no pin marker, no inactivity timer, no separate close/restore elements. JS: single IIFE with drag + toggle, no timers, localStorage write only when expanded, stale-state recovery, page-specific key.
+⛔ **PRE-BUILD CHECK**: Before writing the nav panel HTML/CSS/JS, re-read the full "Navigation Control Best Practices" section and the "Navigation Control" and "localStorage Correctness" items in the Validation Checklist. Confirm: collapse-to-header-bar pattern, always-visible header, toggle button (+/−) with aria-label, links hidden when collapsed (`max-height:0`), draggable by header bar, resizable, starts collapsed by default, no pin marker, no separate close/restore elements, inactivity fade after 2 minutes with reactivation marker. JS: IIFE for drag + toggle + inactivity fade; separate IIFE for fade timer; localStorage write only when expanded, stale-state recovery, page-specific key.
 
-**Pattern**: Collapse-to-header-bar — the panel is always visible as a compact header. A toggle button collapses/expands the link list. No pin marker, no inactivity fade, no separate close/restore buttons.
+**Pattern**: Collapse-to-header-bar — the panel is always visible as a compact header. A toggle button collapses/expands the link list. No pin marker, no separate close/restore buttons.
+
+**Inactivity fade**: After 2 minutes of user inactivity (no `mousemove`, `keydown`, `scroll`, `click`, or `touchstart`), the nav panel fades out via `opacity: 0` + `pointer-events: none`. A small reactivation marker (☰ button, same `top`/`right` position as the nav, `z-index` one above) becomes visible. Clicking the marker or any user activity resets the 2-minute timer and restores the nav. The marker is created dynamically in JS, styled via an injected `<style>` block, and requires `transition: opacity 0.8s ease` on `#fnav`.
 
 **Header bar**:
 - Always visible, positioned fixed (top-left or top-right)
@@ -261,7 +279,7 @@ The generated HTML follows this narrative flow:
 - Toggle button shows `−` with title "Collapse"
 - Link list appears below the header
 
-**JavaScript**: Use the minimal collapse IIFE — a single script block with draggable header and toggle behavior. No timers, no localStorage, no separate close/restore/pin elements.
+**JavaScript**: Two IIFEs — (1) drag + collapse toggle with localStorage persistence; (2) inactivity fade timer (2-minute `setTimeout`, reset on any user activity) that fades the nav and shows a dynamically created reactivation marker. No separate close/restore/pin elements.
 
 ### Hero Section Best Practices
 
@@ -293,7 +311,8 @@ See `references/design-patterns.md` for detailed design system guidelines.
 - Always-visible header with title and collapse toggle (− / +)
 - Collapsed: header bar only. Expanded: header + link list
 - Contains navigation to all entity types and main sections
-- No pin marker, no inactivity timer, no separate close/restore buttons
+- No pin marker, no separate close/restore buttons
+- Inactivity fade: nav fades after 2 minutes; reactivation marker (☰) appears at same position
 - JavaScript: single IIFE with drag + toggle behavior
 
 #### Scroll-Triggered Animations
@@ -396,9 +415,10 @@ This version of the rdf-infographic-skill includes significant UX and visual imp
 
 ### Navigation Panel Redesign
 - **Collapse-to-Header-Bar**: Panel always shows a compact header; toggle expands/collapses the link list
-- **No Pin Marker**: Pin marker and inactivity fade removed — simpler, always-visible control
+- **No Pin Marker**: No pin marker or separate close/restore buttons
+- **Inactivity Fade**: Nav fades to 0 opacity after 2 minutes of inactivity; a ☰ reactivation marker appears at the same position; any user activity (mousemove, keydown, scroll, click, touch) resets the timer and restores the nav
 - **No Close Button**: Toggle replaces close/restore — a single button handles both states
-- **Minimal JavaScript**: Single IIFE with drag + toggle behavior, no timers or localStorage
+- **JavaScript**: Two IIFEs — drag + collapse toggle (with localStorage), and inactivity fade timer with reactivation marker
 - **Smooth Animations**: Cubic-bezier easing (0.16, 1, 0.3, 1) throughout
 
 ### Hero Section Fixes

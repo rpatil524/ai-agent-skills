@@ -453,10 +453,18 @@ def formation_svg(team_name, tactic_str, starters, colour, annotations):
 
     player_slots = []
     idx = 0
+    # Inward margin per count: fewer players → more central, more players → full width
+    _MARGINS = {1: 0, 2: 65, 3: 30, 4: 10, 5: 0}
     for li, (count, y) in enumerate(zip(lines, y_positions)):
         line_players = sorted_starters[idx: idx + count]
         idx += count
-        xs = [170] if count == 1 else [40 + round(j * 260 / (count - 1)) for j in range(count)]
+        margin = _MARGINS.get(count, 0)
+        left = 40 + margin
+        right = 300 - margin
+        if count == 1:
+            xs = [170]
+        else:
+            xs = [round(left + j * (right - left) / (count - 1)) for j in range(count)]
         for player, cx in zip(line_players, xs):
             player_slots.append((player, cx, y))
 
@@ -887,6 +895,64 @@ JS = """
     while(document.getElementById(slug)||seen[slug]){slug=base+'-'+(++n);}
     seen[slug]=1;el.id=slug;wire(el,'#'+slug);
   });
+})();
+
+// Nav inactivity fade — fades after 2 min of inactivity, leaves reactivation marker
+(function(){
+  var nav = document.getElementById('fnav');
+  var DELAY = 2 * 60 * 1000;
+  var timer = null;
+  var faded = false;
+
+  // Reactivation marker — same position as nav, appears when nav fades
+  var marker = document.createElement('button');
+  marker.id = 'fnav-reactivate';
+  marker.innerHTML = '&#9776;';
+  marker.setAttribute('aria-label', 'Show navigation');
+  marker.title = 'Show navigation';
+  document.body.appendChild(marker);
+
+  // Inject CSS for transition and marker
+  var s = document.createElement('style');
+  s.textContent =
+    '#fnav{transition:opacity 0.8s ease;}' +
+    '#fnav-reactivate{position:fixed;top:24px;right:24px;z-index:1001;' +
+    'width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.25);' +
+    'background:rgba(10,22,40,0.65);backdrop-filter:blur(10px);' +
+    'color:rgba(255,255,255,0.55);font-size:18px;cursor:pointer;' +
+    'display:flex;align-items:center;justify-content:center;' +
+    'opacity:0;pointer-events:none;transition:opacity 0.5s ease;}' +
+    '#fnav-reactivate:hover{background:rgba(10,22,40,0.9);color:#fff;}';
+  document.head.appendChild(s);
+
+  function fade() {
+    nav.style.opacity = '0';
+    nav.style.pointerEvents = 'none';
+    marker.style.opacity = '1';
+    marker.style.pointerEvents = 'auto';
+    faded = true;
+  }
+
+  function restore() {
+    nav.style.opacity = '1';
+    nav.style.pointerEvents = '';
+    marker.style.opacity = '0';
+    marker.style.pointerEvents = 'none';
+    faded = false;
+  }
+
+  function reset() {
+    clearTimeout(timer);
+    if (faded) restore();
+    timer = setTimeout(fade, DELAY);
+  }
+
+  marker.addEventListener('click', reset);
+  ['mousemove','keydown','scroll','click','touchstart'].forEach(function(e){
+    document.addEventListener(e, reset, {passive:true});
+  });
+
+  reset(); // start timer on load
 })();
 
 // Explore KG using SPARQL — canonical SAMPLE-based entity-type summary query
@@ -1547,6 +1613,9 @@ details summary::after {{ color: var(--accent); }}
       {a_form_svg}
     </div>
   </div>
+  <p style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:16px;text-align:center;">
+    ⚽ Goal &nbsp;·&nbsp; ↑ Substituted on &nbsp;·&nbsp; ↓ Substituted off &nbsp;·&nbsp; 🟨 Yellow card &nbsp;·&nbsp; 🟥 Red card
+  </p>
 </section>
 
 <!-- Squads -->

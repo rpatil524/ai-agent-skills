@@ -10,7 +10,7 @@
 <> a schema:CreativeWork ;
     schema:name "preferences.ttl"@en ;
     schema:description "Configuration for agent RDF memory management and semantic memory skill usage." ;
-    schema:dateModified "2026-06-18T13:05:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-25T14:00:00Z"^^xsd:dateTime ;
     schema:dateCreated "2026-05-29T17:22:00Z"^^xsd:dateTime ;
     schema:author <https://linkedin.com/in/kidehen#this> ;
     schema:about :agentBehaviorGuide .
@@ -105,9 +105,9 @@
 
 :step-modelIdentityPreflight a schema:HowToStep ;
     schema:position 2.3 ;
-    schema:name "Determine output root folder at session initialization — never re-derive mid-session"@en ;
-    schema:text """Before writing any output file, confirm the session's output root folder has been determined. The output root is resolved once at session initialization, with model identity as the primary input. All artifacts in the session use this determined root consistently. Never re-derive, second-guess, or infer the root from agent environment name, session context, prior filenames, or any source other than the session-initialization determination."""@en ;
-    onto:hasTrigger onto:triggerArtifactGeneration ;
+    schema:name "BLOCKING GATE — resolve output root from system prompt model ID before any file write"@en ;
+    schema:text """BLOCKING GATE: No file write of any kind (HTML, RDF, Markdown, or other artifact) is permitted until the output root has been explicitly resolved from the system prompt model identifier. This resolution MUST occur at session initialization — not at write time, not on demand, not inferred from context. RESOLUTION PROCEDURE: (1) Read the system prompt for the model identifier (e.g. 'claude-sonnet-4-6', 'deepseek-v4-pro'). (2) Map it to the canonical model-specific subdirectory under /Users/kidehen/Documents/LLMs/ per step-outputDirs. (3) Confirm the resolved root before proceeding. ENFORCEMENT: If the resolved root has not been confirmed when a write is about to occur, stop — resolve it first, then write. Never fall back to kg-output/, the repo root, /tmp, or any working folder. Never re-derive mid-session. Never infer from session filenames, agent environment name, prior conversation context, or memory entries."""@en ;
+    onto:hasTrigger onto:triggerSessionStart, onto:triggerArtifactGeneration ;
     rdfs:seeAlso <howto/artifact-routing.ttl> .
 
 :topicModelIdentityPreflight a schema:Thing ;
@@ -326,7 +326,24 @@
 
 :step-whoamiFormat a schema:HowToStep ;
     schema:position 23 ;
-    schema:name "Present whoami responses in the canonical two-section bullet format"@en ;
+    schema:name "Respond to identity queries: full two-section for 'whoami', agent-only section for 'who are you?'"@en ;
+    schema:text """Identity queries have two triggers with distinct response formats:
+
+**Trigger A — "whoami?"** → Full two-section response (User principal + Agent).
+Run the verified identity gate, then emit both sections with ✅/⚠️ badges.
+
+**Trigger B — "who are you?"** / "who is this?" / "identify yourself" → Agent-only response.
+Skip the verified identity gate. Emit only the **Agent (me)** section with these fields:
+• Model: {model name} ({llm-id})
+• Environment: {agent environment name}
+• Artifact output root: {path from step-outputDirs} (rdf/, md/, webpages/)
+• Active project: {current task/project or 'none yet this session'}
+• Memory store: {absolute path to agent-rdf-memory/}
+• Behavioral contract: preferences.ttl ({count} standing instructions, incl. {notable recent additions})
+• Agent WebID: {agent SAN URI} (omit ✅/⚠ badge — no cert verification on this trigger)
+
+Do not add User section lines or verify identity when the query is about the agent only."""@en ;
+    onto:hasTrigger onto:triggerWhoamiQuery ;
     rdfs:seeAlso <howto/agent-identity.ttl> .
 
 # ── Step 24: Secret Redaction ────────────────────────────────────────────────
@@ -438,8 +455,8 @@
     schema:description "Stripe test mode card credentials for ACP subscription payment validation."@en .
 
 :topicWhoamiFormat a schema:Thing ;
-    schema:name "Whoami Response Format"@en ;
-    schema:description "Canonical two-section bullet format for whoami responses, covering user principal and agent identity with artifact routing, memory store, and behavioral contract."@en .
+    schema:name "Identity Query Response Format"@en ;
+    schema:description "Two triggers: 'whoami?' → full two-section (User + Agent) with verified identity badges; 'who are you?' → agent-only section without badges. Agent section covers model, environment, artifact routing, memory store, and behavioral contract."@en .
 
 :topicSecretRedaction a schema:Thing ;
     schema:name "Secret Redaction in Memory Documents"@en ;
@@ -1029,8 +1046,10 @@ Root cause this gate prevents: in session 2026-06-12, schema:Question entities w
 
 :step-uiUxExpertPersona a schema:HowToStep ;
     schema:position 44 ;
-    schema:name "Operate as a UI/UX expert when producing any visual or interactive artifact"@en ;
-    schema:text """Whenever generating or editing an HTML page, interactive infographic, dashboard, or any other visual artifact, operate as a UI/UX expert without being asked. This is a standing behavioral default — not a per-session request.
+    schema:name "Operate as a modern UI/UX expert when producing any visual or interactive artifact"@en ;
+    schema:text """**Primary declaration:** The rdf-infographic-skill SKILL.md "Operating Modality" section is the primary source for this persona. This preferences.ttl step is the cross-session reinforcement — it fires even when the skill SKILL.md is not explicitly re-read.
+
+Whenever generating or editing an HTML page, interactive infographic, dashboard, or any other visual artifact, operate as a modern UI/UX expert and visual designer without being asked. This is a standing behavioral default — not a per-session request. Design intent precedes implementation: decide visual hierarchy, colour system, spacing rhythm, and interaction model before writing code.
 
 **What this means in practice:**
 
@@ -1536,11 +1555,11 @@ a contract violation — raise the threshold or use skos:related instead."""@en 
 
 **What NOT to escape:** Live query URLs use `encodeURIComponent()` — URL-encoding is separate from HTML-escaping. Do NOT double-escape.
 
-**Verification gate:** After generating HTML, grep for `GRAPH\s+<https?://` inside `<pre class="sparql-code">` blocks. A match means the IRI brackets were NOT escaped and the IRI will be invisible. The check passes only when `GRAPH &lt;https://` (escaped) is found instead.
+**Verification gate:** After generating HTML, grep for `GRAPH\\s+<https?://` inside `<pre class="sparql-code">` blocks. A match means the IRI brackets were NOT escaped and the IRI will be invisible. The check passes only when `GRAPH &lt;https://` (escaped) is found instead.
 
   # Gate check (MUST pass):
-  grep -Pzo '(?s)<pre class="sparql-code">.*?GRAPH\s+&lt;https?://' file.html  → MUST return match
-  grep -Pzo '(?s)<pre class="sparql-code">.*?GRAPH\s+<https?://' file.html   → MUST return 0 matches
+  grep -Pzo '(?s)<pre class="sparql-code">.*?GRAPH\\s+&lt;https?://' file.html  → MUST return match
+  grep -Pzo '(?s)<pre class="sparql-code">.*?GRAPH\\s+<https?://' file.html   → MUST return 0 matches
 
 **Why:** This bug was discovered when the Databricks-Virtuoso infographic's Entity Type Discovery query showed `GRAPH  {` with an empty IRI — the DAV path was present in the source but consumed as an HTML tag. The user flagged: "Aren't these escaping rules in the skills contract(s)?" — they weren't. They are now."""@en ;
     schema:url <howto/sparql-html-escape-gate.ttl> .
@@ -1607,8 +1626,10 @@ This also applies to derived phrases: "the Semantic Web stack" → "a Semantic W
 
 :step-verifiedWhoami a schema:HowToStep ;
     schema:position 60 ;
-    schema:name "Run verified identity gate before responding to whoami"@en ;
-    schema:text """When a whoami query is received, execute the verified identity gate BEFORE composing the response. Do not skip this for speed — the gate is part of the whoami protocol.
+    schema:name "Run verified identity gate before responding to whoami (not for 'who are you?' queries)"@en ;
+    schema:text """The verified identity gate only applies to **Trigger A ("whoami?")** — full two-section responses. For **Trigger B ("who are you?" / "who is this?" / "identify yourself")** skip this gate entirely and emit only the Agent section without ✅/⚠ badges.
+
+When a "whoami?" query is received:
 
 Gate procedure:
 
@@ -1627,7 +1648,7 @@ AGENT verification:
 1. Default credentials dir: /Users/kidehen/Documents/Management/Marketing/WebID/Templates/YouID/link-in-bio-agent-credentials/
 2. Same steps 2–6 as above.
 
-Response format (after gate):
+Response format (Trigger A only — after gate):
 
 **User (principal)**
 • Name: Kingsley Uyi Idehen
@@ -1655,7 +1676,7 @@ Always emit the Agent WebID and On-Behalf-Of lines even when unverified — ⚠�
 
 :topicVerifiedWhoami a schema:Thing ;
     schema:name "Verified identity gate for whoami"@en ;
-    schema:description "Before responding to whoami, run openssl cert modulus checks against local credential bundles for both user and agent. Emit verified IRI lines with ✅ or ⚠️ Unverified badge."@en .
+    schema:description "Before responding to 'whoami?' (Trigger A), run openssl cert modulus checks against local credential bundles for both user and agent. Emit verified IRI lines with ✅ or ⚠️ Unverified badge. For 'who are you?' (Trigger B), skip gate and emit Agent-only section without badges."@en .
 
 # ── Step 61: URIBurner OAuth Authorization Code Flow ──────────────────────────
 
@@ -1683,7 +1704,7 @@ Always emit the Agent WebID and On-Behalf-Of lines even when unverified — ⚠�
 See howto/uriburner-oauth-authcode-flow.ttl for the full step-by-step with curl and Python templates.
 
 **The prompt to use next time:**
-"Use OAuth Authorization Code flow with local redirect server on localhost:12345. Register a dynamic client at linkeddata.uriburner.com's OAuth2/register, execute the Auth Code flow to get a Bearer token, then use that token to access the DAV resource. The token issuer MUST be linkeddata.uriburner.com — NOT my.openlinksw.com."@en ;
+"Use OAuth Authorization Code flow with local redirect server on localhost:12345. Register a dynamic client at linkeddata.uriburner.com's OAuth2/register, execute the Auth Code flow to get a Bearer token, then use that token to access the DAV resource. The token issuer MUST be linkeddata.uriburner.com — NOT my.openlinksw.com."""@en ;
     onto:hasTrigger onto:triggerPreferencesUpdate, onto:triggerCurlAuth ;
     rdfs:seeAlso <howto/uriburner-oauth-authcode-flow.ttl> .
 
@@ -1711,6 +1732,157 @@ was generated incorrectly. Newton, Massachusetts (LinkedIn profile location) is 
 **Related:** X.509 DN field L= (Locality Name) = place of residence, NOT birthplace. See howto/rdf-residence-vs-birthplace.ttl."""@en ;
     onto:hasTrigger onto:triggerPreferencesUpdate ;
     rdfs:seeAlso <howto/rdf-residence-vs-birthplace.ttl> .
+
+# ── Step 64: FAQ question text must be a resolver hyperlink ──────────────────
+
+:step-faqQuestionTextHyperlink a schema:HowToStep ;
+    schema:position 64 ;
+    schema:name "Wrap FAQ question TEXT in a resolver <a> — 'Lookup' badge alone is insufficient"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every FAQ section generated.**
+
+The CLAUDE.md entity hyperlinks contract states: "ALL entity text (FAQ Q&A, glossary terms/defs, HowTo title/steps) must be hyperlinked to KG entity IRIs via resolver pattern."
+
+The faq-entity-iri-gate (step 42) prescribes a 'Lookup' badge inside `.faq-q`. This badge is ADDITIONAL, not a replacement. The question text itself must ALSO be an `<a>` targeting the schema:Question entity IRI through the resolver.
+
+**Correct FAQ question HTML (both hyperlinked text AND Lookup badge):**
+```html
+<div class="faq-q" role="button" tabindex="0" onclick="toggleFaq(this)">
+  <span class="faq-q-text">
+    <a href="{resolver-url}" target="_blank" rel="noopener noreferrer"
+       onclick="event.stopPropagation()"
+       style="color:var(--accent);text-decoration:none">
+      {question text}
+    </a>
+  </span>
+  <span class="faq-q-actions">
+    <a class="faq-lookup" href="{resolver-url}" target="_blank" rel="noopener noreferrer"
+       onclick="event.stopPropagation()">Lookup</a>
+    <span class="faq-arrow">▼</span>
+  </span>
+</div>
+```
+
+**CSS required:**
+```css
+.faq-q-text a { color: var(--accent); text-decoration: none; font-weight: inherit; }
+.faq-q-text a:hover { text-decoration: underline; }
+```
+
+**Verification gate:** grep generated HTML for `class="faq-q-text"` — every match MUST contain an `<a href="https://linkeddata.uriburner.com/describe/?url=` within the same `<span>`. If any `.faq-q-text` span lacks that nested anchor, it is a contract violation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24), all 12 FAQ question texts were plain `<span>` with only a 'Lookup' badge. The static validator (validate-harness-contract.py) does not check for nested anchors inside `.faq-q-text`, so the gap passed the gate but violated the entity hyperlink contract. User had to request the fix manually."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/faq-entity-iri-gate.ttl> .
+
+:topicFaqQuestionTextHyperlink a schema:Thing ;
+    schema:name "FAQ Question Text Hyperlink Gate"@en ;
+    schema:description "FAQ question TEXT must be wrapped in a resolver <a> targeting the schema:Question entity IRI — the 'Lookup' badge is additional, not a substitute. Verified by grepping .faq-q-text spans for nested resolver anchors."@en .
+
+# ── Step 65: SPARQL workbench placement — after content sections ──────────────
+
+:step-sparqlWorkbenchPlacement a schema:HowToStep ;
+    schema:position 65 ;
+    schema:name "Place the SPARQL workbench section AFTER FAQ/Glossary/HowTo — never between KG Explorer and FAQ"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every HTML infographic with a SPARQL workbench.**
+
+The rdf-infographic-skill contract calls the workbench a "Footer SPARQL Workbench." This means it belongs AFTER all content sections (FAQ, Glossary, HowTo), immediately before the attribution footer. It must NOT appear between the KG Explorer and the FAQ.
+
+**Correct section order:**
+1. Hero
+2. Feature/content sections (AI Integration, Auth, Core Engine, SPARQL/Middleware, …)
+3. Knowledge Graph Explorer
+4. FAQ
+5. Glossary
+6. HowTo
+7. SPARQL Workbench  ← last content section, just above footer
+8. Footer
+
+**Verification gate:** In the generated HTML, verify that the character position of `id="sparql-workbench"` (or `id="sparql-explorer"`) is AFTER the character position of `id="howto"`. If `sparql-workbench` appears before `faq` or between `kg-explorer` and `faq`, it is a placement violation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24), the SPARQL workbench was placed between the KG Explorer and the FAQ sections. The static validator checks for the workbench's text presence but not its DOM position. User had to request the move manually."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+:topicSparqlWorkbenchPlacement a schema:Thing ;
+    schema:name "SPARQL Workbench Placement"@en ;
+    schema:description "The SPARQL workbench must be the last content section, placed after FAQ/Glossary/HowTo and before the attribution footer. Verified by comparing character positions of id='sparql-workbench' vs id='howto' in generated HTML."@en .
+
+# ── Step 66: KG drag sticky — never null fx/fy on dragend ────────────────────
+
+:step-kgDragSticky a schema:HowToStep ;
+    schema:position 66 ;
+    schema:name "KG Explorer sticky drag: never null d.fx/d.fy on dragend; dblclick to unpin"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every D3 KG Explorer implementation.**
+
+Nodes must stay where the user drops them ("sticky pin"). This requires:
+1. On `dragstart`: set `d.fx = d.x; d.fy = d.y`
+2. On `drag`: update `d.fx = e.x; d.fy = e.y`
+3. On `dragend`: **DO NOT set `d.fx = null; d.fy = null`** — clearing these causes the node to spring back to the simulation's calculated position
+4. On `dblclick`: set `d.fx = null; d.fy = null; simulation.alpha(0.1).restart()` to unpin
+
+**D3 click vs drag:** D3 v7 drag natively suppresses the click event when the pointer moves beyond a threshold (~5px). Therefore a separate `.on("click")` handler that opens the resolver is safe alongside drag — it fires only when the user taps a node without dragging.
+
+**Correct pattern:**
+```javascript
+.call(d3.drag()
+  .on("start", (e,d) => { if(!e.active) simulation.alphaTarget(.3).restart(); d.fx=d.x; d.fy=d.y; })
+  .on("drag",  (e,d) => { d.fx=e.x; d.fy=e.y; })
+  .on("end",   (e,d) => { if(!e.active) simulation.alphaTarget(0); /* sticky — keep d.fx/d.fy */ })
+)
+.on("click",   (e,d) => { openResolver(d.iri); })
+.on("dblclick",(e,d) => { d.fx=null; d.fy=null; simulation.alpha(0.1).restart(); e.stopPropagation(); })
+```
+
+**Verification gate:** grep the generated HTML for `d\\.fx=null.*drag` or `d\\.fy=null` inside the drag `end` handler. A match is a contract violation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24), the dragend handler cleared `d.fx=null; d.fy=null;` causing all nodes to spring back. The static validator checks for `d3.drag()` presence but not for the sticky pattern. User had to request the fix manually."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/kg-explorer-d3-patterns.ttl> .
+
+:topicKgDragSticky a schema:Thing ;
+    schema:name "KG Explorer Sticky Drag"@en ;
+    schema:description "D3 KG Explorer nodes must stay pinned after drag. dragend MUST NOT clear d.fx/d.fy. Double-click to unpin. Static validator cannot catch this — it is a pre-build behavioral gate."@en .
+
+# ── Step 67: IIFE scope — all onclick handlers must be window-exposed ──────────
+
+:step-iifeGlobalScope a schema:HowToStep ;
+    schema:position 67 ;
+    schema:name "All onclick/onchange handler functions defined inside an IIFE must be exposed on window"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every HTML file with inline event handlers and JS IIFEs.**
+
+When JavaScript functions are defined inside an IIFE `(function(){ ... })()`, they are scoped to the IIFE closure and NOT accessible from HTML `onclick=`, `onchange=`, or similar inline event attributes. Every such function silently fails at runtime — the browser console shows "ReferenceError: X is not defined" — but no static validator catches it.
+
+**Rule:** After defining any function inside an IIFE that is called from an HTML attribute:
+```javascript
+(function(){
+  function toggleNav() { ... }
+  function toggleTheme() { ... }
+  // ... all other handlers ...
+
+  // REQUIRED — expose all inline-handler functions globally:
+  window.toggleNav    = toggleNav;
+  window.toggleTheme  = toggleTheme;
+  window.setMode      = setMode;
+  window.setDensity   = setDensity;
+  window.toggleFaq    = toggleFaq;
+  // ... etc. for every function called from onclick/onchange
+})();
+```
+
+**Verification gate (pre-delivery):**
+1. grep generated HTML for `onclick="` — collect all function names referenced
+2. For each name, verify either (a) it appears as `window.{name} =` inside an IIFE, OR (b) it is defined at module/script top level outside any IIFE
+3. Any function name found in `onclick=` but NOT exposed on `window` is a scoping violation
+
+**Alternative pattern:** Define event-handler functions at the script top level (outside the IIFE) instead. Only non-global helpers, simulation objects, and data variables need IIFE encapsulation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24), all UI functions (toggleNav, toggleTheme, setMode, setDensity, toggleFaq, runSparqlQuery, etc.) were trapped inside the main IIFE, silently breaking every interactive element. The nav panel, theme toggle, FAQ accordions, KG controls, and SPARQL workbench all appeared functional in static HTML but failed at runtime. The static validator only checks for `toggleNav()` call presence in an onclick attribute — not whether the function is actually reachable."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+:topicIifeGlobalScope a schema:Thing ;
+    schema:name "IIFE Global Scope for onclick Handlers"@en ;
+    schema:description "All functions called from HTML onclick/onchange attributes MUST be exposed on window if defined inside an IIFE. Unscoped functions silently fail at runtime — no static validator catches this. Verified by cross-referencing onclick attribute function names against window.X assignments."@en .
 
 # ── Step 63: No blank nodes for resolver-addressable entities ─────────────────
 
@@ -1752,3 +1924,191 @@ Blank nodes (`[...]` or `_:b`) have no stable IRI. Any entity that will be (a) h
 **How to apply:** Before writing the FAQ section of any companion TTL, verify every `schema:acceptedAnswer` value is a named IRI. grep for `acceptedAnswer [` — if any match exists, it is a contract violation. Fix before proceeding."""@en ;
     onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
     rdfs:seeAlso <howto/no-blank-nodes-resolver-entities.ttl> .
+
+# ── Step 68: sparqlBtn must be <a> in footer with real SPARQL href ─────────────
+
+:step-sparqlBtnFooterAnchor a schema:HowToStep ;
+    schema:position 68 ;
+    schema:name "sparqlBtn must be an <a> element in the footer with a pre-built SPARQL href — not a <button> scroll trigger at page top"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+The harness contract (SKILL.md line 1029) states: "Every HTML infographic that has a companion RDF file MUST include a SPARQL button in the **footer** that lets users query the knowledge graph via URIBurner."
+
+And line 1040 shows: `<a id="sparqlBtn" href="...">Explore Knowledge Graph using SPARQL</a>`
+
+**Two hard rules:**
+
+1. **Element type**: `id="sparqlBtn"` MUST be an `<a>` (anchor/link) — NOT a `<button>`. The href carries the live SPARQL URL; clicking navigates directly to the endpoint result. A `<button>` that scrolls to an on-page workbench section is a different UX and does not satisfy this contract item.
+
+2. **Placement**: The `<a id="sparqlBtn">` MUST be inside the footer section (or inside `id="sparql-explorer"` which is in/near the footer) — NOT in a `#controls-bar` at the top of the page.
+
+**Required implementation pattern:**
+```html
+<!-- In footer, wrapped in id="sparql-explorer" -->
+<div id="sparql-explorer">
+  <!-- Format tabs for Turtle / JSON-LD -->
+  <button class="fmt-tab active" data-fmt="ttl" onclick="setSparqlFmt('ttl',this)">RDF Turtle</button>
+  <button class="fmt-tab" data-fmt="jsonld" onclick="setSparqlFmt('jsonld',this)">JSON-LD</button>
+  <!-- The actual sparqlBtn: an <a> with a live SPARQL href -->
+  <a id="sparqlBtn" href="{pre-encoded-sparql-url}" target="_blank" rel="noopener noreferrer">
+    Explore Knowledge Graph using SPARQL
+  </a>
+</div>
+```
+
+**Initial href**: Must NOT be `href="#"` (fragment) combined with `target="_blank"` — the validator rejects this as a fragment link incorrectly opened in a new tab. Pre-compute the canonical entity-type summary query URL and embed it directly as the initial href value.
+
+**Canonical entity-type summary query (from SKILL.md line 1027):**
+```sparql
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+SELECT ?type (SAMPLE(?s) AS ?sampleEntity) (SAMPLE(?label) AS ?sampleLabel) (COUNT(?s) AS ?entityCount)
+FROM <{graphIri}>
+WHERE {
+  GRAPH <{graphIri}> {
+    ?s rdf:type ?type .
+    OPTIONAL { ?s rdfs:label ?label }
+  }
+}
+GROUP BY ?type
+ORDER BY DESC(?entityCount)
+```
+
+URL: `https://linkeddata.uriburner.com/sparql?query={encodeURIComponent(query)}&format=text%2Fx-html%2Btr`
+
+**setSparqlFmt / setSparqlFmt function**: Must exist and update `sparqlBtn.href` when the user switches between RDF Turtle and JSON-LD format tabs.
+
+**Verification gate (pre-delivery):**
+grep for `id="sparqlBtn"` — the match MUST be an `<a` tag, NOT a `<button` tag. Also verify the match appears after `<footer>` in the DOM, not in a `#controls-bar` near the top.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24 and 2026-06-25), `sparqlBtn` was a `<button>` in a `#controls-bar` at the top of the page that only scrolled to the on-page SPARQL workbench. The static validator only checks for `id="sparqlBtn"` presence anywhere in the HTML — it does not check element type or position. User had to request the fix manually twice."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+:topicSparqlBtnFooterAnchor a schema:Thing ;
+    schema:name "sparqlBtn Footer Anchor Gate"@en ;
+    schema:description "id=sparqlBtn must be an <a> element placed in the footer/sparql-explorer section with a pre-built canonical SPARQL href — never a <button> scroll trigger at the top of the page. Static validator checks presence only, not element type or position."@en .
+
+# ── Step 69: Theme toggle must be in nav header bar — always visible ───────────
+
+:step-themeToggleInNavHeader a schema:HowToStep ;
+    schema:position 69 ;
+    schema:name "Theme toggle must live in the nav panel header bar — not a separate controls bar, not inside the collapsible nav body"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+The harness contract (SKILL.md line 48) states: "one page-level light/dark toggle in the **navigation panel**"
+
+The validation checklist (SKILL.md line 1174) is more precise: "Light/dark theme toggle is present in the **nav panel header bar** (`#fnav-header`) — not inside the collapsible `#fnav-links` section — so it is accessible whether the nav is collapsed or expanded."
+
+**Two rules:**
+
+1. **Location**: The theme toggle button MUST be inside the nav panel header (the always-visible strip, e.g. `.nav-header` or `#fnav-header`), NOT:
+   - In a separate `#controls-bar` floating at the top-right of the page
+   - Inside the collapsible nav body (`.nav-body`, `#fnav-links`)
+   - In the KG Explorer toolbar
+
+2. **Accessibility when collapsed**: Because the header is always visible (even when the nav is collapsed to its compact header-bar state), the theme toggle is always reachable. Placing it inside the collapsible body means the user cannot reach it when the nav is collapsed.
+
+**Correct HTML pattern (theme toggle in header alongside +/- collapse toggle):**
+```html
+<div class="nav-header" id="nav-drag-handle">
+  <span>☰ Page Title</span>
+  <div style="display:flex;gap:5px;align-items:center">
+    <button id="theme-toggle" aria-label="Switch to dark mode" title="Switch to dark mode"
+            onclick="toggleTheme()">☀</button>
+    <button id="nav-toggle" aria-label="Expand navigation" title="Expand">+</button>
+  </div>
+</div>
+```
+
+**toggleTheme() must update the button**: On each toggle, update the button's icon (☀/☾), `aria-label`, and `title` to reflect the new theme state.
+
+**No duplicate controls**: Do not also place a theme toggle in `#controls-bar` or the KG toolbar. One toggle, in the nav header bar. SKILL.md line 584 explicitly forbids duplicate theme controls.
+
+**Verification gate (pre-delivery):**
+grep for `id="theme-toggle"` — the match MUST appear between `<div class="nav-header"` (or `id="fnav-header"`) and its closing `</div>`. A match outside the nav header is a placement violation.
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-24 and 2026-06-25), the theme toggle was in a `#controls-bar` at the top-right of the page (outside the nav panel entirely). An earlier fix moved it to the collapsible nav body, which also violates the contract because it becomes unreachable when the nav is collapsed. The static validator only checks that `toggleTheme` or `theme-toggle` appears somewhere in the HTML — not where."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl> .
+
+:topicThemeToggleInNavHeader a schema:Thing ;
+    schema:name "Theme Toggle Nav Header Placement Gate"@en ;
+    schema:description "The theme toggle must be in the nav panel header bar (always-visible strip) — not in a separate controls bar, not in the collapsible nav body. Static validator checks string presence only, not DOM placement."@en .
+
+# ── Step 70: Section heading fragment identifiers + 🔗 copy-to-clipboard ───────
+
+:step-headingFragmentIds a schema:HowToStep ;
+    schema:position 70 ;
+    schema:name "Every section heading must carry a stable id + 🔗 hover anchor with copy-to-clipboard"@en ;
+    schema:text """**PRE-BUILD GATE — applies to every rdf-infographic-skill HTML artifact.**
+
+SKILL.md (Section Anchors section) states:
+- "Every section/subsection heading MUST carry a stable, unique HTML `id` attribute serving as a URL-addressable fragment identifier."
+- "Fragment IDs MUST use lowercase kebab-case."
+- "Fragment IDs MUST be stable across regenerations — derive them from section heading text (slugified) or RDF entity IRI local name."
+- "Heading hover shows visible 🔗 icon that copies the full page URL with the fragment to clipboard."
+
+**Three common violations to avoid:**
+
+1. **Id on `<section>` wrapper instead of the heading element** — putting `id="ai-integration"` on a `<section>` wrapper and leaving the `<div class="section-title">` without an id satisfies navigation but violates the spec. The id MUST be on the heading element itself (`<h2 id="ai-integration">`).
+
+2. **Using `<div class="section-title">` instead of `<h2>`** — section titles must be semantic heading elements (`<h2>`) so screen readers, document outlines, and crawlers can navigate the page structure.
+
+3. **Missing 🔗 icon** — every `<h2>` section heading must contain an `<a class="heading-anchor">` child that is hidden by default and appears on `:hover`. Clicking it copies the fragment URL to clipboard via `navigator.clipboard.writeText()`.
+
+**Correct pattern:**
+```html
+<!-- Parent <section> has NO id — the h2 carries it -->
+<section class="section">
+  <h2 class="section-title" id="ai-integration">
+    <span class="dot dot-ai"></span>
+    1. Deep AI Integration with OPAL
+    <a class="heading-anchor" href="#ai-integration"
+       onclick="copyFragmentUrl(event,'ai-integration')"
+       aria-label="Link to this section" title="Copy link to section">🔗</a>
+  </h2>
+  <!-- section content -->
+</section>
+```
+
+**Required CSS:**
+```css
+.heading-anchor {
+  display: inline-flex; align-items: center; margin-left: 8px;
+  opacity: 0; transition: opacity .15s; font-size: .75em;
+  color: var(--muted); text-decoration: none; cursor: pointer;
+}
+h2:hover .heading-anchor { opacity: 1; }
+.heading-anchor:hover { color: var(--accent); }
+```
+
+**Required JS:**
+```javascript
+function copyFragmentUrl(e, slug) {
+  e.preventDefault(); e.stopPropagation();
+  const url = window.location.href.split('#')[0] + '#' + slug;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(function() {
+      const a = e.currentTarget, orig = a.textContent;
+      a.textContent = '✓';
+      setTimeout(function() { a.textContent = orig; }, 1200);
+    });
+  }
+}
+```
+
+**Sections that always need this treatment:**
+hero, ai-integration (or equivalent), authentication, core-engine, sparql-middleware, kg-explorer, faq, glossary, howto, sparql-workbench — and any additional content sections.
+
+**Verification gate (pre-delivery):**
+grep for `class="section-title"` — every match must be `<h2 class=` not `<div class=`.
+grep for `id="` on `<section>` elements — should return 0 matches (ids belong on heading elements, not section wrappers).
+
+**Why this gate exists:** In the Virtuoso 08.03.3335 infographic (2026-06-25), ALL section titles were `<div class="section-title">` without any `id` or fragment anchor. The parent `<section>` elements carried the ids (which satisfied nav link navigation) but the heading elements themselves were unsemantic divs with no ids and no 🔗 icon. The static validator does not check heading element type, id placement on heading vs wrapper, or presence of copy-to-clipboard anchors."""@en ;
+    onto:hasTrigger onto:triggerSkillInvocation, onto:triggerPreferencesUpdate ;
+    rdfs:seeAlso <howto/harness-contract-compliance.ttl> .
+
+:topicHeadingFragmentIds a schema:Thing ;
+    schema:name "Section Heading Fragment Id Gate"@en ;
+    schema:description "Every section heading must be an <h2> (not <div>) carrying its own id attribute, plus a .heading-anchor <a> child that appears on hover and copies the fragment URL to clipboard. Static validator has no check for heading element type, id-on-wrapper vs id-on-heading, or 🔗 icon presence."@en .
