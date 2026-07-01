@@ -27,74 +27,223 @@
 :agentBehaviorGuide a schema:HowTo ;
     schema:name "Agent Standing Instructions"@en ;
     schema:description "Procedural rules the agent must follow in every session. Encoded as structured RDF so rules are queryable, resolvable, and harder to overlook than flat prose alone."@en ;
-    schema:about :topicApprovalWorkflow, :topicArtifactRouting, :topicModelIdentityPreflight,
-        :topicWhoamiSameAsHyperlinks,
-        :topicVerifyRecipDelegation,
-        :topicUrlsAsHyperlinks,
-        :topicSkillComposition,         :topicEntityResolution, :topicCanonicalEntityIriDenotation,
-        :topicEntityIriDenotationMechanics,
-        :topicMemoryManagement, :topicVersionControl,
-        :topicAttributionStyling, :topicPackaging,
-        :topicThemeImplementation, :topicGraphVisualization,
-        :topicContractValidation, :topicNoFabricatedUrls, :topicCurlAuth,
-        :topicStripeSandboxCard, :topicWhoamiFormat, :topicSecretRedaction,
-        :topicPromptRecording, :topicSemanticFidelity,
-        :topicKGExplorerReuseFirst, :topicOntologyDiscovery, :topicRetrievalToolOrder,
-        :topicVirtuosoSparqlFormats, :topicEntityTypeGate, :topicExternalIriVerification,
-        :topicEntityLinkPlacement, :topicCanonicalIriCompliance,
-        :topicConceptEntityHyperlinking, :topicModelOverEnvironment,
-        :topicNoBlankNodes,
-        :topicRemoteWebdavUpload, :topicMemoryProtocolGate,
-        :topicTokenOptimizedSessionHandoff, :topicOntologyCrossReference,
-        :topicNoUnauthorizedDeletion,
-        :topicNoMemoryMdWrite,
-        :topicEntityLookupDisambiguation,
-        :topicSparqlHtmlEscape,
-        :topicYouidValidationGate,
-        :topicOAuthAuthCodeFlow,
-        :topicD3Loading,
-        :topicSecretEchoRedaction,
-        :topicWebidVerificationServices ,
-        :topicWebidVerificationTable ,
-        :topicDelegationInsertGate ,
-        :topicOboHeaderFormat ,
-        :topicOwlPropertyCharacterization ;
-    schema:step :step-approval, :step-outputDirs, :step-gpt5ChatCodexOutputDirs, :step-mashupVsMeshup, :step-modelIdentityPreflight, :step-skillChain,
-        :step-whoamiSameAsHyperlinks,
-        :step-verifyRecipDelegation,
-        :step-verifyDelegationRemote,
-        :step-urlsAsHyperlinks,
-        :step-kgQueryMode,
-        :step-entityDenotation, :step-memoryProtocol,
-        :step-gitWorkflow, :step-attribution, :step-zipRepackage,
-        :step-darkModeCSS, :step-kgExplorerReuse, :step-templateSelection,
-        :step-kgNavPlacement, :step-kgNavCollapsed, :step-kgControlsMasterClose,
-        :step-kgNoOrphans, :step-kgToolbarGroups, :step-kgSettingsPanel,
-        :step-harnessIds, :step-footerLabels, :step-sparqlFormat,
-        :step-complianceBug, :step-simulationLifecycle,
-        :step-clickGuard, :step-kgDataRegex,
-        :step-documentEntity, :step-noFabricatedUrls, :step-curlAuth,
-        :step-stripeSandboxCard, :step-whoamiFormat, :step-secretRedaction,
-        :step-promptRecording, :step-retrievalToolOrder,
-        :step-defaultOutputRoot, :step-modelOverEnvironment, :step-virtuosoSparqlFormats, :step-entityTypeGate,
-        :step-externalIriVerification, :step-entityLinkPlacement,
-        :step-canonicalIriCompliance, :step-conceptEntityHyperlinking,
-        :step-noBlankNodes,
-        :step-remoteWebdavUpload, :step-memoryProtocolGate,
-        :step-tokenOptimizedSessionHandoff, :step-ontologyCrossReference,
-        :step-noUnauthorizedDeletion,
-        :step-noMemoryMdWrite,
-        :step-entityLookupDisambiguation,
-        :step-sparqlHtmlEscape,
-        :step-youidValidationGate,
-        :step-uriburnerOAuthAuthCodeFlow,
-        :step-staticD3Load, :step-singleRender,
-        :step-secretEchoRedaction,
-        :step-webidVerificationServiceSelection ,
-        :step-webidVerificationTable ,
-        :step-delegationInsertGate ,
-        :step-oboHeaderFormat ,
+    schema:about :topic-identity-webid, :topic-memory-management, :topic-artifact-routing,
+        :topic-rdf-authoring, :topic-html-kg-explorer, :topic-ontology-generation,
+        :topic-skill-workflows, :topic-virtuoso-sparql, :topic-terminology ;
+    schema:hasPart :howto-identity-webid,
+        :howto-memory-management,
+        :howto-artifact-routing,
+        :howto-rdf-authoring,
+        :howto-html-kg-explorer,
+        :howto-ontology-generation,
+        :howto-skill-workflows,
+        :howto-virtuoso-sparql,
+        :howto-terminology .
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ── Topic Entities (simplified — one per sub-HowTo) ──────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+
+:topic-identity-webid a schema:Thing ;
+    schema:name "Identity, WebID & Delegation"@en ;
+    schema:description "Agent identity format, whoami triggers, WebID-TLS verification, reciprocal delegation, On-Behalf-Of, and YouID validation."@en .
+
+:topic-memory-management a schema:Thing ;
+    schema:name "Memory Management & Session Governance"@en ;
+    schema:description "Agent RDF memory protocol, prompt recording, secret redaction, SPARQL-based loading, and token-optimized handoffs."@en .
+
+:topic-artifact-routing a schema:Thing ;
+    schema:name "Artifact Output Routing"@en ;
+    schema:description "Model-specific output directories, model identity pre-flight gate, and remote WebDAV upload."@en .
+
+:topic-rdf-authoring a schema:Thing ;
+    schema:name "RDF Authoring & Entity Resolution"@en ;
+    schema:description "Entity IRI denotation, canonical IRI compliance, entity type gates, concept hyperlinking, and blank node prohibitions."@en .
+
+:topic-html-kg-explorer a schema:Thing ;
+    schema:name "HTML Infographic & KG Explorer"@en ;
+    schema:description "Infographic authoring, D3.js KG Explorer patterns, harness contract compliance, SPARQL workbench, and UI patterns."@en .
+
+:topic-ontology-generation a schema:Thing ;
+    schema:name "Ontology Generation"@en ;
+    schema:description "Cross-reference gate, OWL property characterization, and shared ontology discovery."@en .
+
+:topic-skill-workflows a schema:Thing ;
+    schema:name "Skill Chain & Workflows"@en ;
+    schema:description "kg-generator → rdf-infographic-skill chain, KG query modes, ZIP repackaging, and OPAL session vocabulary."@en .
+
+:topic-virtuoso-sparql a schema:Thing ;
+    schema:name "Virtuoso & SPARQL"@en ;
+    schema:description "Virtuoso SPARQL URL format parameters and workbench query deduplication rules."@en .
+
+:topic-terminology a schema:Thing ;
+    schema:name "Terminology & Conventions"@en ;
+    schema:description "Mashup vs meshup and other terminological conventions."@en .
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ── Sub-HowTo Entities ──────────────────────────────────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ── 1. Identity, WebID & Delegation ────────────────────────────────────────
+
+:howto-identity-webid a schema:HowTo ;
+    schema:name "Identity, WebID & Delegation"@en ;
+    schema:description "Agent identity format, whoami triggers, WebID-TLS verification, reciprocal delegation (local+remote), On-Behalf-Of header format, WebID verification services, and YouID validation gates."@en ;
+    rdfs:seeAlso <howto/agent-identity.ttl>,
+        <howto/verified-identity.ttl>,
+        <howto/youid-delegation.ttl>,
+        <howto/webid-verification-services.ttl>,
+        <howto/webid-verification-table.ttl>,
+        <howto/delegation-insert-gate.ttl>,
+        <howto/youid-validation-gates.ttl> ;
+    schema:step :step-whoamiFormat, :step-webidTlsVerification, :step-verifiedWhoami,
+        :step-whoamiSameAsHyperlinks, :step-urlsAsHyperlinks, :step-stripeSandboxCard,
+        :step-verifyRecipDelegation, :step-verifyDelegationRemote,
+        :step-webidVerificationServiceSelection, :step-webidVerificationTable,
+        :step-delegationLocalFiles, :step-delegationInsertGate,
+        :step-oboHeaderFormat, :step-youidValidationGate .
+
+# ── 2. Memory Management & Session Governance ──────────────────────────────
+
+:howto-memory-management a schema:HowTo ;
+    schema:name "Memory Management & Session Governance"@en ;
+    schema:description "Agent RDF memory protocol, session file naming, prompt recording, secret redaction, SPARQL-based memory loading, token-optimized handoffs, and no-unauthorized-deletion rules."@en ;
+    rdfs:seeAlso <howto/session-governance.ttl>,
+        <howto/memory-protocol-gate.ttl>,
+        <howto/token-optimized-session-handoff.ttl>,
+        <howto/sparql-memory-loading.ttl>,
+        <howto/no-unauthorized-deletion.ttl>,
+        <howto/no-memory-md-write.ttl> ;
+    schema:step :step-approval, :step-memoryProtocol, :step-gitWorkflow,
+        :step-noFabricatedUrls, :step-curlAuth, :step-secretRedaction,
+        :step-promptRecording, :step-memoryProtocolGate,
+        :step-tokenOptimizedSessionHandoff, :step-soleMemoryIndex,
+        :step-sparqlMemoryLoading, :step-noUnauthorizedDeletion,
+        :step-noMemoryMdWrite, :step-preferencesSparse, :step-secretEchoRedaction,
+        :step-preferencesPresentationFormat .
+
+# ── 3. Artifact Output Routing ──────────────────────────────────────────────
+
+:howto-artifact-routing a schema:HowTo ;
+    schema:name "Artifact Output Routing"@en ;
+    schema:description "Model-specific output directory routing, model identity pre-flight gate, model-over-environment tiebreaker, artifact placement elicitation, and remote WebDAV upload."@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl>,
+        <howto/remote-webdav-upload.ttl> ;
+    schema:step :step-outputDirs, :step-gpt5ChatCodexOutputDirs,
+        :step-modelIdentityPreflight, :step-defaultOutputRoot,
+        :step-modelOverEnvironment, :step-artifactPlacement,
+        :step-remoteWebdavUpload .
+
+# ── 4. RDF Authoring & Entity Resolution ────────────────────────────────────
+
+:howto-rdf-authoring a schema:HowTo ;
+    schema:name "RDF Authoring & Entity Resolution"@en ;
+    schema:description "Entity IRI denotation, canonical IRI compliance, external IRI verification, entity type gates, concept hyperlinking, FAQ entity IRI pre-build gate, DBpedia canonical subjects, blank node prohibitions, and language tagging."@en ;
+    rdfs:seeAlso <howto/canonical-entity-iri-denotation.ttl>,
+        <howto/entity-iri-denotation-mechanics.ttl>,
+        <howto/canonical-iri-compliance-gate.ttl>,
+        <howto/entity-type-gate.ttl>,
+        <howto/external-iri-verification.ttl>,
+        <howto/entity-link-placement.ttl>,
+        <howto/concept-entity-hyperlinking.ttl>,
+        <howto/faq-entity-iri-gate.ttl>,
+        <howto/sparql-absolute-prefix-iri.ttl>,
+        <howto/entity-href-companion-ttl.ttl>,
+        <howto/owl-sameas-vs-skos-related.ttl>,
+        <howto/entity-lookup-disambiguation.ttl>,
+        <howto/rdf-residence-vs-birthplace.ttl>,
+        <howto/no-blank-nodes-resolver-entities.ttl>,
+        <howto/rdf-document-authoring.ttl> ;
+    schema:step :step-entityDenotation, :step-documentEntity, :step-documentAbout,
+        :step-entityTypeGate, :step-externalIriVerification,
+        :step-entityLinkPlacement, :step-canonicalIriCompliance,
+        :step-conceptEntityHyperlinking, :step-noBlankNodes,
+        :step-faqEntityIriGate, :step-schemaAuthorOverFoafMaker,
+        :step-entityHrefCompanionTTL, :step-sparqlAbsolutePrefixIRI,
+        :step-owlSameAsVsSkosRelated, :step-entityLookupDisambiguation,
+        :step-residenceVsBirthplace, :step-noBlankNodesForResolverEntities,
+        :step-dbpediaCanonicalSubject, :step-terminologySemanticWeb .
+
+# ── 5. HTML Infographic & KG Explorer ───────────────────────────────────────
+
+:howto-html-kg-explorer a schema:HowTo ;
+    schema:name "HTML Infographic & KG Explorer"@en ;
+    schema:description "Infographic authoring, D3.js KG Explorer patterns (simulation lifecycle, click guard, sticky drag, lazy init, single render, static D3 load), UI patterns (nav placement/collapse, controls, orphans, toolbar, settings), harness contract compliance, SPARQL workbench, footer gates, heading fragment IDs, theme toggle, and IIFE scoping."@en ;
+    rdfs:seeAlso <howto/infographic-authoring.ttl>,
+        <howto/kg-explorer-ui-patterns.ttl>,
+        <howto/kg-explorer-d3-patterns.ttl>,
+        <howto/kg-explorer-reuse-first.ttl>,
+        <howto/harness-contract-compliance.ttl>,
+        <howto/rdf-infographic-compliance-gate.ttl>,
+        <howto/rdf-infographic-gated-workflow.ttl>,
+        <howto/footer-sparql-explorer-gate.ttl>,
+        <howto/sparql-html-escape-gate.ttl>,
+        <howto/study-prior-patterns.ttl>,
+        <howto/kg-curation-attribution.ttl>,
+        <howto/ui-ux-expert-persona.ttl> ;
+    schema:step :step-attribution, :step-darkModeCSS, :step-kgExplorerReuse,
+        :step-templateSelection, :step-kgNavPlacement, :step-kgNavCollapsed,
+        :step-kgControlsMasterClose, :step-kgNoOrphans, :step-kgToolbarGroups,
+        :step-kgSettingsPanel, :step-harnessIds, :step-footerLabels,
+        :step-sparqlFormat, :step-complianceBug, :step-simulationLifecycle,
+        :step-clickGuard, :step-kgDataRegex, :step-rdfInfographicGateEnforcement,
+        :step-rdfInfographicGatedWorkflow, :step-sparqlHtmlEscape,
+        :step-reuseWorkingKG, :step-kgDragSticky, :step-iifeGlobalScope,
+        :step-sparqlBtnFooterAnchor, :step-themeToggleInNavHeader,
+        :step-headingFragmentIds, :step-staticD3Load, :step-singleRender,
+        :step-kgLazyInit, :step-studyPriorPatterns, :step-kgCurationAttribution,
+        :step-uiUxExpertPersona, :step-faqQuestionTextHyperlink,
+        :step-sparqlWorkbenchPlacement, :step-sparqlBtnMandatory,
+        :step-sparqlExplorerVisibleText, :step-footerTextAlignCascade,
+        :step-staleWorkbenchCleanup .
+
+# ── 6. Ontology Generation ──────────────────────────────────────────────────
+
+:howto-ontology-generation a schema:HowTo ;
+    schema:name "Ontology Generation"@en ;
+    schema:description "Cross-reference gate for custom ontology terms, OWL property characterization from nine semantic categories, and shared ontology discovery via prefix.cc before inventing new predicates."@en ;
+    rdfs:seeAlso <howto/ontology-cross-reference-gate.ttl>,
+        <howto/owl-property-characterization.ttl>,
+        <howto/ontology-discovery.ttl> ;
+    schema:step :step-ontologyCrossReference,
         :step-owlPropertyCharacterization .
+
+# ── 7. Skill Chain & Workflows ──────────────────────────────────────────────
+
+:howto-skill-workflows a schema:HowTo ;
+    schema:name "Skill Chain & Workflows"@en ;
+    schema:description "kg-generator → rdf-infographic-skill chain, KG query modes, ZIP repackaging, content retrieval tool order, OPAL session vocabulary, and URIBurner OAuth authorization code flow."@en ;
+    rdfs:seeAlso <howto/skill-invocation.ttl>,
+        <howto/opal-session-vocabulary.ttl>,
+        <howto/uriburner-oauth-authcode-flow.ttl> ;
+    schema:step :step-skillChain, :step-kgQueryMode, :step-zipRepackage,
+        :step-retrievalToolOrder, :step-opalSessionVocabulary,
+        :step-uriburnerOAuthAuthCodeFlow .
+
+# ── 8. Virtuoso & SPARQL ────────────────────────────────────────────────────
+
+:howto-virtuoso-sparql a schema:HowTo ;
+    schema:name "Virtuoso & SPARQL"@en ;
+    schema:description "Virtuoso SPARQL URL format parameters by query type, workbench query deduplication via named graphs, and SPARQL absolute PREFIX IRI rules."@en ;
+    rdfs:seeAlso <howto/virtuoso-sparql-formats.ttl>,
+        <howto/virtuoso-workbench-query-dedup.ttl> ;
+    schema:step :step-virtuosoSparqlFormats,
+        :step-virtuosoWorkbenchQueryDedup .
+
+# ── 9. Terminology & Conventions ────────────────────────────────────────────
+
+:howto-terminology a schema:HowTo ;
+    schema:name "Terminology & Conventions"@en ;
+    schema:description "Mashup vs meshup terminology and other terminological conventions."@en ;
+    rdfs:seeAlso <howto/artifact-routing.ttl>,
+        <howto/rdf-document-authoring.ttl> ;
+    schema:step :step-mashupVsMeshup .
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ── Step Definitions (referenced by sub-HowTos above) ────────────────────
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ── Identity, WebID & Delegation ────────────────────────────────────────────
 
 # ── Step 1: Seek Approval ────────────────────────────────────────────────────
 
