@@ -182,9 +182,11 @@ that the purchased file/resource is accessible:
 2. **Fetch with On-Behalf-Of delegation** using the ACP bearer token:
    ```bash
    curl -sI -H "Authorization: Bearer ${ACP_AUTH_TOKEN}" \
-     -H "On-Behalf-Of: <resource-iri>" \
-     "<resource-url>"
+     -H "On-Behalf-Of: {resource-iri}" \
+     "{resource-url}"
    ```
+   > **IMPORTANT**: The `On-Behalf-Of` header value must be a **bare WebID URI — no angle brackets**. Correct: `-H "On-Behalf-Of: https://example.com/path#fragment"`. Angle brackets cause delegation resolution failure (402/401). The `{resource-iri}` placeholder uses curly braces conventionally — the actual value is a bare IRI.
+
    - `200 OK` → access granted, file is available
    - `401 Unauthorized` → provisioning may be async; retry after a short delay
    - `403 Forbidden` → access not granted; check order/subscription status

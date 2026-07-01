@@ -306,6 +306,10 @@ Verification SPARQL queries are in `references/verification-queries.md`.
      }
    }
    ```
+   > **IMPORTANT**: The `On-Behalf-Of` HTTP header value must be a **bare WebID URI — no angle brackets**. When using curl directly:
+   > - Correct: `-H "On-Behalf-Of: https://example.com/dataspace/person/user@example.com"`
+   > - Incorrect: `-H "On-Behalf-Of: <https://example.com/dataspace/person/user@example.com>"`
+   > Angle brackets cause delegation resolution failure (402/401). The `<delegate-webid>` placeholder above uses angle brackets as placeholder delimiters — the generated JSON rule will contain the actual bare WebID URI.
 
 9. **Present changes to the user** — show each file that was modified and the exact triple added
    - *"The delegation triple has been added to the following files. Upload them to the server to deploy: [file list]"*

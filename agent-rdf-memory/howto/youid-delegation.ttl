@@ -9,16 +9,17 @@
     schema:name "YouID Delegation — Local File Modification Pattern"@en ;
     schema:description "Detailed workflow for applying WebID On-Behalf-Of delegation triples to local profile files. The delegation triple is written to the delegator's local profile documents (TTL, JSON-LD, RDFa HTML) — never deployed server-side via PATCH."@en ;
     schema:dateCreated "2026-06-16"^^xsd:date ;
-    schema:dateModified "2026-06-16"^^xsd:date ;
+    schema:dateModified "2026-07-01"^^xsd:date ;
     schema:about :delegationGuide .
 
 :delegationGuide a schema:HowTo ;
     schema:name "How to set up WebID On-Behalf-Of Delegation"@en ;
-    schema:description "Applies delegation triples to local YouID profile files using edit_file, then the user uploads manually."@en ;
+    schema:description "Applies delegation triples to local YouID profile files using edit_file, then the user uploads manually. Includes curl On-Behalf-Of header format requirements."@en ;
     schema:step :stepElicitDelegator, :stepElicitDelegate, :stepElicitRole,
         :stepElicitDelegatorDir, :stepElicitDelegateDir,
         :stepEditProfileTtl, :stepEditProfileJsonld, :stepEditProfileRdfa, :stepEditIndexHtml,
-        :stepEditDelegateFiles, :stepGenerateDnrRule, :stepPresentForUpload, :stepVerify .
+        :stepEditDelegateFiles, :stepGenerateDnrRule, :stepPresentForUpload, :stepVerify,
+        :stepOboHeaderFormat14 .
 
 :stepElicitDelegator a schema:HowToStep ;
     schema:position 1 ;
@@ -84,3 +85,12 @@
     schema:position 13 ;
     schema:name "Verify after upload"@en ;
     schema:text "After the user confirms upload, suggest verifying by describing the delegator's WebID and checking for oplcert:hasIdentityDelegate triples."@en .
+
+:stepOboHeaderFormat14 a schema:HowToStep ;
+    schema:position 14 ;
+    schema:name "Use bare WebID URI in On-Behalf-Of header — no angle brackets"@en ;
+    schema:text """CRITICAL: The On-Behalf-Of HTTP header value must be a bare WebID URI without angle brackets. Correct:
+  curl ... -H "On-Behalf-Of: https://example.com/dataspace/person/user@example.com"
+Incorrect (causes 402/401):
+  curl ... -H "On-Behalf-Of: <https://example.com/dataspace/person/user@example.com>"
+Angle brackets cause delegation resolution failure even when the reciprocal delegation triples are correctly installed on both sides. The SPARQL endpoint interprets the angle brackets as literal characters, breaking the WebID lookup chain."@en .
