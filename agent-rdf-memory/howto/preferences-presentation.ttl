@@ -1,0 +1,36 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+
+<> a schema:CreativeWork ;
+    schema:name "Preferences Presentation Format"@en ;
+    schema:description "How to present the user's standing preferences when asked — themed-table widget by default, override only when explicitly instructed."@en ;
+    schema:dateCreated "2026-06-28T00:00:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-28T00:00:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :step-preferencesPresentationFormat ;
+    rdfs:seeAlso <../preferences.ttl> .
+
+:step-preferencesPresentationFormat a schema:HowToStep ;
+    schema:position "88"^^xsd:integer ;
+    schema:name "Present preferences as a succinct themed-table widget"@en ;
+    schema:text """When the user asks to see their preferences (triggers: 'my preferences?', 'show preferences', 'what are my preferences?'), respond with a mcp__visualize__show_widget HTML widget in the following format:
+
+FORMAT:
+- One HTML table per theme group
+- Theme heading: <h2> (13px, uppercase, muted) above each table
+- Columns: # | Rule | Detail
+  - # column: step number from preferences.ttl (12px, muted, tabular-nums, 36px wide)
+  - Rule column: short imperative name (font-weight 500, ~38% width)
+  - Detail column: one-sentence explanation (muted, remaining width)
+- Theme groups (in order): Identity & Verification, Memory & Session Governance, Artifact Routing & Output, RDF Authoring, HTML Infographic & KG Explorer, Skill Invocation & Workflows
+- Include only the most operationally significant steps per theme (~5–12 per group)
+- Do NOT list all 100+ steps — distill to the essential ones
+
+OVERRIDE:
+Use a different presentation only if the user explicitly requests it (e.g., 'as a flat list', 'in prose', 'full list of all steps').
+
+WHY:
+The flat numbered-list format (used before 2026-06-28) was verbose and hard to scan. The themed-table widget is more readable and actionable. Established 2026-06-28 by user instruction: 'Use this presentation going forward, unless you are instructed to provide in different form.'"""@en .

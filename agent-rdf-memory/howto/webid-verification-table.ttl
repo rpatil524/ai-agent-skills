@@ -1,0 +1,64 @@
+@prefix : <#> .
+@prefix schema: <http://schema.org/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix onto: <../ontology.ttl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+: a schema:CreativeWork ;
+    schema:name "Identity Verification Table Pattern"@en ;
+    schema:description "Structured procedure for verifying WebID/NetID identity with reciprocal delegation checks, emitted as a verification table."@en ;
+    schema:dateCreated "2026-06-28T18:30:00Z"^^xsd:dateTime ;
+    schema:dateModified "2026-06-28T18:30:00Z"^^xsd:dateTime ;
+    schema:author <https://linkedin.com/in/kidehen#this> ;
+    schema:about :webidVerificationTableHowto .
+
+:webidVerificationTableHowto a schema:HowTo ;
+    schema:name "WebID/NetID Identity Verification Table Procedure"@en ;
+    schema:description "Step-by-step identity verification with structured table output. Each row covers one check with status (✅/⚠️) and the source data."@en ;
+    schema:step :step-extractCertFingerprint, :step-baseVerification, :step-oboVerification,
+        :step-delegatorHasIdentityDelegate, :step-agentOnBehalfOf, :step-modulusConsistency,
+        :step-crossSerializationCheck, :step-emitTable .
+
+:step-extractCertFingerprint a schema:HowToStep ;
+    schema:position 1 ;
+    schema:name "Extract SHA-1 fingerprint from PKCS#12 certificate"@en ;
+    schema:text "Extract the SHA-1 digest from the agent's PKCS#12 cert via: openssl pkcs12 -in agent-cert.p12 -passin pass:$PW -nokeys -clcerts 2>/dev/null | openssl x509 -noout -fingerprint -sha1 | sed 's/.*=//'. Store as a table row: Agent Cert SHA-1."@en .
+
+:step-baseVerification a schema:HowToStep ;
+    schema:position 2 ;
+    schema:name "Run base WebID verification (no On-Behalf-Of header)"@en ;
+    schema:text "Present the PKCS#12 certificate to the ODS webid_verify.vsp service without On-Behalf-Of header: curl -sL --cert-type P12 --cert agent-cert.p12:$PW 'https://ods-qa.openlinksw.com:5443/webid/?go=Verify'. Extract returned NetID URI and SHA-1 digest from the response. Store as table rows: Base NetID and Base SHA-1 Match (compare against step 1 fingerprint)."@en .
+
+:step-oboVerification a schema:HowToStep ;
+    schema:position 3 ;
+    schema:name "Run On-Behalf-Of verification with delegator WebID header"@en ;
+    schema:text "Present the PKCS#12 certificate with On-Behalf-Of header set to the delegator's WebID: curl -sL --cert-type P12 --cert agent-cert.p12:$PW -H 'On-Behalf-Of: <delegator-webid>' 'https://ods-qa.openlinksw.com:5443/webid/?go=Verify'. The returned NetID should match step 2. The verification service may not independently validate delegation — record result as-is. Store as table row: OBO NetID (match/mismatch/unavailable due to timeout)."@en .
+
+:step-delegatorHasIdentityDelegate a schema:HowToStep ;
+    schema:position 4 ;
+    schema:name "Verify delegator profile has oplcert:hasIdentityDelegate pointing to agent"@en ;
+    schema:text "Fetch the delegator's WebID profile and grep for oplcert:hasIdentityDelegate. Resolve the prefix to confirm the target is the agent WebID. Check all serializations available (Turtle profile, RDFa HTML). Store as table row: Delegator hasIdentityDelegate → agent (✅ present / ⚠️ missing)."@en ;
+    rdfs:seeAlso <verified-identity.ttl> .
+
+:step-agentOnBehalfOf a schema:HowToStep ;
+    schema:position 5 ;
+    schema:name "Verify agent profile has oplcert:onBehalfOf pointing to delegator"@en ;
+    schema:text "Fetch the agent's WebID profile documents (profile.ttl, profile.jsonld, index.html) and grep each for oplcert:onBehalfOf. Confirm the delegator WebID appears as a target. Store as table row: Agent onBehalfOf → delegator (✅ present / ⚠️ missing). Include sub-rows per serialization format (TTL, JSON-LD, HTML RDFa)."@en ;
+    rdfs:seeAlso <verified-identity.ttl> .
+
+:step-modulusConsistency a schema:HowToStep ;
+    schema:position 6 ;
+    schema:name "Verify RSA modulus consistency between cert and profile documents"@en ;
+    schema:text "Extract the RSA modulus from the PKCS#12 cert: openssl pkcs12 -in agent-cert.p12 -passin pass:$PW -nokeys -clcerts 2>/dev/null | openssl x509 -noout -modulus | sed 's/Modulus=//'. Compare against cert:modulus in profile.ttl and profile.jsonld. The modulus is hexBinary and must match byte-for-byte. Store as table rows: Modulus Match — profile.ttl (✅ match / ❌ mismatch) and profile.jsonld (✅ match / ❌ mismatch)."@en ;
+    rdfs:seeAlso <../preferences.ttl#step-youidValidationGate> .
+
+:step-crossSerializationCheck a schema:HowToStep ;
+    schema:position 7 ;
+    schema:name "Cross-check delegation triples across all RDF serializations"@en ;
+    schema:text "Verify that the delegation triple (oplcert:onBehalfOf / oplcert:hasIdentityDelegate) is present consistently across all RDF serializations: profile.ttl (Turtle), profile.jsonld (JSON-LD), index.html (RDFa / JSON-LD embedded / Turtle embedded / POSH <link>). Any serialization missing the triple is a consistency gap. Store as table rows per serialization: Delegation in {format} (✅ present / ⚠️ absent)."@en .
+
+:step-emitTable a schema:HowToStep ;
+    schema:position 8 ;
+    schema:name "Emit results as a structured verification table"@en ;
+    schema:text "Emit a Markdown verification table with columns: Check | Status | Detail. Rows: Agent Cert SHA-1, Base NetID, Base SHA-1 Match, OBO NetID, Delegator hasIdentityDelegate, Agent onBehalfOf (per serialization), Modulus Match (per profile document), Cross-Serialization Consistency. Status values: ✅ corroborated, ⚠️ partial (one side only), ❌ mismatch, ⚠️ unavailable (timeout/error). Detail column contains the actual value or error description. Present the table as a summary at the end of the identity verification response."@en .
